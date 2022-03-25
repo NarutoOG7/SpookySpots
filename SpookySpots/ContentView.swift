@@ -8,9 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @ObservedObject var authorization = Authorization.instance
+    init() {
+            authorization.signedIn = authorization.isSignedIn
+        
+    }
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        Login()
     }
 }
 
