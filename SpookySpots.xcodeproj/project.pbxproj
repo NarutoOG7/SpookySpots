@@ -1,0 +1,588 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */; };
+		C9A8C9F127ED621000116B61 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9F027ED621000116B61 /* ContentView.swift */; };
+		C9A8C9F327ED621000116B61 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9A8C9F227ED621000116B61 /* Assets.xcassets */; };
+		C9A8C9F627ED621000116B61 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9A8C9F527ED621000116B61 /* Preview Assets.xcassets */; };
+		C9A8CA0027ED621000116B61 /* SpookySpotsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9FF27ED621000116B61 /* SpookySpotsTests.swift */; };
+		C9A8CA0A27ED621100116B61 /* SpookySpotsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA0927ED621100116B61 /* SpookySpotsUITests.swift */; };
+		C9A8CA0C27ED621100116B61 /* SpookySpotsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA0B27ED621100116B61 /* SpookySpotsUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C9A8C9FC27ED621000116B61 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C9A8C9E327ED621000116B61 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C9A8C9EA27ED621000116B61;
+			remoteInfo = SpookySpots;
+		};
+		C9A8CA0627ED621100116B61 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C9A8C9E327ED621000116B61 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C9A8C9EA27ED621000116B61;
+			remoteInfo = SpookySpots;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C9A8C9EB27ED621000116B61 /* SpookySpots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpookySpots.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsApp.swift; sourceTree = "<group>"; };
+		C9A8C9F027ED621000116B61 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C9A8C9F227ED621000116B61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C9A8C9F527ED621000116B61 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C9A8C9FB27ED621000116B61 /* SpookySpotsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpookySpotsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9A8C9FF27ED621000116B61 /* SpookySpotsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsTests.swift; sourceTree = "<group>"; };
+		C9A8CA0527ED621100116B61 /* SpookySpotsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpookySpotsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9A8CA0927ED621100116B61 /* SpookySpotsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsUITests.swift; sourceTree = "<group>"; };
+		C9A8CA0B27ED621100116B61 /* SpookySpotsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C9A8C9E827ED621000116B61 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9A8C9F827ED621000116B61 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9A8CA0227ED621100116B61 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C9A8C9E227ED621000116B61 = {
+			isa = PBXGroup;
+			children = (
+				C9A8C9ED27ED621000116B61 /* SpookySpots */,
+				C9A8C9FE27ED621000116B61 /* SpookySpotsTests */,
+				C9A8CA0827ED621100116B61 /* SpookySpotsUITests */,
+				C9A8C9EC27ED621000116B61 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C9A8C9EC27ED621000116B61 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C9A8C9EB27ED621000116B61 /* SpookySpots.app */,
+				C9A8C9FB27ED621000116B61 /* SpookySpotsTests.xctest */,
+				C9A8CA0527ED621100116B61 /* SpookySpotsUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C9A8C9ED27ED621000116B61 /* SpookySpots */ = {
+			isa = PBXGroup;
+			children = (
+				C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */,
+				C9A8C9F027ED621000116B61 /* ContentView.swift */,
+				C9A8C9F227ED621000116B61 /* Assets.xcassets */,
+				C9A8C9F427ED621000116B61 /* Preview Content */,
+			);
+			path = SpookySpots;
+			sourceTree = "<group>";
+		};
+		C9A8C9F427ED621000116B61 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				C9A8C9F527ED621000116B61 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C9A8C9FE27ED621000116B61 /* SpookySpotsTests */ = {
+			isa = PBXGroup;
+			children = (
+				C9A8C9FF27ED621000116B61 /* SpookySpotsTests.swift */,
+			);
+			path = SpookySpotsTests;
+			sourceTree = "<group>";
+		};
+		C9A8CA0827ED621100116B61 /* SpookySpotsUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C9A8CA0927ED621100116B61 /* SpookySpotsUITests.swift */,
+				C9A8CA0B27ED621100116B61 /* SpookySpotsUITestsLaunchTests.swift */,
+			);
+			path = SpookySpotsUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C9A8C9EA27ED621000116B61 /* SpookySpots */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C9A8CA0F27ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpots" */;
+			buildPhases = (
+				C9A8C9E727ED621000116B61 /* Sources */,
+				C9A8C9E827ED621000116B61 /* Frameworks */,
+				C9A8C9E927ED621000116B61 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SpookySpots;
+			productName = SpookySpots;
+			productReference = C9A8C9EB27ED621000116B61 /* SpookySpots.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C9A8C9FA27ED621000116B61 /* SpookySpotsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C9A8CA1227ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpotsTests" */;
+			buildPhases = (
+				C9A8C9F727ED621000116B61 /* Sources */,
+				C9A8C9F827ED621000116B61 /* Frameworks */,
+				C9A8C9F927ED621000116B61 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C9A8C9FD27ED621000116B61 /* PBXTargetDependency */,
+			);
+			name = SpookySpotsTests;
+			productName = SpookySpotsTests;
+			productReference = C9A8C9FB27ED621000116B61 /* SpookySpotsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C9A8CA0427ED621100116B61 /* SpookySpotsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C9A8CA1527ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpotsUITests" */;
+			buildPhases = (
+				C9A8CA0127ED621100116B61 /* Sources */,
+				C9A8CA0227ED621100116B61 /* Frameworks */,
+				C9A8CA0327ED621100116B61 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C9A8CA0727ED621100116B61 /* PBXTargetDependency */,
+			);
+			name = SpookySpotsUITests;
+			productName = SpookySpotsUITests;
+			productReference = C9A8CA0527ED621100116B61 /* SpookySpotsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C9A8C9E327ED621000116B61 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					C9A8C9EA27ED621000116B61 = {
+						CreatedOnToolsVersion = 13.3;
+					};
+					C9A8C9FA27ED621000116B61 = {
+						CreatedOnToolsVersion = 13.3;
+						TestTargetID = C9A8C9EA27ED621000116B61;
+					};
+					C9A8CA0427ED621100116B61 = {
+						CreatedOnToolsVersion = 13.3;
+						TestTargetID = C9A8C9EA27ED621000116B61;
+					};
+				};
+			};
+			buildConfigurationList = C9A8C9E627ED621000116B61 /* Build configuration list for PBXProject "SpookySpots" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C9A8C9E227ED621000116B61;
+			productRefGroup = C9A8C9EC27ED621000116B61 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C9A8C9EA27ED621000116B61 /* SpookySpots */,
+				C9A8C9FA27ED621000116B61 /* SpookySpotsTests */,
+				C9A8CA0427ED621100116B61 /* SpookySpotsUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C9A8C9E927ED621000116B61 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9A8C9F627ED621000116B61 /* Preview Assets.xcassets in Resources */,
+				C9A8C9F327ED621000116B61 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9A8C9F927ED621000116B61 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9A8CA0327ED621100116B61 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C9A8C9E727ED621000116B61 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9A8C9F127ED621000116B61 /* ContentView.swift in Sources */,
+				C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9A8C9F727ED621000116B61 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9A8CA0027ED621000116B61 /* SpookySpotsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C9A8CA0127ED621100116B61 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C9A8CA0A27ED621100116B61 /* SpookySpotsUITests.swift in Sources */,
+				C9A8CA0C27ED621100116B61 /* SpookySpotsUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C9A8C9FD27ED621000116B61 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C9A8C9EA27ED621000116B61 /* SpookySpots */;
+			targetProxy = C9A8C9FC27ED621000116B61 /* PBXContainerItemProxy */;
+		};
+		C9A8CA0727ED621100116B61 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C9A8C9EA27ED621000116B61 /* SpookySpots */;
+			targetProxy = C9A8CA0627ED621100116B61 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C9A8CA0D27ED621100116B61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C9A8CA0E27ED621100116B61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C9A8CA1027ED621100116B61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SpookySpots/Preview Content\"";
+				DEVELOPMENT_TEAM = S9WALA6A8N;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpots;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C9A8CA1127ED621100116B61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SpookySpots/Preview Content\"";
+				DEVELOPMENT_TEAM = S9WALA6A8N;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpots;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C9A8CA1327ED621100116B61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S9WALA6A8N;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpotsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpookySpots.app/SpookySpots";
+			};
+			name = Debug;
+		};
+		C9A8CA1427ED621100116B61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S9WALA6A8N;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpotsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SpookySpots.app/SpookySpots";
+			};
+			name = Release;
+		};
+		C9A8CA1627ED621100116B61 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S9WALA6A8N;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpotsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SpookySpots;
+			};
+			name = Debug;
+		};
+		C9A8CA1727ED621100116B61 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = S9WALA6A8N;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpotsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = SpookySpots;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C9A8C9E627ED621000116B61 /* Build configuration list for PBXProject "SpookySpots" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C9A8CA0D27ED621100116B61 /* Debug */,
+				C9A8CA0E27ED621100116B61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C9A8CA0F27ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpots" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C9A8CA1027ED621100116B61 /* Debug */,
+				C9A8CA1127ED621100116B61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C9A8CA1227ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpotsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C9A8CA1327ED621100116B61 /* Debug */,
+				C9A8CA1427ED621100116B61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C9A8CA1527ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpotsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C9A8CA1627ED621100116B61 /* Debug */,
+				C9A8CA1727ED621100116B61 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C9A8C9E327ED621000116B61 /* Project object */;
+}
