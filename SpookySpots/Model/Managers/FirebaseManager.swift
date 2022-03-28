@@ -16,29 +16,19 @@ import Firebase
 class FirebaseManager: ObservableObject {
     static let instance = FirebaseManager()
     
-    enum Queries: String, CaseIterable {
-        case hauntedHotels = "Haunted Hotels"
-        case ghostTowns = "Ghost Towns"
-        
-    }
+//    @ObservedObject var userLocManager = UserLocationManager.instance
+//    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     
-    @ObservedObject var userLocManager = UserLocationManager.instance
     
-    var geoFireRef: DatabaseReference!
-    var geoFire: GeoFire!
-//    let db = Firestore.firestore()
     let locationStore = LocationStore.instance
-    @Published var images: [Location.Images] = []
-    init() {
-        geoFireRef = Database.database().reference()
-        geoFire = GeoFire(firebaseRef: geoFireRef)
-        getHauntedHotels()
-//        setCoordinates()
-        getImages()
-    }
+//    @Published var images: [Location.Images] = []
+//
+//    init() {
+////        getImages()
+//    }
     
     
-    func getHauntedHotels() {
+    func getHauntedHotels(withCompletion completion: @escaping ((_ location: Location) -> Void)) {
         let ref = Database.database().reference().child("Haunted Hotels")
         ref.observe(DataEventType.value) { (snapshot) in
             if snapshot.childrenCount > 0 {
@@ -63,16 +53,33 @@ class FirebaseManager: ObservableObject {
                     let lastReviewTitle = data?["lastReviewTitle"] as? String ?? ""
                     let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
                     let imageName = data?["imageName"] as? String ?? ""
-
-                    let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: nil, tours: nil, imageName: imageName, baseImage: nil, distanceToUser: nil)
-//                    let local = LocationModel(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, user: lastReviewUser), locationType: "Haunted Hotel", coordinates: nil, imageName: imageName, baseImage: nil, distanceToUser: nil)
-//                    let local = LocationModel(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, user: lastReviewUser), locationType: "Haunted Hotel", imageName: imageName)
-                    self.locationStore.hauntedHotels.append(local)
+                    let hasTours = data?["offersGhostTours"] as? Bool ?? false
+                    let lat = data?["l/0"] as? Double ?? 0
+                    let lon = data?["l/1"] as? Double ?? 0
+                    
+                    
+                    let addressString = "\(street), \(city), \(state)"
+                    
+//                    self.getCoordinatesFrom(address: addressString) { coordinates in
+                        
+                        let clloc = CLLocation(latitude: lat, longitude: lon)
+                        
+                        let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil)
+                        
+                        completion(local)
+                        self.locationStore.hauntedHotels.append(local)
+//                    }
+                    
+                    
+                    
+                    
                 }
             }
         }
         
     }
+    
+    
     func getImages() {
         
         let ref = Database.database().reference().child("Images")
@@ -85,21 +92,21 @@ class FirebaseManager: ObservableObject {
                     let id = data?["id"] as? Int ?? Int.random(in: 3000...4000)
                     
                     let img = Location.Images(id: id, imageURL: imageURL, locationID: imageLocationID)
-                    self.images.append(img)
+//                    self.images.append(img)
                 }
             }
         }
     }
     
-    func getImageFromLocationID(id: Int, withCompletion completion: @escaping ((_ image: Location.Images) -> (Void))) {
-        for image in self.images {
-            if image.locationID == id {
-                completion(image)
-            }
-        }
-        
-    }
-    
+//    func getImageFromLocationID(id: Int, withCompletion completion: @escaping ((_ image: Location.Images) -> (Void))) {
+//        for image in self.images {
+//            if image.locationID == id {
+//                completion(image)
+//            }
+//        }
+//
+//    }
+//
     func getImageFromURLString(_ urlString: String) -> Image {
         var imageToReturn = Image("blank")
         let storageRef = Storage.storage().reference().child(urlString)
@@ -109,53 +116,79 @@ class FirebaseManager: ObservableObject {
             }
             guard let data = data else { return }
             if let image = UIImage(data: data) {
-               imageToReturn = Image(uiImage: image)
+                imageToReturn = Image(uiImage: image)
             }
         }
         return imageToReturn
     }
     
-    //MARK: - GeoFire
+    //MARK: - Queries
+    enum Queries: String, CaseIterable {
+        case hauntedHotels = "Haunted Hotels"
+        case ghostTowns = "Ghost Towns"
+        
+    }
     
-    func createSpookyLocation(forLocation location: Location) {
-        if let loc = location.cLLocation {
-            geoFire.setLocation(loc, forKey: "\(location.id)")
+    //MARK: - Coordinates & Address
+    func getCoordinatesFrom(address: String, withCompletion completion: @escaping ((_ coordinates: CLLocationCoordinate2D) -> (Void))) {
+        
+        let addressString = address
+        let geoCoder = CLGeocoder()
+        
+        geoCoder.geocodeAddressString(addressString) { (placemarks, error) in
+            guard
+                let placemarks = placemarks,
+                let loc = placemarks.first?.location
+            else {
+                // handle no location found
+                    print("error on forward geocoding.. getting coordinates from location address: \(addressString)")
+                return
+            }
+//            print("successful geocode with addrress: \(addressString)")
+            completion(loc.coordinate)
         }
     }
     
-    func getLocationsFromSpecificRadius(withCompletion completion: @escaping ((_ location: String) -> (Void))) {
-
-//        var centerCoordinates = userLocManager.region.center
-//        var center = CLLocation(latitude: centerCoordinates.latitude, longitude: centerCoordinates.longitude)
-//        var radius = userLocManager.region.span
-
-        // Query location by region
-        let region = userLocManager.region
-        let regionQuery = geoFire.query(with: region)
-
-        regionQuery.observe(.keyEntered, with: { (key : String, location: CLLocation) in
-            print("Key '\(key)' entered the search area and is at location '\(location)'")
-            
-
-            completion(key)
-        })
-        
-        
+    func getAddressFrom(coordinates: CLLocationCoordinate2D, withCompletion completion: @escaping ((_ location: Address) -> (Void))) {
+        let location  = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
+        let geoCoder = CLGeocoder()
+        geoCoder.reverseGeocodeLocation(location) { (placemarks, error) in
+            guard
+                let placemarks = placemarks,
+                let location = placemarks.first
+            else {
+                // Handle error
+                return
+            }
+            if let buildingNumber = location.subThoroughfare,
+               let street = location.thoroughfare,
+               let city = location.locality,
+               let state = location.administrativeArea,
+               let zip = location.postalCode,
+               let country = location.country {
+                
+                let address = Address(
+                    address: "\(buildingNumber) \(street)",
+                    city: city,
+                    state: state,
+                    zipCode: zip,
+                    country: country)
+                completion(address)
+            }
+        }
     }
-    
 }
-    
-    
+
 
 //MARK: - Image Load From URL
-    extension Image {
-        func data(url: URL?) -> Self {
-            if let url = url,
-               let data = try? Data(contentsOf: url) {
-                return Image(uiImage: UIImage(data: data)!)
-                    .resizable()
-            }
-            return self
+extension Image {
+    func data(url: URL?) -> Self {
+        if let url = url,
+           let data = try? Data(contentsOf: url) {
+            return Image(uiImage: UIImage(data: data)!)
                 .resizable()
         }
+        return self
+            .resizable()
     }
+}

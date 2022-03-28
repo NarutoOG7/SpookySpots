@@ -21,10 +21,13 @@ class LocationStore: ObservableObject {
         Location(id: 1235, name: "Hotel Occidental")
     ]
     
-    var locationManager = UserLocationManager.instance
     @Published var locations: [Location] = []
     @Published var hauntedHotels: [Location] = []
-    @Published var onMapLocations: [Location] = []
+    @Published var onMapLocations: [Location] = [] {
+        willSet {
+            print(newValue.last)
+        }
+    }
     @Published var nearbyLocations: [Location] = []
     @Published var everyFavoritedLocation: [FavoriteLocation] = []
     @Published var trendingLocations: [Location] = []

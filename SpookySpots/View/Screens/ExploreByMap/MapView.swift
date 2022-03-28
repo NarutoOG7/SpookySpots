@@ -12,36 +12,35 @@ import GeoFire
 
 struct MapView: View {
     
-    @State var locationStore = LocationStore.instance
+    @State var onMapLocs: [Location] = []
+    @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var locationManager = UserLocationManager.instance
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    var geoFireManager = GeoFireManager.instance
+//    @State var region = MKCoordinateRegion(center: MapDetails.startingLocation.coordinate,
+//                                               span: MapDetails.defaultSpan)
     
+
     var body: some View {
 //        ForEach(locationStore.locations) { location in
 //            if locationIsInRegion(location: location, region: locationManager.region) {
 //
 //
-        Map(coordinateRegion: $locationManager.region, showsUserLocation: true, annotationItems: locationStore.onMapLocations) { location in
-            
-            
-            
-            MapAnnotation(coordinate: location.cLLocation?.coordinate ?? CLLocationCoordinate2D()) {
+        Map(coordinateRegion: $exploreByMapVM.region, showsUserLocation: true, annotationItems: onMapLocs) { location in
+                        
+            MapAnnotation(coordinate: location.cLLocation?.coordinate ?? MapDetails.startingLocation.coordinate) {
                 
                 Button(action: {
-                    locationStore.selectedLocation = location
-                    print("location tapped \(location.name)")
+//                    locationStore.selectedLocation = location
+//                    print("location tapped \(location.name)")
                 }, label: {
                     ZStack {
                         Circle()
-                            .stroke(
-                                exploreByMapVM.locationShownOnList == location ?
-                                    Color(#colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)) : Color.yellow,
-                                lineWidth: 3)
+                            .stroke(Color.yellow, lineWidth: 3)
                         
                         
                         
-                        LocationImage(location: location)
-                        
+//                        LocationImage(locationID: location.id)
                     }
                     .frame(width: 70, height: 70)
                 })
@@ -52,32 +51,13 @@ struct MapView: View {
         .accentColor(.pink)
         .onAppear {
             locationManager.checkIfLocationServicesIsEnabled()
+            geoFireManager.startLocationListener()
+//            geoFireManager.removeGeoFireLocations()
+        } .onDisappear {
+            geoFireManager.endLocationListener()
         }
 //            }
 //        }
-    }
-    
-    private func locationIsInRegion(location: Location, region: MKCoordinateRegion) -> Bool {
-        if let cLLocation = location.cLLocation {
-            
-            let circularRegion = CLCircularRegion(center: region.center, radius: region.span.longitudeDelta, identifier: "MapRegion")
-            return circularRegion.contains(cLLocation.coordinate)
-        }
-        return false
-    }
-    
-    private func locationIsInRegionSecond(location: Location, region: MKCoordinateRegion) -> Bool {
-        if let cLLocation = location.cLLocation {
-            let coordinates = cLLocation.coordinate
-            let origin = MKMapPoint(coordinates)
-            let size = MKMapSize(width: region.span.longitudeDelta, height: region.span.latitudeDelta)
-            let mapRect = MKMapRect(origin: origin, size: size)
-            let point = MKMapPoint(coordinates)
-            if mapRect.contains(point) {
-                return true
-            }
-        }
-        return false
     }
 }
 

@@ -37,5 +37,10 @@ struct Address {
     func fullAddress() -> String {
         address + ", " + city + ", " + state + " " + zipCode + " " + country
     }
+    
+    func geoCodeAddress() -> String {
+        "\(address), \(city), \(state)"
+//        address + ", " + city + ", " + state
+    }
 }
 

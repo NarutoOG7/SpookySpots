@@ -11,9 +11,7 @@ import Firebase
 @main
 struct SpookySpotsApp: App {
     
-    init() {
-        FirebaseApp.configure()
-    }
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     var body: some Scene {
         WindowGroup {
@@ -21,3 +19,5 @@ struct SpookySpotsApp: App {
         }
     }
 }
+
+

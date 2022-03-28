@@ -9,6 +9,7 @@ import MapKit
 import CoreLocation
 import SwiftUI
 import Firebase
+import Contacts
 
 struct Location: Identifiable, Equatable {
     static func == (lhs: Location, rhs: Location) -> Bool {
@@ -63,13 +64,15 @@ struct Location: Identifiable, Equatable {
     }
     
     
-    mutating func assignCoordinates(cLLocation: CLLocation) {
-        self.cLLocation = cLLocation
-    }
+//    mutating func assignCoordinates(cLLocation: CLLocation) {
+//        self.cLLocation = cLLocation
+//    }
+//
+//
     
     
     
-    
+    //MARK: - Review
     struct Review {
         var avgRating: Double
         var lastRating: Int
@@ -78,6 +81,7 @@ struct Location: Identifiable, Equatable {
         var user: String
     }
     
+    //MARK: - Images
     struct Images {
         var id: Int
         var imageURL: String

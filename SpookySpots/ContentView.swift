@@ -12,7 +12,7 @@ struct ContentView: View {
     @ObservedObject var authorization = Authorization.instance
     init() {
             authorization.signedIn = authorization.isSignedIn
-        
+        GeoFireManager.instance.setGeoFireLocations()
     }
     
     var body: some View {

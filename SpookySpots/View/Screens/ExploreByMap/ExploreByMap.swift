@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct ExploreByMap: View {
     
@@ -31,7 +32,7 @@ struct ExploreByMap: View {
                     currentLocationButton
                 }.padding(.horizontal)
                 Spacer()
-                locationsList
+//                locationsList
             }
             
         
@@ -47,24 +48,24 @@ extension ExploreByMap {
         MapView()
 //        MapForExplore()
     }
-    
-    private var locationsList: some View {
-        GeometryReader { geo in
-        ScrollView(.horizontal) {
-            HStack {
-                ForEach(locationStore.onMapLocations) { location in
-            LocationPreviewOnMap(location: location)
-                .onChange(of: location, perform: { value in
-                    if locationIsInView(geo) {
-                        exploreByMapVM.locationShownOnList = value
-                    }
-                })
-        }.frame(width: UIScreen.main.bounds.width)
-                
-            }
-    }
-        }
-    }
+//
+//    private var locationsList: some View {
+//        GeometryReader { geo in
+//        ScrollView(.horizontal) {
+//            HStack {
+//                ForEach(locationStore.onMapLocations) { location in
+//            LocationPreviewOnMap(location: location)
+//                .onChange(of: location, perform: { value in
+//                    if locationIsInView(geo) {
+//                        exploreByMapVM.locationShownOnList = value
+//                    }
+//                })
+//        }.frame(width: UIScreen.main.bounds.width)
+//
+//            }
+//    }
+//        }
+//    }
     
     
     
@@ -121,9 +122,16 @@ extension ExploreByMap {
     }
     
     func searchThisArea() {
-        FirebaseManager.instance.getLocationsFromSpecificRadius { location in
-            print(location + "_%%%%")
-        }
+//        FirebaseManager.instance.getLocationDataFromKey(key: "1") { location in
+//            print(location.name)
+//        }
+//        FirebaseManager.instance.showSpotsOnMap(location: CLLocation(latitude: exploreByMapVM.region.center.latitude, longitude: exploreByMapVM.region.center.longitude))
+//        FirebaseManager.instance.showSpotsOnMap { locAnnoModel in
+//            
+//        }
+//        FirebaseManager.instance.getLocationsFromSpecificRadius { location in
+//            print(location + "_%%%%")
+//        }
 //        FirebaseManager.instance.getallDocs(
 //            center: UserLocationManager.instance.region.center,
 //            radius: UserLocationManager.instance.region.distanceMax()) { (location) -> (Void) in
