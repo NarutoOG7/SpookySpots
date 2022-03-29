@@ -26,7 +26,7 @@ struct MapView: View {
 //            if locationIsInRegion(location: location, region: locationManager.region) {
 //
 //
-        Map(coordinateRegion: $exploreByMapVM.region, showsUserLocation: true, annotationItems: onMapLocs) { location in
+        Map(coordinateRegion: $exploreByMapVM.region, showsUserLocation: true, annotationItems: locationStore.onMapLocations) { location in
                         
             MapAnnotation(coordinate: location.cLLocation?.coordinate ?? MapDetails.startingLocation.coordinate) {
                 
@@ -51,10 +51,10 @@ struct MapView: View {
         .accentColor(.pink)
         .onAppear {
             locationManager.checkIfLocationServicesIsEnabled()
-//            geoFireManager.startLocationListener()
+            geoFireManager.startLocationListener()
 //            geoFireManager.removeGeoFireLocations()
         } .onDisappear {
-//            geoFireManager.endLocationListener()
+            geoFireManager.endLocationListener()
         }
 //            }
 //        }

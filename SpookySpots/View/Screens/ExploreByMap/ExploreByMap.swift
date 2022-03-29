@@ -45,8 +45,8 @@ struct ExploreByMap: View {
 extension ExploreByMap {
     
     private var map: some View {
-//        MapView()
-        MapForExplore()
+        MapView()
+//        MapForExplore()
     }
 //
 //    private var locationsList: some View {
