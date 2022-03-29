@@ -145,13 +145,14 @@ class GeoFireManager {
                         
                         let lat = coordinates.latitude
                         let lon = coordinates.longitude
-                    
-                    
                     let clloc = CLLocation(latitude: lat, longitude: lon)
+                        
+                        self.firebaseManager.getImageFromURLString(imageName) { image in
+                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil)
+                            
+                            completion(local)
+                        }
                     
-                    let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil)
-                    
-                completion(local)
                     }
             }
             }

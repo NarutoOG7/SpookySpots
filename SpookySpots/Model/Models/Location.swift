@@ -27,7 +27,7 @@ struct Location: Identifiable, Equatable {
                                   cLLocation: nil,
                              tours: true,
                              imageName: "FairbanksBridge.jpg",
-                             baseImage: nil,
+                                  baseImage: Image("bannack"),
                              distanceToUser: nil)
     
     var id: Int

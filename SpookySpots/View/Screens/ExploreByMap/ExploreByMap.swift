@@ -21,15 +21,11 @@ struct ExploreByMap: View {
                 HStack {
                     SearchBar()
                     filterButton
+                    VStack {
                     listButton
-                }.padding(.horizontal)
-                HStack {
-                    Spacer()
-                    
-                    searchAreaButton
-                    Spacer()
-                    Spacer()
-                    currentLocationButton
+                        currentLocationButton
+
+                    }
                 }.padding(.horizontal)
                 Spacer()
 //                locationsList

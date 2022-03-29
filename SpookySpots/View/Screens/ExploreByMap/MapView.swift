@@ -12,20 +12,12 @@ import GeoFire
 
 struct MapView: View {
     
-    @State var onMapLocs: [Location] = []
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var locationManager = UserLocationManager.instance
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     var geoFireManager = GeoFireManager.instance
-//    @State var region = MKCoordinateRegion(center: MapDetails.startingLocation.coordinate,
-//                                               span: MapDetails.defaultSpan)
-    
 
     var body: some View {
-//        ForEach(locationStore.locations) { location in
-//            if locationIsInRegion(location: location, region: locationManager.region) {
-//
-//
         Map(coordinateRegion: $exploreByMapVM.region, showsUserLocation: true, annotationItems: locationStore.onMapLocations) { location in
                         
             MapAnnotation(coordinate: location.cLLocation?.coordinate ?? MapDetails.startingLocation.coordinate) {
@@ -38,9 +30,8 @@ struct MapView: View {
                         Circle()
                             .stroke(Color.yellow, lineWidth: 3)
                         
-                        
-                        
-//                        LocationImage(locationID: location.id)
+//         LocAnnoImageView(location: location)
+                        LocationImage(location: location)
                     }
                     .frame(width: 70, height: 70)
                 })
@@ -60,6 +51,29 @@ struct MapView: View {
 //        }
     }
 }
+
+struct LocAnnoImageView: View {
+    var location: Location
+    
+    var body: some View {
+        let imgView: Image
+        if let baseImage = location.baseImage {
+            imgView = baseImage
+        } else {
+            imgView = Image("bannack")
+        }
+        return imgView
+            .resizable()
+            .aspectRatio(1, contentMode: .fit)
+    }
+}
+
+struct MapView_Previews: PreviewProvider {
+    static var previews: some View {
+        MapView()
+    }
+}
+
 
 
 import SDWebImageSwiftUI
@@ -112,7 +126,6 @@ struct Loader : UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<Loader>) {
-        
     }
 }
 

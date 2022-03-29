@@ -16,16 +16,16 @@ import Firebase
 class FirebaseManager: ObservableObject {
     static let instance = FirebaseManager()
     
-//    @ObservedObject var userLocManager = UserLocationManager.instance
-//    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    //    @ObservedObject var userLocManager = UserLocationManager.instance
+    //    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     
     
     let locationStore = LocationStore.instance
-//    @Published var images: [Location.Images] = []
-//
-//    init() {
-////        getImages()
-//    }
+    //    @Published var images: [Location.Images] = []
+    //
+    //    init() {
+    ////        getImages()
+    //    }
     
     
     func getHauntedHotels(withCompletion completion: @escaping ((_ location: Location) -> Void)) {
@@ -57,18 +57,17 @@ class FirebaseManager: ObservableObject {
                     let lat = data?["l/0"] as? Double ?? 0
                     let lon = data?["l/1"] as? Double ?? 0
                     
+                    let clloc = CLLocation(latitude: lat, longitude: lon)
                     
-                    let addressString = "\(street), \(city), \(state)"
-                    
-//                    self.getCoordinatesFrom(address: addressString) { coordinates in
-                        
-                        let clloc = CLLocation(latitude: lat, longitude: lon)
-                        
-                        let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil)
+                    self.getImageFromURLString(imageName) { image in
+    
+                        let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil)
                         
                         completion(local)
                         self.locationStore.hauntedHotels.append(local)
-//                    }
+                    }
+                    
+                    //                    }
                     
                     
                     
@@ -92,34 +91,35 @@ class FirebaseManager: ObservableObject {
                     let id = data?["id"] as? Int ?? Int.random(in: 3000...4000)
                     
                     let img = Location.Images(id: id, imageURL: imageURL, locationID: imageLocationID)
-//                    self.images.append(img)
+                    //                    self.images.append(img)
                 }
             }
         }
     }
     
-//    func getImageFromLocationID(id: Int, withCompletion completion: @escaping ((_ image: Location.Images) -> (Void))) {
-//        for image in self.images {
-//            if image.locationID == id {
-//                completion(image)
-//            }
-//        }
-//
-//    }
-//
-    func getImageFromURLString(_ urlString: String) -> Image {
-        var imageToReturn = Image("blank")
-        let storageRef = Storage.storage().reference().child(urlString)
-        storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-            if let error = error {
-                print(error.localizedDescription)
+    //    func getImageFromLocationID(id: Int, withCompletion completion: @escaping ((_ image: Location.Images) -> (Void))) {
+    //        for image in self.images {
+    //            if image.locationID == id {
+    //                completion(image)
+    //            }
+    //        }
+    //
+    //    }
+    //
+    func getImageFromURLString(_ urlString: String, withCompletion completion: @escaping ((_ image: Image) -> (Void))) {
+            var imageToReturn = Image("bannack")
+            let storageRef = Storage.storage().reference().child(urlString)
+            storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+                guard let data = data else { return }
+                if let image = UIImage(data: data) {
+                    imageToReturn = Image(uiImage: image)
+                    completion(imageToReturn)
+                }
             }
-            guard let data = data else { return }
-            if let image = UIImage(data: data) {
-                imageToReturn = Image(uiImage: image)
-            }
-        }
-        return imageToReturn
+        
     }
     
     //MARK: - Queries
@@ -141,10 +141,10 @@ class FirebaseManager: ObservableObject {
                 let loc = placemarks.first?.location
             else {
                 // handle no location found
-                    print("error on forward geocoding.. getting coordinates from location address: \(addressString)")
+                print("error on forward geocoding.. getting coordinates from location address: \(addressString)")
                 return
             }
-//            print("successful geocode with addrress: \(addressString)")
+            //            print("successful geocode with addrress: \(addressString)")
             completion(loc.coordinate)
         }
     }
