@@ -15,7 +15,7 @@ class GeoFireManager {
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     @ObservedObject var locationStore = LocationStore.instance
     
-    //    var geoFireRef: DatabaseReference!
+//        var geoFireRef: DatabaseReference!
 //    var geoFire: GeoFire?
 //    lazy var locationRef = GeoFire(firebaseRef: Database.database().reference().child("Haunted Hotels"))
     lazy var locationRef = Database.database().reference().child("Haunted Hotels")
@@ -31,8 +31,8 @@ class GeoFireManager {
 //        geoFire = GeoFire(firebaseRef: geoFireRef)
 //
 //    }
-    
-//    func showSpotsOnMap(location: CLLocation, withCompletion completion: @escaping ((_ locAnnoModel: LocationAnnotationModel) -> (Void))) {
+//
+//    func showSpotsOnMap(location: CLLocation, withCompletion completion: @escaping ((_ location: Location) -> (Void))) {
 //        let regionCenter = exploreByMapVM.region.center
 //        let location = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
 //        if let geoFire = geoFire {
@@ -42,7 +42,8 @@ class GeoFireManager {
 //                self.getLocationDataFromKey(key: key) { local in
 //                    let locAnnotationModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
 //                    print(local.name)
-//                    completion(locAnnotationModel)
+//                    self.gfOnMapLocations.append(locAnnotationModel)
+//                    completion(local)
 //                }
 //            })
 //        }
@@ -57,15 +58,15 @@ class GeoFireManager {
             locationHandle = circleQuery.observe(.keyEntered, with: { key, loc in
                 let locAnnotationModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
                 if !self.gfOnMapLocations.contains(locAnnotationModel) {
-                    
+
                     self.getLocationDataFromKey(key: key) { local in
                         self.locationStore.onMapLocations.append(local)
                         self.gfOnMapLocations.append(locAnnotationModel)
                     }
-                    
+
                 }
-                
-                
+
+
             })
 //        }
     }

@@ -22,6 +22,7 @@ struct MapForExplore: UIViewRepresentable {
         let region = exploreByMapVM.region
         mapView.setRegion(region, animated: true)
 //        addAnnotations(to: mapView)
+        GeoFireManager.instance.startLocationListener()
         return mapView
     }
     
@@ -29,7 +30,7 @@ struct MapForExplore: UIViewRepresentable {
         uiView.delegate = exploreMapDelegate
         uiView.translatesAutoresizingMaskIntoConstraints = false
         
-//        addAnnotations(to: uiView)
+        addAnnotations(to: uiView)
 
     }
     
@@ -40,14 +41,15 @@ struct MapForExplore: UIViewRepresentable {
         }
     }
     
-//    func addAnnotations(to view: MKMapView) {
-//        let locations = locationStore.onMapLocations
-//        for location in locations {
-//            let coordinate = location.coordinate
-//            let placemark = MKPlacemark(coordinate: coordinate)
-//            view.addAnnotation(placemark)
-//        }
-//    }
+    func addAnnotations(to view: MKMapView) {
+        let locations = locationStore.onMapLocations
+        for location in locations {
+            if let clloc = location.cLLocation {
+                let placemark = MKPlacemark(coordinate: clloc.coordinate)
+            view.addAnnotation(placemark)
+            }
+        }
+    }
     
 }
 
@@ -82,22 +84,28 @@ class ExploreMapDelegate: NSObject, MKMapViewDelegate {
 //    }
 //
     
-    func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
-        
-        let loc = CLLocation(
-            latitude: mapView.centerCoordinate.latitude,
-            longitude: mapView.centerCoordinate.longitude)
-        
-        print(locationStore.onMapLocations.count)
-        
+//    func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
+//
+//        let loc = CLLocation(
+//            latitude: mapView.centerCoordinate.latitude,
+//            longitude: mapView.centerCoordinate.longitude)
+//
+//        print(locationStore.onMapLocations.count)
+//
 //        FirebaseManager.instance.showSpotsOnMap(location: loc) { locAnnoModel in
 //            if !self.locationStore.onMapLocations.contains(locAnnoModel) {
 //            self.locationStore.onMapLocations.append(locAnnoModel)
 //            }
 //        }
         
+//        GeoFireManager.instance.showSpotsOnMap(location: loc) { location in
+//            self.locationStore.onMapLocations.append(location)
+//        }
         
+        
+//    }
+    
+    deinit {
+        GeoFireManager.instance.endLocationListener()
     }
-    
-    
 }

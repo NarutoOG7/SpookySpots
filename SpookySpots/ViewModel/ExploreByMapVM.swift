@@ -21,5 +21,16 @@ class ExploreByMapVM: ObservableObject {
     @Published var region = MKCoordinateRegion(
         center: MapDetails.startingLocation.coordinate,
         span: MapDetails.defaultSpan) 
+//    @Published var region = MKCoordinateRegion(
+//        center: MapDetails.startingLocation.coordinate,
+//        span: MapDetails.defaultSpan) {
+//            willSet {
+//                let center = newValue.center
+//                let loc = CLLocation(latitude: center.latitude, longitude: center.longitude)
+//                GeoFireManager.instance.showSpotsOnMap(location: loc) { location in
+//                    self.locationStore.onMapLocations.append(location)
+//                }
+//            }
+//        }
     
 }

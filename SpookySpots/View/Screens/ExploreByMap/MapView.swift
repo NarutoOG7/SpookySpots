@@ -51,10 +51,10 @@ struct MapView: View {
         .accentColor(.pink)
         .onAppear {
             locationManager.checkIfLocationServicesIsEnabled()
-            geoFireManager.startLocationListener()
+//            geoFireManager.startLocationListener()
 //            geoFireManager.removeGeoFireLocations()
         } .onDisappear {
-            geoFireManager.endLocationListener()
+//            geoFireManager.endLocationListener()
         }
 //            }
 //        }
