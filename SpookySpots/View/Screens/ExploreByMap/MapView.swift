@@ -23,6 +23,7 @@ struct MapView: View {
             MapAnnotation(coordinate: location.cLLocation?.coordinate ?? MapDetails.startingLocation.coordinate) {
                 
                 Button(action: {
+                    exploreByMapVM.showingLocationList = true
 //                    locationStore.selectedLocation = location
 //                    print("location tapped \(location.name)")
                 }, label: {
@@ -46,6 +47,9 @@ struct MapView: View {
 //            geoFireManager.removeGeoFireLocations()
         } .onDisappear {
             geoFireManager.endLocationListener()
+        }
+        .onTapGesture {
+            exploreByMapVM.showingLocationList = false
         }
 //            }
 //        }

@@ -18,79 +18,107 @@ struct LocationPreviewOnMap: View {
     var body: some View {
         ZStack {
             
-        HStack {
-                image
-            VStack(alignment: .leading, spacing: 12) {
-                title
-                address
-                
-                HStack {
-                milesAway
-                    Spacer()
-                    addToTripButton
-                }.frame(height: 40)
-            }
-        }
-        .cornerRadius(25)
-        .background(RoundedRectangle(cornerRadius: 25.0))
-        .shadow(color: .black, radius: 3, x: 0.5, y: 0.5)
-        .padding()
-            
+            image
             HStack {
-                favoriteButton
-                Spacer()
-            }
+                spacer
+                VStack(alignment: .leading) {
+                    title
+                    address
+                    Spacer()
+                    milesAway
+                }.padding()
+                    .background(Color(red: 111 / 255, green: 30 / 255, blue: 81 / 255))
+//                    .frame(width: UIScreen.main.bounds.width - 20, height: UIScreen.main.bounds.height / 5)
+
+                
+            }         .frame(width: UIScreen.main.bounds.width - 20, height: UIScreen.main.bounds.height / 5)
+
+            favoriteButton
+            addToTripButton
+              
         }
+//        .padding()
+        .cornerRadius(25)
+        .frame(width: UIScreen.main.bounds.width - 20, height: UIScreen.main.bounds.height / 5)
+        .background(RoundedRectangle(cornerRadius: 25.0))
+
         
     }
     
     //MARK: - SubViews
+    
     private var image: some View {
-        Image("bannack")
-            .resizable()
-            .aspectRatio(1, contentMode: .fit)
-            .frame(width: UIScreen.main.bounds.width / 2.7)
-        
+        let img: Image
+        if let image = location.baseImage {
+            img = image
+        } else {
+            img = Image("Bannack")
+        }
+        return HStack {
+        img
+                .resizable()
+                .aspectRatio(1, contentMode: .fit)
+                .frame(width: 200)
+                .offset(x: -35)
+            Spacer()
+        }
     }
     
     private var title: some View {
         Text(location.name)
             .font(.title3)
             .fontWeight(.medium)
-            .foregroundColor(Color(#colorLiteral(red: 0.6526787877, green: 0.9948721528, blue: 1, alpha: 1)))
-            .padding(.horizontal, 5)
+            .lineLimit(2)
+            .foregroundColor(Color(red: 18/255, green: 203/255, blue: 196/255))
+            .padding(.vertical, 5)
+
     }
     
     private var address: some View {
         Text(location.address?.streetCityState() ?? "")
             .font(.subheadline)
-            .foregroundColor(Color(#colorLiteral(red: 0.4834827094, green: 0.4834827094, blue: 0.4834827094, alpha: 1)))
+            .foregroundColor(Color(red: 153/255, green: 128/255, blue: 250/255))
+            .lineLimit(2)
             .padding(.trailing)
             .padding(.bottom, 8)
     }
     
     private var milesAway: some View {
+
         Text(String(format: "%.0f miles", location.distanceToUser ?? 0))
             .font(.headline)
             .fontWeight(.medium)
-            .foregroundColor(Color(#colorLiteral(red: 0.6642242074, green: 0.6642400622, blue: 0.6642315388, alpha: 1)))
-            .offset(y: 17)
+            .foregroundColor(Color(red: 153/255, green: 128/255, blue: 250/255))
+        
     }
     
+    private var spacer: some View {
+        RoundedRectangle(cornerRadius: 25)
+            .fill(Color.clear)
+            .frame(width: 143)
+    }
     //MARK: - Buttons
     
     private var favoriteButton: some View {
+        HStack {
+            VStack {
         CircleButton(size: .small,
                      image: Image(systemName: "heart"),
                      outlineColor: .white,
                      iconColor: .gray,
                      backgroundColor: .white,
                      clicked: favoriteTapped)
-            .offset(x: 23, y: -48)
+                Spacer()
+            }
+            Spacer()
+        } .offset(x: 5, y: 5)
     }
     
     private var addToTripButton: some View {
+        HStack {
+            Spacer()
             VStack {
+                Spacer()
                 StackedCircleButton(
                     size: .small,
                     mainImage: isInTrip() ? Image(systemName: "map.fill") : Image(systemName: "map"),
@@ -100,9 +128,9 @@ struct LocationPreviewOnMap: View {
                     backgroundColor: .blue,
                     clicked: addOrSubtractFromTrip)
             }
-            .frame(width: 100, height: 100)
-            .offset(x: 14, y: 4)
-    }
+        }
+//        }.offset(x: 17, y: 17)
+     }
     
     
     //MARK: - Methods

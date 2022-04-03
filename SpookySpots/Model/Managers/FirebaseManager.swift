@@ -13,29 +13,27 @@ import CoreLocation
 import GeoFire
 import Firebase
 
+
 class FirebaseManager: ObservableObject {
     static let instance = FirebaseManager()
     
     //    @ObservedObject var userLocManager = UserLocationManager.instance
     //    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
-    
-    
+
     let locationStore = LocationStore.instance
     //    @Published var images: [Location.Images] = []
     //
     //    init() {
     ////        getImages()
     //    }
-    
+
     
     func getHauntedHotels(withCompletion completion: @escaping ((_ location: Location) -> Void)) {
         let ref = Database.database().reference().child("Haunted Hotels")
         ref.observe(DataEventType.value) { (snapshot) in
             if snapshot.childrenCount > 0 {
-                
                 self.locationStore.hauntedHotels.removeAll()
-                
-                
+
                 for location in snapshot.children.allObjects as! [DataSnapshot] {
                     let data = location.value as? [String : AnyObject]
                     let id = data?["id"] as? Int ?? Int.random(in: 200...300)
@@ -54,28 +52,34 @@ class FirebaseManager: ObservableObject {
                     let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
                     let imageName = data?["imageName"] as? String ?? ""
                     let hasTours = data?["offersGhostTours"] as? Bool ?? false
+                    let hotelKey = data?["hotelKey"] as? String ?? ""
                     let lat = data?["l/0"] as? Double ?? 0
                     let lon = data?["l/1"] as? Double ?? 0
-                    
+
                     let clloc = CLLocation(latitude: lat, longitude: lon)
-                    
+
                     self.getImageFromURLString(imageName) { image in
-    
-                        let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil)
-                        
+
+//                        HotelPriceManager.instance.getPriceOfHotel(key: hotelKey) { hotelPriceModel in
+//                            let price = hotelPriceModel?.lowestPrice
+
+
+                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil, price: 0)
+
                         completion(local)
                         self.locationStore.hauntedHotels.append(local)
-                    }
-                    
+
+//                    }
+                }
                     //                    }
-                    
-                    
-                    
-                    
+
+
+
+
                 }
             }
         }
-        
+
     }
     
     
@@ -90,7 +94,7 @@ class FirebaseManager: ObservableObject {
                     let imageURL = data?["imageURL"] as? String ?? ""
                     let id = data?["id"] as? Int ?? Int.random(in: 3000...4000)
                     
-                    let img = Location.Images(id: id, imageURL: imageURL, locationID: imageLocationID)
+                    _ = Location.Images(id: id, imageURL: imageURL, locationID: imageLocationID)
                     //                    self.images.append(img)
                 }
             }
@@ -121,6 +125,8 @@ class FirebaseManager: ObservableObject {
             }
         
     }
+    
+    
     
     //MARK: - Queries
     enum Queries: String, CaseIterable {

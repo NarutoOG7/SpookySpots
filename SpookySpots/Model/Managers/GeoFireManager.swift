@@ -136,6 +136,8 @@ class GeoFireManager {
                 let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
                 let imageName = data?["imageName"] as? String ?? ""
                     let hasTours = data?["offersGhostTours"] as? Bool ?? false
+                    let hotelKey = data?["hotelKey"] as? String ?? ""
+
 //                    let lat = data?["l/0"] as? Double ?? 0
 //                    let lon = data?["l/1"] as? Double ?? 0
                     
@@ -147,12 +149,16 @@ class GeoFireManager {
                         let lon = coordinates.longitude
                     let clloc = CLLocation(latitude: lat, longitude: lon)
                         
+//                        HotelPriceManager.instance.getPriceOfHotel(key: hotelKey) { hotelPriceModel in
+//                            let price = hotelPriceModel?.lowestPrice
+
+                        
                         self.firebaseManager.getImageFromURLString(imageName) { image in
-                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Location.Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil)
+                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil, price: 0)
                             
                             completion(local)
                         }
-                    
+//                        }
                     }
             }
             }

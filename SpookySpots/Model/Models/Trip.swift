@@ -36,29 +36,11 @@ struct Trip {
         startLocation = Location(
             id: TripDetails.startLocationID,
             name: MapDetails.startingLocationName,
-            address: nil,
-            description: nil,
-            moreInfoLink: nil,
-            review: nil,
-            locationType: nil,
-            cLLocation: MapDetails.startingLocation,
-            tours: nil,
-            imageName: nil,
-            baseImage: nil,
-            distanceToUser: nil)
+            cLLocation: MapDetails.startingLocation)
         endLocation = Location(
             id: TripDetails.endLocationID,
             name: MapDetails.startingLocationName,
-            address: nil,
-            description: nil,
-            moreInfoLink: nil,
-            review: nil,
-            locationType: nil,
-            cLLocation: MapDetails.startingLocation,
-            tours: nil,
-            imageName: nil,
-            baseImage: nil,
-            distanceToUser: nil)
+            cLLocation: MapDetails.startingLocation)
         locations = []
     }
     
@@ -78,30 +60,12 @@ struct Trip {
             startLocation = Location(
                 id: TripDetails.startLocationID,
                 name: "Current Location",
-                address: nil,
-                description: nil,
-                moreInfoLink: nil,
-                review: nil,
-                locationType: nil,
-                cLLocation: cLLocation,
-                tours: nil,
-                imageName: nil,
-                baseImage: nil,
-                distanceToUser: nil)
+                cLLocation: cLLocation)
         case .end:
             endLocation = Location(
                 id: TripDetails.endLocationID,
                 name: "Current Location",
-                address: nil,
-                description: nil,
-                moreInfoLink: nil,
-                review: nil,
-                locationType: nil,
-                cLLocation: cLLocation,
-                tours: nil,
-                imageName: nil,
-                baseImage: nil,
-                distanceToUser: nil)
+                cLLocation: cLLocation)
         }
     }
     

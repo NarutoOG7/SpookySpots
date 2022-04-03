@@ -20,7 +20,9 @@ class ExploreByMapVM: ObservableObject {
     @Published var locationShownOnList: Location?
     @Published var region = MKCoordinateRegion(
         center: MapDetails.startingLocation.coordinate,
-        span: MapDetails.defaultSpan) 
+        span: MapDetails.defaultSpan)
+    
+    @Published var showingLocationList = false
 //    @Published var region = MKCoordinateRegion(
 //        center: MapDetails.startingLocation.coordinate,
 //        span: MapDetails.defaultSpan) {

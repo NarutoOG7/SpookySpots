@@ -156,30 +156,12 @@ struct ChangeStartAndStop: View {
             let newStartingLocation = Location(
                 id: TripDetails.startLocationID,
                 name: startInput,
-                address: nil,
-                description: nil,
-                moreInfoLink: nil,
-                review: nil,
-                locationType: nil,
-                cLLocation: CLLocation(latitude: startLat, longitude: startLon),
-                tours: nil,
-                imageName: nil,
-                baseImage: nil,
-                distanceToUser: nil)
+                cLLocation: CLLocation(latitude: startLat, longitude: startLon))
             
             let newEndingLocation = Location(
                 id: TripDetails.endLocationID,
                 name: endInput,
-                address: nil,
-                description: nil,
-                moreInfoLink: nil,
-                review: nil,
-                locationType: nil,
-                cLLocation: CLLocation(latitude: newLat, longitude: newLon),
-                tours: nil,
-                imageName: nil,
-                baseImage: nil,
-                distanceToUser: nil)
+                cLLocation: CLLocation(latitude: newLat, longitude: newLon))
             let newTrip = Trip(start: newStartingLocation, end: newEndingLocation, locations: trip.locations, duration: trip.duration, miles: trip.miles)
 //            trip.startLocation = newStartingLocation
 //            trip.endLocation = newEndingLocation

@@ -28,7 +28,8 @@ struct ExploreByMap: View {
                     }
                 }.padding(.horizontal)
                 Spacer()
-//                locationsList
+                    Spacer()
+                locationList
             }
             
         
@@ -44,25 +45,43 @@ extension ExploreByMap {
         MapView()
 //        MapForExplore()
     }
-//
-//    private var locationsList: some View {
-//        GeometryReader { geo in
-//        ScrollView(.horizontal) {
-//            HStack {
-//                ForEach(locationStore.onMapLocations) { location in
-//            LocationPreviewOnMap(location: location)
+
+    private var locationsList: AnyView {
+        AnyView(
+        GeometryReader { geo in
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(locationStore.onMapLocations) { location in
+            LocationPreviewOnMap(location: location)
 //                .onChange(of: location, perform: { value in
 //                    if locationIsInView(geo) {
 //                        exploreByMapVM.locationShownOnList = value
 //                    }
 //                })
-//        }.frame(width: UIScreen.main.bounds.width)
-//
-//            }
-//    }
-//        }
-//    }
+
+                }.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3.7)
+            }
+    } .pagedScrollView()
+        }
+        )
+
+    }
     
+//    private var locationsList: AnyView {
+//        AnyView(
+//        HorizontalSnapScrollView(items: locationStore.onMapLocations)
+//        )
+//    }
+//
+    private var locationList: some View {
+        let view: AnyView
+        if exploreByMapVM.showingLocationList {
+            view = locationsList
+        } else {
+            view = AnyView(EmptyView())
+        }
+        return view
+    }
     
     
     //MARK: - Buttons

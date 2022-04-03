@@ -79,7 +79,7 @@ struct HorizontalSnapScrollView: View {
             ForEach(items) { location in
                 DefaultLocationCell(location: location)
             }
-        }.modifier(HorizontalSnap(items: items.count, itemWidth: 250, itemSpacing: 30))
+        }.modifier(HorizontalSnap(items: items.count, itemWidth: UIScreen.main.bounds.width - 60, itemSpacing: 20))
     }
 }
 
