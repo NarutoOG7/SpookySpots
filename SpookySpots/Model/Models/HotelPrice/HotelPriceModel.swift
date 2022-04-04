@@ -12,7 +12,7 @@ struct HotelPriceModel {
     let prices: [Double]
     
     var avgPrice: Double {
-        var total = 0.0
+        var total: Double = 0.0
         for price in prices {
             total += price
         }

@@ -58,19 +58,19 @@ class FirebaseManager: ObservableObject {
 
                     let clloc = CLLocation(latitude: lat, longitude: lon)
 
-                    self.getImageFromURLString(imageName) { image in
+//                    self.getImageFromURLString(imageName) { image in
 
 //                        HotelPriceManager.instance.getPriceOfHotel(key: hotelKey) { hotelPriceModel in
 //                            let price = hotelPriceModel?.lowestPrice
 
 
-                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: image, distanceToUser: nil, price: 0)
+                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil, price: 0)
 
                         completion(local)
                         self.locationStore.hauntedHotels.append(local)
 
 //                    }
-                }
+//                }
                     //                    }
 
 

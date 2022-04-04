@@ -11,16 +11,31 @@ import SwiftUI
 class HotelPriceManager {
     static let instance = HotelPriceManager()
     
-    let hotelPriceURL = "https://data.xotelo.com/api/rates?hotel_key=g297930-d305178&chk_in=2022-12-25&chk_out=2022-12-26"
+    let hotelPriceURL = "https://data.xotelo.com/api/rates"
     
-    func getPriceOfHotel(key: String, withCompletion completion: @escaping ((_ hotelPriceModel: HotelPriceModel?) -> (Void))) {
-        let urlString = "\(hotelPriceURL)?hotel_key=\(key)"
+    func getDates() -> [String] {
+        let firstDate = Date().advanced(by: 86400)
+        let secondDate = firstDate.advanced(by: 86400)
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd"
+        let checkIn = df.string(from: firstDate)
+        let checkOut = df.string(from: secondDate)
+        return [checkIn, checkOut]
+    }
+    
+    func getPriceOfHotel(key: String, withCompletion completion: @escaping ((HotelPriceModel) -> (Void))) {
+        let checkIn = getDates().first ?? ""
+        let checkOut = getDates().last ?? ""
+        let urlString = "\(hotelPriceURL)?hotel_key=\(key)&chk_in=\(checkIn)&chk_out=\(checkOut)"
+        print(urlString)
         let url = URL(string: urlString)!
         let session = URLSession(configuration: .default)
         let task = session.dataTask(with: url) { (data, response, error) in
             if let error = error {
                 print("Error fetching hotel prices for hotelKey: \(key), error: \(error)")
                 //handle error
+                completion(HotelPriceModel(prices: [0]))
+//                onError(error.localizedDescription)
             }
             
             guard let data = data else { return }
@@ -31,10 +46,14 @@ class HotelPriceManager {
                     prices.append(price.rate)
                 }
                 let hotelPriceModel = HotelPriceModel(prices: prices)
+                print(prices)
                 completion(hotelPriceModel)
+//                onSuccess(hotelPriceModel)
             } catch {
                 // Handle Error
                 print(error.localizedDescription)
+//                onError(error.localizedDescription)
+                completion(HotelPriceModel(prices: [0]))
             }
         }
         task.resume()

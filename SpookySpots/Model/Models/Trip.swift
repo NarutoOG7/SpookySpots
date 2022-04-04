@@ -36,11 +36,11 @@ struct Trip {
         startLocation = Location(
             id: TripDetails.startLocationID,
             name: MapDetails.startingLocationName,
-            cLLocation: MapDetails.startingLocation)
+            cLLocation: MapDetails.startingLocation, baseImage: nil)
         endLocation = Location(
             id: TripDetails.endLocationID,
             name: MapDetails.startingLocationName,
-            cLLocation: MapDetails.startingLocation)
+            cLLocation: MapDetails.startingLocation, baseImage: nil)
         locations = []
     }
     
@@ -60,12 +60,12 @@ struct Trip {
             startLocation = Location(
                 id: TripDetails.startLocationID,
                 name: "Current Location",
-                cLLocation: cLLocation)
+                cLLocation: cLLocation, baseImage: nil)
         case .end:
             endLocation = Location(
                 id: TripDetails.endLocationID,
                 name: "Current Location",
-                cLLocation: cLLocation)
+                cLLocation: cLLocation, baseImage: nil)
         }
     }
     

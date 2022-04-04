@@ -19,8 +19,13 @@ struct ExploreByMap: View {
             map
             VStack {
                 HStack {
-                    SearchBar()
-                    filterButton
+                    VStack {
+                        HStack {
+                            SearchBar()
+                            filterButton
+                        }
+                        Rectangle().fill(Color.clear).frame(width: 100, height: 50)
+                    }
                     VStack {
                     listButton
                         currentLocationButton
@@ -28,7 +33,11 @@ struct ExploreByMap: View {
                     }
                 }.padding(.horizontal)
                 Spacer()
-                    Spacer()
+                
+            }
+            
+            VStack {
+                Spacer()
                 locationList
             }
             
@@ -48,37 +57,30 @@ extension ExploreByMap {
 
     private var locationsList: AnyView {
         AnyView(
-        GeometryReader { geo in
         ScrollView(.horizontal) {
             HStack {
                 ForEach(locationStore.onMapLocations) { location in
-            LocationPreviewOnMap(location: location)
-//                .onChange(of: location, perform: { value in
-//                    if locationIsInView(geo) {
-//                        exploreByMapVM.locationShownOnList = value
-//                    }
-//                })
+//            LocationPreviewOnMap(location: location)
+                    LargeImageLocationView(location: location)
 
-                }.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3.7)
+                }
+
             }
     } .pagedScrollView()
-        }
+        
         )
 
     }
-    
-//    private var locationsList: AnyView {
-//        AnyView(
-//        HorizontalSnapScrollView(items: locationStore.onMapLocations)
-//        )
-//    }
-//
+
     private var locationList: some View {
         let view: AnyView
         if exploreByMapVM.showingLocationList {
             view = locationsList
         } else {
-            view = AnyView(EmptyView())
+            view = AnyView(
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: 100, height: 200))
         }
         return view
     }
@@ -159,12 +161,6 @@ extension ExploreByMap {
         
     }
     
-    private func locationIsInView(_ geometry: GeometryProxy) -> Bool {
-        if geometry.frame(in: .global).maxY <= 0 {
-            return true
-        }
-        return false
-    }
 }
 
 

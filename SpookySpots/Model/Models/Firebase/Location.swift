@@ -120,10 +120,11 @@ struct Location: Identifiable, Equatable {
             self.price = price
         }
     
-    init(id: Int, name: String, cLLocation: CLLocation) {
+    init(id: Int, name: String, cLLocation: CLLocation, baseImage: Image?) {
             self.id = id
             self.name = name
         self.cLLocation = cLLocation
+        self.baseImage = baseImage
         }
     
     
