@@ -20,6 +20,7 @@ class UserStore: ObservableObject {
             let region = MKCoordinateRegion(center: newValue.coordinate,
                                             span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
             ExploreByMapVM.instance.region = region
+//                RegionWrapper.instance.region = region
         }
         }
     }

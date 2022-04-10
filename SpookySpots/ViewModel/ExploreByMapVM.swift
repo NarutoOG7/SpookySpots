@@ -12,16 +12,29 @@ class ExploreByMapVM: ObservableObject {
     static let instance = ExploreByMapVM()
     
     @ObservedObject var locationManager = UserLocationManager.instance
-    @ObservedObject var locationStore = LocationStore.instance
-    @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var locationStore   = LocationStore.instance
+    @ObservedObject var userStore       = UserStore.instance
     
     var selectedLocationDistance: Double = 0
-    
     @Published var locationShownOnList: Location?
+    @Published var locAnnoTapped: LocationAnnotationModel?
     @Published var region = MKCoordinateRegion(
         center: MapDetails.startingLocation.coordinate,
         span: MapDetails.defaultSpan)
-    
+//    {
+//        willSet {
+//            let newRegionCenter = CLLocation(latitude: newValue.center.latitude,
+//                                             longitude: newValue.center.longitude)
+//            let oldRegionCenter = CLLocation(latitude: regionBeforeLastMove.center.latitude,
+//                                             longitude: regionBeforeLastMove.center.longitude)
+//            
+//            if oldRegionCenter.distance(from: newRegionCenter) > 1000 {
+//                GeoFireManager.instance.searchForLocations(region: newValue)
+//            }
+//            regionBeforeLastMove = newValue
+//        }
+//    }
+    private var regionBeforeLastMove = MKCoordinateRegion()
     @Published var showingLocationList = false
 //    @Published var region = MKCoordinateRegion(
 //        center: MapDetails.startingLocation.coordinate,
@@ -36,3 +49,19 @@ class ExploreByMapVM: ObservableObject {
 //        }
     
 }
+
+
+//class RegionWrapper {
+//    static let instance = RegionWrapper()
+//
+//    var _region: MKCoordinateRegion = MKCoordinateRegion(
+//        center: CLLocationCoordinate2D(latitude: 30, longitude: -90),
+//        span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10))
+//
+//    var region: Binding<MKCoordinateRegion> {
+//        Binding(
+//            get: { self._region },
+//            set: { self._region = $0 }
+//        )
+//    }
+//}

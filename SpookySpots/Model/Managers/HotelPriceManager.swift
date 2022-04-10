@@ -24,10 +24,10 @@ class HotelPriceManager {
     }
     
     func getPriceOfHotel(key: String, withCompletion completion: @escaping ((HotelPriceModel) -> (Void))) {
+        if key != "" {
         let checkIn = getDates().first ?? ""
         let checkOut = getDates().last ?? ""
         let urlString = "\(hotelPriceURL)?hotel_key=\(key)&chk_in=\(checkIn)&chk_out=\(checkOut)"
-        print(urlString)
         let url = URL(string: urlString)!
         let session = URLSession(configuration: .default)
         let task = session.dataTask(with: url) { (data, response, error) in
@@ -46,17 +46,14 @@ class HotelPriceManager {
                     prices.append(price.rate)
                 }
                 let hotelPriceModel = HotelPriceModel(prices: prices)
-                print(prices)
                 completion(hotelPriceModel)
-//                onSuccess(hotelPriceModel)
             } catch {
                 // Handle Error
                 print(error.localizedDescription)
-//                onError(error.localizedDescription)
                 completion(HotelPriceModel(prices: [0]))
             }
         }
         task.resume()
     }
-    
+    }
 }

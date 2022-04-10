@@ -53,6 +53,8 @@ class UserLocationManager: NSObject, ObservableObject {
             print("DEBUG: Auth when in use")
             if let curentLoc = locationManager.location {
                 userStore.currentLocation = curentLoc
+//                RegionWrapper.instance.region = MKCoordinateRegion(
+//                    center: curentLoc.coordinate, span: MapDetails.defaultSpan)
                 ExploreByMapVM.instance.region = MKCoordinateRegion(
                     center: curentLoc.coordinate, span: MapDetails.defaultSpan)
             }
@@ -104,7 +106,7 @@ extension MKCoordinateRegion {
         let furthest = CLLocation(latitude: center.latitude + (span.latitudeDelta/2),
                                   longitude: center.longitude + (span.longitudeDelta/2))
         let centerLoc = CLLocation(latitude: center.latitude, longitude: center.longitude)
-        return centerLoc.distance(from: furthest)
+        return (centerLoc.distance(from: furthest) / 1609.344) * 2
     }
 }
 

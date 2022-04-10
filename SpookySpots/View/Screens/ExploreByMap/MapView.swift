@@ -10,6 +10,25 @@ import MapKit
 import CoreLocation
 import GeoFire
 
+struct LazyView<Content: View>: View {
+
+    let build: () -> Content
+
+    init(_ build: @autoclosure @escaping () -> Content) {
+
+        self.build = build
+
+    }
+
+    var body: Content {
+
+        build()
+
+    }
+
+}
+
+
 struct MapView: View {
     
     @ObservedObject var locationStore = LocationStore.instance
@@ -17,11 +36,15 @@ struct MapView: View {
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     var geoFireManager = GeoFireManager.instance
 
+
     var body: some View {
-        Map(coordinateRegion: $exploreByMapVM.region, showsUserLocation: true, annotationItems: locationStore.onMapLocations) { location in
-                        
-            MapAnnotation(coordinate: location.cLLocation?.coordinate ?? MapDetails.startingLocation.coordinate) {
-                
+        LazyView(
+        Map(coordinateRegion: $exploreByMapVM.region, showsUserLocation: true, annotationItems: geoFireManager.gfOnMapLocations) { location in
+
+            MapAnnotation(coordinate: location.coordinate) {
+
+//            MapAnnotation(coordinate: location.cLLocation?.coordinate ?? MapDetails.startingLocation.coordinate) {
+
                 Button(action: {
                     exploreByMapVM.showingLocationList = true
 //                    locationStore.selectedLocation = location
@@ -30,38 +53,43 @@ struct MapView: View {
                     ZStack {
                         Circle()
                             .stroke(Color.yellow, lineWidth: 3)
-                        
+//                        LocationImage(location: locationFromId(location.id))
 //         LocAnnoImageView(location: location)
-                        LocationImage(location: location)
+//                        LocationImage(location: location)
                     }
                     .frame(width: 70, height: 70)
                 })
             }
-            
+
         }
         .ignoresSafeArea()
         .accentColor(.pink)
         .onAppear {
             locationManager.checkIfLocationServicesIsEnabled()
-            geoFireManager.startLocationListener()
-//            geoFireManager.removeGeoFireLocations()
+//            geoFireManager.startLocationListener()
         } .onDisappear {
-            geoFireManager.endLocationListener()
+//            geoFireManager.endLocationListener()
         }
         .onTapGesture {
             exploreByMapVM.showingLocationList = false
         }
 //            }
 //        }
+        )
+    }
+    
+    func locationFromId(_ id: String) -> Location? {
+        locationStore.onMapLocations.filter { "\($0.id)" == id }.first
     }
 }
 
 struct LocAnnoImageView: View {
-    var location: Location
+    var location: Location?
     
     var body: some View {
         let imgView: Image
-        if let baseImage = location.baseImage {
+        if let location = location,
+           let baseImage = location.baseImage {
             imgView = baseImage
         } else {
             imgView = Image("bannack")
@@ -84,14 +112,14 @@ import SDWebImageSwiftUI
 import Firebase
 
 struct LocationImage: View {
-    
-    var location: Location
+
+    var location: Location?
     @State var url = ""
-    
+
     var body: some View {
-        
+
         VStack {
-            
+
             if url == "" {
                 Loader()
             } else {
@@ -103,18 +131,37 @@ struct LocationImage: View {
             }
         }
         .onAppear {
+
+//            let storage = Storage.storage().reference()
+//            if let imageName = location.imageName {
+//                storage.child(imageName).downloadURL { (url, error) in
+//                    if let error = error {
+//                        print(error.localizedDescription)
+//                    } else {
+//                        guard let url = url else { return }
+//                        DispatchQueue.main.async {
+//                            self.url = "\(url)"
+//                        }
+//                    }
+//                }
+//            }
+            loadImageFromFirebase()
+        }
+    }
+    
+    func loadImageFromFirebase() {
+        if let location = location,
+           let imageName = location.imageName {
+            let storage = Storage.storage().reference(withPath: imageName)
             
-            let storage = Storage.storage().reference()
-            if let imageName = location.imageName {
-                storage.child(imageName).downloadURL { (url, error) in
-                    if let error = error {
-                        print(error.localizedDescription)
-                    } else {
-                        guard let url = url else { return }
-                        DispatchQueue.main.async {
-                            self.url = "\(url)"
-                        }
-                    }
+            storage.downloadURL { url, error in
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
+                
+                if let url = url {
+                    self.url = "\(url)"
                 }
             }
         }
@@ -122,15 +169,50 @@ struct LocationImage: View {
 }
 
 struct Loader : UIViewRepresentable {
-    
+
     func makeUIView(context: UIViewRepresentableContext<Loader>) -> UIActivityIndicatorView {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.startAnimating()
         return indicator
     }
-    
+
     func updateUIView(_ uiView: UIActivityIndicatorView, context: UIViewRepresentableContext<Loader>) {
     }
 }
 
 
+
+import SDWebImageSwiftUI
+import FirebaseStorage
+
+struct FirebaseImage: View {
+    
+    var location: Location?
+    @State private var imageURL = URL(string: "")
+    
+    var body: some View {
+        
+        WebImage(url: imageURL)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .onAppear(perform: loadImageFromFirebase)
+    }
+    
+    func loadImageFromFirebase() {
+        if let location = location,
+           let imageName = location.imageName {
+            let storage = Storage.storage().reference(withPath: imageName)
+            
+            storage.downloadURL { url, error in
+                if let error = error {
+                    print(error.localizedDescription)
+                    return
+                }
+                
+                if let url = url {
+                    self.imageURL = url
+                }
+            }
+        }
+    }
+}

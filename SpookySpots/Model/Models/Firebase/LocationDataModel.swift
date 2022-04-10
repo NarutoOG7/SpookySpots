@@ -23,3 +23,5 @@ struct LocationDataModel {
         var locationID: Int
     }
 }
+
+

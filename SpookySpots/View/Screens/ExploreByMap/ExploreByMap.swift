@@ -13,7 +13,8 @@ struct ExploreByMap: View {
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
-    
+    let mapp = MapViewUI()
+
     var body: some View {
         ZStack {
             map
@@ -24,7 +25,13 @@ struct ExploreByMap: View {
                             SearchBar()
                             filterButton
                         }
-                        Rectangle().fill(Color.clear).frame(width: 100, height: 50)
+                        
+                        searchAreaButton
+                        
+//
+//                        Rectangle().fill(Color.clear).frame(width: 100, height: 50)
+//
+//
                     }
                     VStack {
                     listButton
@@ -51,7 +58,8 @@ struct ExploreByMap: View {
 extension ExploreByMap {
     
     private var map: some View {
-        MapView()
+        mapp
+//        MapView()
 //        MapForExplore()
     }
 
@@ -139,6 +147,8 @@ extension ExploreByMap {
     }
     
     func searchThisArea() {
+        
+        GeoFireManager.instance.searchForLocations(region: mapp.getRegion())
 //        FirebaseManager.instance.getLocationDataFromKey(key: "1") { location in
 //            print(location.name)
 //        }

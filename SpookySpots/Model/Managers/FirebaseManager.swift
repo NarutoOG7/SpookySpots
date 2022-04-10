@@ -126,6 +126,20 @@ class FirebaseManager: ObservableObject {
         
     }
     
+    func getUIImageFromURLString(_ urlString: String, withCompletion completion: @escaping ((_ image: UIImage) -> (Void))) {
+            let storageRef = Storage.storage().reference().child(urlString)
+            storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+                guard let data = data else { return }
+                if let image = UIImage(data: data) {
+                    completion(image)
+                }
+            }
+        
+    }
+    
     
     
     //MARK: - Queries
@@ -140,18 +154,27 @@ class FirebaseManager: ObservableObject {
         
         let addressString = address
         let geoCoder = CLGeocoder()
-        
         geoCoder.geocodeAddressString(addressString) { (placemarks, error) in
+//            guard
+//                let placemarks = placemarks,
+//                let loc = placemarks.first?.location
+//            else {
             guard
-                let placemarks = placemarks,
-                let loc = placemarks.first?.location
+                let placemarks = placemarks
             else {
                 // handle no location found
                 print("error on forward geocoding.. getting coordinates from location address: \(addressString)")
                 return
             }
+            
+            for placemark in placemarks {
+                if let loc = placemark.location {
+                    print(loc.coordinate)
+//                    completion(loc.coordinate)
+                }
+            }
+//            completion(loc.coordinate)
             //            print("successful geocode with addrress: \(addressString)")
-            completion(loc.coordinate)
         }
     }
     

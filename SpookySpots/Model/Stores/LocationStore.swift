@@ -21,36 +21,12 @@ class LocationStore: ObservableObject {
         Location(id: 1235, name: "Hotel Occidental", cLLocation: CLLocation(latitude: 40.58451, longitude: -105.07762), baseImage: Image("bannack"))
     ]
     
-    @Published var locations: [Location] = [] {
-        willSet {
-            print(newValue)
-        }
-    }
-    @Published var hauntedHotels: [Location] = [] {
-        willSet {
-            print(newValue)
-        }
-    }
-    @Published var onMapLocations: [Location] = [] {
-        willSet {
-            print(newValue)
-        }
-    }
-    @Published var nearbyLocations: [Location] = [] {
-        willSet {
-            print(newValue)
-        }
-    }
-    @Published var everyFavoritedLocation: [FavoriteLocation] = [] {
-        willSet {
-            print(newValue)
-        }
-    }
-    @Published var trendingLocations: [Location] = [] {
-        willSet {
-            print(newValue)
-        }
-    }
+    @Published var locations: [Location] = [] 
+    @Published var hauntedHotels: [Location] = []
+    @Published var onMapLocations: [Location] = []
+    @Published var nearbyLocations: [Location] = []
+    @Published var everyFavoritedLocation: [FavoriteLocation] = []
+    @Published var trendingLocations: [Location] = [] 
     @Published var selectedLocation: Location? {
         willSet {
             if newValue != nil {

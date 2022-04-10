@@ -48,37 +48,33 @@ struct Location: Identifiable, Equatable {
     var price: Double?
     var hotelKey: String?
     
-//    init(snapshot: DataSnapshot) {
-//        let data = snapshot.value as? [String : AnyObject]
-//            id = data?["id"] as? Int ?? Int.random(in: 200...300)
-//            name = data?["name"] as? String ?? ""
-//            address = Address(
-//                    address: data?["street"] as? String ?? "",
-//                    city: data?["city"] as? String ?? "",
-//                    state: data?["state"] as? String ?? "",
-//                    zipCode: data?["zipCode"] as? String ?? "",
-//                    country: data?["country"] as? String ?? "")
-//            description = data?["description"] as? String ?? ""
-//            moreInfoLink = data?["moreInfoLink"] as? String ?? ""
-//            review = Review(
-//                    avgRating: data?["avgRating"] as? Double ?? 0,
-//                    lastRating: data?["lastRating"] as? Int ?? 0,
-//                    lastReview: data?["lastReview"] as? String ?? "",
-//                    lastReviewTitle: data?["lastReviewTitle"] as? String ?? "",
-//                    user: data?["lastReviewUser"] as? String ?? "")
-//            imageName = data?["imageName"] as? String ?? ""
-//            tours = data?["offersGhostTours"] as? Bool ?? false
-//            hours = data?["hoursOfOperation"] as? String ?? ""
-//            hotelKey = data?["hotelKey"] as? String ?? ""
-//            cLLocation = CLLocation(
-//                    latitude: data?["l/0"] as? Double ?? 0,
-//                    longitude: data?["l/1"] as? Double ?? 0)
-//
-//        FirebaseManager().getImageFromURLString(imageName) { image in
-//
-//        }
-//
-//    }
+    init(snapshot: DataSnapshot) {
+        let data = snapshot.value as? [String : AnyObject]
+            id = data?["id"] as? Int ?? Int.random(in: 200...300)
+            name = data?["name"] as? String ?? ""
+            address = Address(
+                    address: data?["street"] as? String ?? "",
+                    city: data?["city"] as? String ?? "",
+                    state: data?["state"] as? String ?? "",
+                    zipCode: data?["zipCode"] as? String ?? "",
+                    country: data?["country"] as? String ?? "")
+            description = data?["description"] as? String ?? ""
+            moreInfoLink = data?["moreInfoLink"] as? String ?? ""
+            review = Review(
+                    avgRating: data?["avgRating"] as? Double ?? 0,
+                    lastRating: data?["lastRating"] as? Int ?? 0,
+                    lastReview: data?["lastReview"] as? String ?? "",
+                    lastReviewTitle: data?["lastReviewTitle"] as? String ?? "",
+                    user: data?["lastReviewUser"] as? String ?? "")
+            imageName = data?["imageName"] as? String ?? ""
+            tours = data?["offersGhostTours"] as? Bool ?? false
+            hours = data?["hoursOfOperation"] as? String ?? ""
+            hotelKey = data?["hotelKey"] as? String ?? ""
+            cLLocation = CLLocation(
+                    latitude: data?["l/0"] as? Double ?? 0,
+                    longitude: data?["l/1"] as? Double ?? 0)
+
+    }
     
 //    func toAnyObject() -> Any {
 //       return [
