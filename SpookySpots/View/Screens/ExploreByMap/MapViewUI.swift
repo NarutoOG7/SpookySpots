@@ -18,6 +18,7 @@ struct MapViewUI: UIViewRepresentable {
 
     func makeUIView(context: Context) -> MKMapView {
         mapView.setRegion(exploreByMapVM.region, animated: true)
+        setCurrentLocationRegion()
         mapView.mapType = .standard
         mapView.isRotateEnabled = false
         mapView.addAnnotations(geoFireManager.gfOnMapLocations)
@@ -37,26 +38,38 @@ struct MapViewUI: UIViewRepresentable {
         mapView.region
     }
     
+    func setCurrentLocationRegion() {
+        if UserLocationManager.instance.locationServEnabled,
+            let currentLoc = UserStore.instance.currentLocation {
+            mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: false)
+        }
+    }
+    //MARK: - Coordinator
+    
     final class MapCoordinator: NSObject, MKMapViewDelegate {
+        
+        @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
         
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             
             switch annotation {
                 
-            case let cluster as MKClusterAnnotation:
+            case _ as MKClusterAnnotation:
                 
                 let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "cluster") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "cluster")
                 annotationView.markerTintColor = .black
                 annotationView.titleVisibility = .hidden
+                annotationView.subtitleVisibility = .hidden
                 return annotationView
                 
-            case let locAnnotation as LocationAnnotationModel:
+            case _ as LocationAnnotationModel:
                 
                 let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "SpookySpot") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "Spooky Spot")
                 annotationView.canShowCallout = false
                 annotationView.clusteringIdentifier = "cluster"
                 annotationView.markerTintColor = .purple
                 annotationView.titleVisibility = .visible
+                annotationView.glyphText = "👻"
 
                 return annotationView
                 
@@ -70,7 +83,8 @@ struct MapViewUI: UIViewRepresentable {
                                 
             case let locAnnotation as LocationAnnotationModel:
                 
-                ExploreByMapVM.instance.locAnnoTapped = locAnnotation
+                exploreByMapVM.locAnnoTapped = locAnnotation
+                exploreByMapVM.showingLocationList = true
                 print(locAnnotation)
                 
             default: break

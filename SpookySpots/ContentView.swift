@@ -9,13 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @ObservedObject var authorization = Authorization.instance
-    init() {
-            authorization.signedIn = authorization.isSignedIn
-    }
-    
+//    @ObservedObject var userStore = UserStore.instance
+//    init() {
+//            authorization.signedIn = authorization.isSignedIn
+//    }
+//
     var body: some View {
-        Login()
+        Home()
     }
 }
 

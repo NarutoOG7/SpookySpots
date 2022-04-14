@@ -13,7 +13,8 @@ struct ExploreByMap: View {
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
-    let mapp = MapViewUI()
+    
+    let map = MapViewUI()
 
     var body: some View {
         ZStack {
@@ -56,28 +57,22 @@ struct ExploreByMap: View {
 //MARK: - Subviews
 
 extension ExploreByMap {
-    
-    private var map: some View {
-        mapp
-//        MapView()
-//        MapForExplore()
-    }
 
     private var locationsList: AnyView {
         AnyView(
         ScrollView(.horizontal) {
             HStack {
-                ForEach(locationStore.onMapLocations) { location in
+                ForEach(locationStore.tripLocationsExample) { location in
 //            LocationPreviewOnMap(location: location)
                     LargeImageLocationView(location: location)
 
                 }
 
             }
-    } .pagedScrollView()
-        
-        )
+                        } .pagedScrollView()
 
+        )
+                
     }
 
     private var locationList: some View {
@@ -148,7 +143,7 @@ extension ExploreByMap {
     
     func searchThisArea() {
         
-        GeoFireManager.instance.searchForLocations(region: mapp.getRegion())
+        GeoFireManager.instance.searchForLocations(region: map.getRegion())
 //        FirebaseManager.instance.getLocationDataFromKey(key: "1") { location in
 //            print(location.name)
 //        }

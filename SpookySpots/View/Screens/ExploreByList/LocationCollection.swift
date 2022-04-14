@@ -13,12 +13,12 @@ struct LocationCollection: View {
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var userLocManager = UserLocationManager.instance
     
-    var collectionType = LocationCollectionTypes.nearby
+    var collectionType: LocationCollectionTypes
     
     var body: some View {
         VStack(alignment: .leading) {
             titleView
-
+            locationsList
         }
         
     }
@@ -64,12 +64,11 @@ struct LocationCollection: View {
             })
         }
     }
-    
 }
 
 struct LocationCollection_Previews: PreviewProvider {
     static var previews: some View {
-        LocationCollection()
+        LocationCollection(collectionType: .nearby)
     }
 }
 

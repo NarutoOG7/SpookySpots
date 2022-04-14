@@ -9,11 +9,17 @@ import SwiftUI
 
 
 struct ExploreByList: View {
-    @ObservedObject var explorePageVM = ExploreByListVM.instance
+    @ObservedObject var exploreByListVM = ExploreByListVM.instance
     @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var locationStore = LocationStore.instance
 //    @ObservedObject var locationManager = UserLocationManager.instance
+    
+//    init() {
+//        exploreByListVM.supplyNearbyLocations()
+//    }
+    
     var body: some View {
-        if explorePageVM.isShowingMap {
+        if exploreByListVM.isShowingMap {
 //            VStack {
 //                Spacer(minLength: 45)
                 ExploreByMap()
@@ -37,14 +43,19 @@ struct ExploreByList: View {
                     
                     
                     locationsCollections
-                        
+//                        list
                     
                     Spacer()
                 }
                 .padding()
+            
+                .onAppear {
+                    exploreByListVM.supplyLocationLists()
+                }
 //            }
 //            .navigationBarHidden(true)
         }
+            
     }
     
     //MARK: - SubViews
@@ -55,11 +66,17 @@ struct ExploreByList: View {
         
     }
     
+    private var list: some View {
+        List(locationStore.nearbyLocations) { location in
+            Text(location.name)
+        }
+    }
+    
     private var locationsCollections: some View {
         VStack {
             ScrollView(.vertical, showsIndicators: false, content: {
                 VStack(spacing: 2) {
-                    LocationCollection(collectionType: .topRated)
+//                    LocationCollection(collectionType: .topRated)
                     LocationCollection(collectionType: .nearby)
                     LocationCollection(collectionType: .trending)
                 }
@@ -87,7 +104,7 @@ struct ExploreByList: View {
     }
     
     func isShowingMap() {
-        explorePageVM.isShowingMap = true
+        exploreByListVM.isShowingMap = true
     }
 }
 

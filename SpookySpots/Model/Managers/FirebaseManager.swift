@@ -140,6 +140,29 @@ class FirebaseManager: ObservableObject {
         
     }
     
+//    func getTrendingLocations(withCompletion completion: @escaping (Location) -> Void) {
+    
+    func getTrendingLocations() {
+        
+        let db = Firestore.firestore()
+        
+        db.collection("Trending").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                
+                if let snapshot = querySnapshot {
+                for document in snapshot.documents {
+                    let dict = document.data()
+//                    if !self.locationStore.trendingLocations.contains(where: { "\($0.id)" == (dict["id"] as? String ?? "") }) {
+                        self.locationStore.trendingLocations.append(Location(dict: dict))
+                    }
+//                    }
+                }
+            }
+        }
+    }
+    
     
     
     //MARK: - Queries
@@ -150,6 +173,24 @@ class FirebaseManager: ObservableObject {
     }
     
     //MARK: - Coordinates & Address
+    
+    func getCoordinatesFromAddress(address: String, withCompletion completion: @escaping (CLLocation) -> Void) {
+        let geoCoder = CLGeocoder()
+        geoCoder.geocodeAddressString(address) { (placemarks, error) in
+            guard
+                let placemarks = placemarks,
+                let loc = placemarks.first?.location
+            else {
+                // handle no location found
+                print("error on forward geocoding.. getting coordinates from location address: \(address)")
+                return
+            }
+            //            print("successful geocode with addrress: \(addressString)")
+            print(loc)
+            completion(loc)
+        }
+    }
+    
     func getCoordinatesFrom(address: String, withCompletion completion: @escaping ((_ coordinates: CLLocationCoordinate2D) -> (Void))) {
         
         let addressString = address

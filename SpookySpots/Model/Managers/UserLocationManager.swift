@@ -10,9 +10,10 @@ import SwiftUI
 
 
 enum MapDetails {
-    static let startingLocation = CLLocation(latitude: 39.8097, longitude: -98.5556)
-    static let startingLocationName = "Lebanon"
+    static let startingLocation = CLLocation(latitude: 45.677, longitude: -111.0429)
+    static let startingLocationName = "Bozeman"
     static let defaultSpan = MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+    static let defaultRegion = MKCoordinateRegion(center: startingLocation.coordinate, span: defaultSpan)
 }
 
 
@@ -21,6 +22,7 @@ class UserLocationManager: NSObject, ObservableObject {
     
     var locationManager: CLLocationManager?
     @Published var displayedLocationRoute: MKRoute!
+    @Published var locationServEnabled = false
     @ObservedObject var userStore = UserStore.instance
     var firebaseManager = FirebaseManager.instance
     
@@ -46,17 +48,19 @@ class UserLocationManager: NSObject, ObservableObject {
         case .restricted:
             print("DEBUG: Restricted")
             print("Your location is restricted likely due to parental controls.") //Alert
+            locationServEnabled = false
         case .denied:
             print("DEBUG: Denied")
             print("You have denied this app location permission. Go into your settings to change it.") //Alert
+            locationServEnabled = false
         case .authorizedAlways, .authorizedWhenInUse:
             print("DEBUG: Auth when in use")
-            if let curentLoc = locationManager.location {
-                userStore.currentLocation = curentLoc
+            if let currentLoc = locationManager.location {
+                locationServEnabled = true
+                userStore.currentLocation = currentLoc
 //                RegionWrapper.instance.region = MKCoordinateRegion(
 //                    center: curentLoc.coordinate, span: MapDetails.defaultSpan)
-                ExploreByMapVM.instance.region = MKCoordinateRegion(
-                    center: curentLoc.coordinate, span: MapDetails.defaultSpan)
+                ExploreByListVM.instance.setCurrentLocRegion(currentLoc)
             }
         @unknown default:
             break

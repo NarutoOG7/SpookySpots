@@ -48,58 +48,19 @@ struct Location: Identifiable, Equatable {
     var price: Double?
     var hotelKey: String?
     
-    init(snapshot: DataSnapshot) {
-        let data = snapshot.value as? [String : AnyObject]
-            id = data?["id"] as? Int ?? Int.random(in: 200...300)
-            name = data?["name"] as? String ?? ""
-            address = Address(
-                    address: data?["street"] as? String ?? "",
-                    city: data?["city"] as? String ?? "",
-                    state: data?["state"] as? String ?? "",
-                    zipCode: data?["zipCode"] as? String ?? "",
-                    country: data?["country"] as? String ?? "")
-            description = data?["description"] as? String ?? ""
-            moreInfoLink = data?["moreInfoLink"] as? String ?? ""
-            review = Review(
-                    avgRating: data?["avgRating"] as? Double ?? 0,
-                    lastRating: data?["lastRating"] as? Int ?? 0,
-                    lastReview: data?["lastReview"] as? String ?? "",
-                    lastReviewTitle: data?["lastReviewTitle"] as? String ?? "",
-                    user: data?["lastReviewUser"] as? String ?? "")
-            imageName = data?["imageName"] as? String ?? ""
-            tours = data?["offersGhostTours"] as? Bool ?? false
-            hours = data?["hoursOfOperation"] as? String ?? ""
-            hotelKey = data?["hotelKey"] as? String ?? ""
-            cLLocation = CLLocation(
-                    latitude: data?["l/0"] as? Double ?? 0,
-                    longitude: data?["l/1"] as? Double ?? 0)
-
+    init(dictionary: [String : AnyObject]) {
+        id = dictionary["id"] as? Int ?? 0
+        name = dictionary["name"] as? String ?? ""
+     hotelKey = dictionary["hotelKey"] as? String ?? ""
+        address?.address = dictionary["street"] as? String ?? ""
+        address?.city = dictionary["city"] as? String ?? ""
+        address?.state = dictionary["state"] as? String ?? ""
+        address?.zipCode = dictionary["zipCode"] as? String ?? ""
+        address?.country = dictionary["country"] as? String ?? ""
+        
     }
+   
     
-//    func toAnyObject() -> Any {
-//       return [
-//        "avgRating": review?.avgRating ?? "",
-//        "city": address?.city ?? "",
-//        "country": address?.country ?? "",
-//        "description": description,
-//        "hotelKey": hotelKey,
-//        "hoursOfOperation": hours,
-//        "id": id,
-//        "imageName": imageName,
-//        "lastRating": review?.lastRating ?? "",
-//        "lastReview": review?.lastReview ?? "",
-//        "lastReviewTitle": review?.lastReviewTitle ?? "",
-//        "lastReviewUser": review?.user ?? "",
-//        "likes": likes,
-//        "moreInfoLink": moreInfoLink,
-//        "name": name,
-//        "offersGhostTours": tours,
-//        "state": address?.state ?? "",
-//        "street": address?.address ?? "",
-//        "zipCode": address?.zipCode ?? ""
-//       ]
-//     }
-//
         init(id: Int, name: String, address: Address?, description: String?, moreInfoLink: String?, review: Review?, locationType: String?, cLLocation: CLLocation?, tours: Bool?, imageName: String?, baseImage: Image?, distanceToUser: Double?, price: Double?) {
             self.id = id
             self.name = name
@@ -123,15 +84,30 @@ struct Location: Identifiable, Equatable {
         self.baseImage = baseImage
         }
     
+    init(dict: [String : Any]) {
+        id = dict["id"] as? Int ?? 00
+        name = dict["name"] as? String ?? ""
+        imageName = dict["imageName"] as? String ?? ""
+    }
     
     
-    //    mutating func assignCoordinates(cLLocation: CLLocation) {
-    //        self.cLLocation = cLLocation
-    //    }
-    //
-    //
-    
-    
+    mutating func addCLoc(_ cllocation: CLLocation) {
+        
+        var result = self
+        
+        let address = address?.geoCodeAddress()
+        FirebaseManager.instance.getCoordinatesFromAddress(address: address ?? "") { cloc in
+            print(cloc.coordinate)
+            result.cLLocation = cloc
+        }
+        self = result
+    }
+
+    mutating func addPrice(_ price: Double) {
+        var result = self
+        result.price = price
+        self = result
+    }
     
     //MARK: - Images
     struct Images {

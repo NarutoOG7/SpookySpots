@@ -13,6 +13,7 @@ import MapKit
 class UserStore: ObservableObject {
     static let instance = UserStore()
     
+    @Published var isSignedIn = false
     @Published var user = User()
     @Published var currentLocation: CLLocation? {
         willSet {

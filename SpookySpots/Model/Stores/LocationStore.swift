@@ -24,9 +24,17 @@ class LocationStore: ObservableObject {
     @Published var locations: [Location] = [] 
     @Published var hauntedHotels: [Location] = []
     @Published var onMapLocations: [Location] = []
-    @Published var nearbyLocations: [Location] = []
+    @Published var nearbyLocations: [Location] = [] {
+        willSet {
+            print(newValue.count)
+        }
+    }
     @Published var everyFavoritedLocation: [FavoriteLocation] = []
-    @Published var trendingLocations: [Location] = [] 
+    @Published var trendingLocations: [Location] = [] {
+        willSet {
+            print(newValue.last)
+        }
+    }
     @Published var selectedLocation: Location? {
         willSet {
             if newValue != nil {
