@@ -12,6 +12,10 @@ import AuthenticationServices
 struct CreativeSignInUp: View {
     @State var index = 0
     
+    @State var firebaseError = false
+    
+    @State var showingAlertForFirebaseError = false
+    
     @ObservedObject var userStore = UserStore.instance
     
     var body: some View {
@@ -63,7 +67,12 @@ struct CreativeSignInUp: View {
                 
                 Spacer()
             }
-            
+            .alert("Firebase Error", isPresented: $showingAlertForFirebaseError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("There was an error with firebase. Check your connection and try again.")
+            }
+
         }
         .preferredColorScheme(.dark)
         .background(Color.white.edgesIgnoringSafeArea(.all))
@@ -127,8 +136,12 @@ struct CreativeSignInUp: View {
     }
     
     private func continueAsGuestTapped() {
-        userStore.isGuest = true
-        userStore.isSignedIn = true
+        Authorization.instance.anonymousSignIn { error in
+            if error == .troubleConnectingToFirebase {
+                firebaseError = true
+            }
+        }
+
     }
 }
 
@@ -147,6 +160,8 @@ struct Login: View {
     
     @State var emailOrPasswordInvalid = false
     @State var firebaseError = false
+    
+    @State var showingAlertPasswordRest = false
     
     var auth = Authorization()
     var body: some View {
@@ -173,6 +188,10 @@ struct Login: View {
             
             loginButton
         }
+        .alert("Email Sent", isPresented: $showingAlertPasswordRest) {
+            Button("OK", role: .cancel) { }
+        }
+
     }
     
     private var authTypeView: some View {
@@ -219,6 +238,8 @@ struct Login: View {
                 SecureField("Password", text: self.$passwordInput)
             }
             Divider().background(Color.gray)
+            
+            passwordError
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -229,6 +250,18 @@ struct Login: View {
             .fill(Color.clear)
             .frame(width: 100, height: 36.25)
         //            .padding(.top, 40)
+    }
+    
+    //MARK: - ErrorMessages
+    private var passwordError: some View {
+        let view: Text
+        if emailOrPasswordInvalid {
+            view = Text(AuthErrorTypes.incorrectEmailOrPassword.rawValue)
+        } else {
+            view = Text("")
+        }
+        return view
+            .foregroundColor(.red)
     }
     
     //MARK: - Buttons
@@ -267,7 +300,15 @@ struct Login: View {
     }
     
     private func forgotPasswordTapped() {
-        
+        auth.passwordReset(email: emailInput) { result in
+            if result == true {
+                self.showingAlertPasswordRest = true
+            }
+        } error: { error in
+            if error == .firebaseTrouble {
+                firebaseError = true
+            }
+        }
     }
     
     private func loginTapped() {
@@ -396,6 +437,8 @@ struct SignUP: View {
                 SecureField("Confirm Password", text: self.$confirmPasswordInput)
             }
             Divider().background(Color.gray)
+            
+            passwordErrorView
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -408,6 +451,17 @@ struct SignUP: View {
             view = Text(AuthErrorTypes.emailInUse.rawValue)
         } else {
             view = Text("")
+        }
+        return view
+            .foregroundColor(.red)
+    }
+    
+    private var passwordErrorView: some View {
+        let view: Text
+        if passwordsMatch {
+            view = Text("")
+        } else {
+            view = Text(AuthErrorTypes.passwordsDontMatch.rawValue)
         }
         return view
             .foregroundColor(.red)
@@ -443,8 +497,9 @@ struct SignUP: View {
                 self.emailInUseAlready = true
             case .failedToSaveUser:
                 self.failedToSaveUser = true
-            case .incorrectEmailOrPassword:
-                break
+            case .troubleConnectingToFirebase:
+                self.firebaseError = true
+            default: break
             }
         }
         

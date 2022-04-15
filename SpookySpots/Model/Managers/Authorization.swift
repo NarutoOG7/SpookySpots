@@ -16,6 +16,8 @@ enum AuthErrorTypes: String {
     case firebaseTrouble = "There was an issue creating your account."
     case emailInUse = "This email is already in use."
     case failedToSaveUser = "There was a problem saving the user"
+    case troubleConnectingToFirebase = "There seems to be an issue with the connection to firebase."
+    case failToSignOut = "There was an error signing out of your account. Check your connection and try again."
 }
 
 class Authorization {
@@ -135,13 +137,45 @@ class Authorization {
         }
     }
     
-    func signOut() {
+    
+    //MARK: - SignOut
+    func signOut(error onError: @escaping(AuthErrorTypes) -> Void) {
         do {
             try auth.signOut()
             self.userStore.isSignedIn = false
         } catch {
             print("Trouble siging out. \(error)")
             // handle error
+            onError(.failToSignOut)
+        }
+    }
+    
+    //MARK: - GuestSignIn
+    func anonymousSignIn(error onError: @escaping(AuthErrorTypes) -> Void) {
+        auth.signInAnonymously { result, error in
+            if let error = error {
+                print(error.localizedDescription)
+                onError(.troubleConnectingToFirebase)
+            }
+            if result != nil {
+                DispatchQueue.main.async {
+                    self.userStore.isSignedIn = true
+                    self.userStore.isGuest = true
+                    UserDefaults.standard.set(true, forKey: "signedIn")
+                }
+            }
+        }
+    }
+    
+    //MARK: - PasswordReset
+    func passwordReset(email: String, withCompletion completion: @escaping(Bool) -> Void, error onError: @escaping(AuthErrorTypes) -> Void) {
+        auth.sendPasswordReset(withEmail: email) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                onError(.firebaseTrouble)
+            } else {
+                completion(true)
+            }
         }
     }
 }
