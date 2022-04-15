@@ -9,11 +9,14 @@ import Firebase
 import SwiftUI
 
 
+
 class AppDelegate: NSObject, UIApplicationDelegate {
     
     private var launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
+    private var signedInUser = UserDefaults.standard.data(forKey: "user")
     
     @ObservedObject var locationManager = UserLocationManager.instance
+    @ObservedObject var userStore = UserStore.instance
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
             FirebaseApp.configure()
@@ -23,6 +26,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
         locationManager.checkIfLocationServicesIsEnabled()
 
+        getUserIfSignedIn()
+        
+        
         return true
+    }
+    
+    func getUserIfSignedIn() {
+        if let data = UserDefaults.standard.data(forKey: "user") {
+            do {
+                // Create JSON Decoder
+                let decoder = JSONDecoder()
+
+                // Decode Note
+                let user = try decoder.decode(User.self, from: data)
+
+                userStore.user = user
+            } catch {
+                print("Unable to Decode Note (\(error))")
+            }
+        }
     }
 }

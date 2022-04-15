@@ -9,13 +9,19 @@ import SwiftUI
 
 struct ContentView: View {
     
-//    @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var userStore = UserStore.instance
 //    init() {
-//            authorization.signedIn = authorization.isSignedIn
+//        userStore.isSignedIn = Authorization.instance.isSignedIn()
 //    }
-//
+
     var body: some View {
-        Home()
+        
+//        if UserDefaults.standard.object(forKey: "user_uid_key") != nil {
+        if userStore.isSignedIn {
+            TabBarSetup()
+        } else {
+            CreativeSignInUp()
+        }
     }
 }
 

@@ -9,50 +9,104 @@ import SwiftUI
 import FirebaseAuth
 import FirebaseFirestore
 
+
+enum AuthErrorTypes: String {
+    case incorrectEmailOrPassword = "Email or Password is invalid"
+    case passwordsDontMatch = "Passwords DO NOT match"
+    case firebaseTrouble = "There was an issue creating your account."
+    case emailInUse = "This email is already in use."
+    case failedToSaveUser = "There was a problem saving the user"
+}
+
 class Authorization {
+    
     static let instance = Authorization()
     
     @ObservedObject var userStore = UserStore.instance
     
     let auth = Auth.auth()
     
-    func signIn(email: String, password: String) {
+    
+    func isUserAlready(id: String) -> Bool {
+        id == auth.currentUser?.uid
+    }
+    
+    func isSignedIn() -> Bool {
+        auth.currentUser != nil
+    }
+    
+    func signIn(email: String, password: String, error onError: @escaping(AuthErrorTypes) -> Void) {
         
         auth.signIn(withEmail: email, password: password) { authResult, error in
             
             if let error = error {
                 print(error.localizedDescription)
+                onError(.firebaseTrouble)
             }
             
             if let result = authResult {
             
                 let user = User(id: result.user.uid, name: result.user.displayName ?? "", email: result.user.email ?? "")
                 
+                do {
+                    let encoder = JSONEncoder()
+                    let data = try encoder.encode(user)
+                    
+                    UserDefaults.standard.set(data, forKey: "user")
+                } catch {
+                    print(AuthErrorTypes.failedToSaveUser.rawValue)
+                    onError(.failedToSaveUser)
+                }
+                
                 DispatchQueue.main.async {
                     self.userStore.isSignedIn = true
                     self.userStore.user = user
+                    UserDefaults.standard.set(true, forKey: "signedIn")
+
                 }
             }
         }
     }
     
-    func signUp(userName: String, email: String, password: String, confirmPassword: String) {
+    func signUp(userName: String, email: String, password: String, confirmPassword: String, error onError: @escaping(AuthErrorTypes) -> Void) {
         //Todo: confirm that password and confirm password match
+        
+        if confirmPassword == password {
+        
         auth.createUser(withEmail: email, password: password) { (result, error) in
                 
             if let error = error {
+                if error.localizedDescription.contains("email in use") {
+                    print("Its in use")
+                    onError(.emailInUse)
+                } else {
                 print("Trouble creating account \(error)")
+                    onError(.firebaseTrouble)
+                }
             } else {
                 guard let result = result else {
                     print("No result")
+                    onError(.firebaseTrouble)
                     return
                 }
                 
                 let user = User(id: result.user.uid, name: userName, email: result.user.email ?? "")
                 
+                do {
+                    let encoder = JSONEncoder()
+                    let data = try encoder.encode(user)
+                    
+                    UserDefaults.standard.set(data, forKey: "user")
+                } catch {
+                    print(AuthErrorTypes.failedToSaveUser.rawValue)
+                    onError(.failedToSaveUser)
+                }
+                
                 DispatchQueue.main.async {
                     self.userStore.isSignedIn = true
                     self.userStore.user = user
+                    UserDefaults.standard.set(true, forKey: "signedIn")
+
                 }
                 
                 
@@ -60,6 +114,10 @@ class Authorization {
         }
         
         setCurrentUsersName(userName)
+            
+        } else {
+            onError(.passwordsDontMatch)
+        }
     }
     
     

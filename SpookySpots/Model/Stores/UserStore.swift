@@ -7,13 +7,18 @@
 
 import Foundation
 import CoreLocation
+import FirebaseAuth
 import MapKit
 
 
 class UserStore: ObservableObject {
     static let instance = UserStore()
     
-    @Published var isSignedIn = false
+    @Published var isSignedIn = UserDefaults.standard.bool(forKey: "signedIn")
+
+    
+//    @Published var isSignedIn = false
+    @Published var isGuest = false
     @Published var user = User()
     @Published var currentLocation: CLLocation? {
         willSet {

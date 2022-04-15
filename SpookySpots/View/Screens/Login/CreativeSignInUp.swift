@@ -6,12 +6,129 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 
 struct CreativeSignInUp: View {
+    @State var index = 0
+    
+    @ObservedObject var userStore = UserStore.instance
+    
     var body: some View {
-        Home()
-            .preferredColorScheme(.dark)
+        
+        GeometryReader { _ in
+            VStack {
+                Spacer()
+                
+                VStack {
+                    VStack(spacing: -20) {
+                        logo
+                        
+                        ZStack {
+                            SignUP(index: self.$index)
+                                .zIndex(Double(self.index))
+                            Login(index: self.$index)
+                        }
+                    }
+                    HStack(spacing: 15) {
+                        
+                        Rectangle()
+                            .fill(Color.black)
+                            .frame(height: 1)
+                        
+                        Text("OR")
+                            .foregroundColor(Color.black)
+                        
+                        Rectangle()
+                            .fill(Color.black)
+                            .frame(height: 1)
+                        
+                    }
+                    .padding(.horizontal, 30)
+                    .padding(.top, 25)
+                    
+                    
+                    //                HStack(spacing: 25) {
+                    //
+                    //                    appleButton
+                    //                    facebookButton
+                    //                    twitterButton
+                    //
+                    //                }
+                    .padding(.top, 30)
+                    //                Spacer()
+                    guest
+                }
+                .padding(.vertical)
+                
+                Spacer()
+            }
+            
+        }
+        .preferredColorScheme(.dark)
+        .background(Color.white.edgesIgnoringSafeArea(.all))
+    }
+    
+    var logo: some View {
+        Image("apple")
+            .logoStyle()
+        
+    }
+    
+    //MARK: - Other Options
+    private var appleButton: some View {
+        //        Button(action: appleTapped) {
+        //            Image("apple")
+        //                .logoStyle()
+        //        }
+        //
+        //
+        SignInWithAppleButton(
+            onRequest: { request in
+                AppleSignIn().signIn(request)
+            },
+            onCompletion: { result in
+                AppleSignIn().completion(result: result)
+            }
+        ).frame(width: 50, height: 50)
+        
+    }
+    
+    private var facebookButton: some View {
+        Button(action: facebookTapped) {
+            Image("apple")
+                .logoStyle()
+        }
+    }
+    
+    private var twitterButton: some View {
+        Button(action: twitterTapped) {
+            Image("apple")
+                .logoStyle()
+        }
+    }
+    
+    private var guest: some View {
+        Text("Continue As Guest")
+            .font(.title3)
+            .fontWeight(.light)
+            .italic()
+            .foregroundColor(.pink)
+            .onTapGesture(perform: continueAsGuestTapped)
+            .padding()
+    }
+    
+    private func facebookTapped() {
+        
+    }
+    
+    private func twitterTapped() {
+        
+    }
+    
+    private func continueAsGuestTapped() {
+        userStore.isGuest = true
+        userStore.isSignedIn = true
     }
 }
 
@@ -28,12 +145,16 @@ struct Login: View {
     @State var passwordInput = ""
     @Binding var index: Int
     
+    @State var emailOrPasswordInvalid = false
+    @State var firebaseError = false
+    
+    var auth = Authorization()
     var body: some View {
         ZStack(alignment: .bottom) {
             
             VStack {
                 
-             authTypeView
+                authTypeView
                 emptySpace
                 email
                 password
@@ -42,10 +163,10 @@ struct Login: View {
             }
             .padding()
             .padding(.bottom, 65)
-            .background(Color.pink)
+            .background(Color.black)
             .clipShape(CurvedShapeLeft())
             .contentShape(CurvedShapeLeft())
-            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: -5)
+            .shadow(color: .white.opacity(0.3), radius: 5, x: 0, y: -5)
             .onTapGesture(perform: authTypeLoginTapped)
             .cornerRadius(45)
             .padding(.horizontal, 20)
@@ -56,15 +177,16 @@ struct Login: View {
     
     private var authTypeView: some View {
         HStack {
-            VStack(spacing: 10) {
-            Text("Login")
-                .foregroundColor(self.index == 0 ? .white : .gray)
-                .font(.title)
-                .fontWeight(.bold)
+            VStack(spacing: 50) {
+                Text("Login")
+                    .foregroundColor(self.index == 0 ? .white : .gray)
+                    .font(.title)
+                    .fontWeight(.bold)
                 
                 Capsule()
-                    .fill(self.index == 0 ? Color.blue : Color.clear)
+                    .fill(self.index == 0 ? Color.pink : Color.clear)
                     .frame(width: 90, height: 4)
+                    .offset(y: -35)
                 
             }
             Spacer(minLength: 0)
@@ -79,9 +201,10 @@ struct Login: View {
                     .foregroundColor(.white)
                 
                 TextField("Email Address", text: self.$emailInput)
+                    .foregroundColor(.white)
             }
             
-            Divider().background(Color.black)
+            Divider().background(Color.gray)
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -95,7 +218,7 @@ struct Login: View {
                 
                 SecureField("Password", text: self.$passwordInput)
             }
-            Divider().background(Color.black)
+            Divider().background(Color.gray)
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -104,8 +227,8 @@ struct Login: View {
     private var emptySpace: some View {
         Rectangle()
             .fill(Color.clear)
-            .frame(width: 100, height: 30)
-//            .padding(.top, 40)
+            .frame(width: 100, height: 36.25)
+        //            .padding(.top, 40)
     }
     
     //MARK: - Buttons
@@ -129,7 +252,7 @@ struct Login: View {
                 .fontWeight(.bold)
                 .padding(.vertical)
                 .padding(.horizontal, 50)
-                .background(Color.blue)
+                .background(Color.pink)
                 .clipShape(Capsule())
                 .shadow(color: Color.white.opacity(0.1), radius: 5, x: 0, y: 5)
         }
@@ -148,10 +271,17 @@ struct Login: View {
     }
     
     private func loginTapped() {
-        
+        auth.signIn(email: emailInput, password: passwordInput) { error in
+            switch error {
+            case .incorrectEmailOrPassword:
+                self.emailOrPasswordInvalid = true
+            case .firebaseTrouble:
+                self.firebaseError = true
+            default: break
+            }
+        }
     }
 }
-
 
 //MARK: - SignUp
 struct SignUP: View {
@@ -160,7 +290,14 @@ struct SignUP: View {
     @State var emailInput = ""
     @State var passwordInput = ""
     @State var confirmPasswordInput = ""
+    
+    @State var passwordsMatch = true
+    @State var firebaseError = false
+    @State var emailInUseAlready = false
+    @State var failedToSaveUser = false
+    
     @Binding var index: Int
+    var auth = Authorization()
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -174,22 +311,22 @@ struct SignUP: View {
             }
             .padding()
             .padding(.bottom, 65)
-            .background(Color.pink)
+            .background(Color.black)
             .clipShape(CurvedShapeRight())
             .contentShape(CurvedShapeRight())
-            .shadow(color: .black.opacity(0.3), radius: 5, x: 0, y: -5)
+            .shadow(color: .white.opacity(0.3), radius: 5, x: 0, y: -5)
             .onTapGesture(perform: authTypeSignUpTapped)
             .cornerRadius(45)
             .padding(.horizontal, 20)
             
-            confirmSignUpButton
+            signUpButton
         }
     }
     private var authTypeView: some View {
         HStack {
             Spacer(minLength: 0)
             
-            VStack(spacing: 10) {
+            VStack(spacing: 50) {
                 Text("Sign Up")
                     .foregroundColor(self.index == 1 ? .white : .gray)
                     .font(.title)
@@ -198,6 +335,7 @@ struct SignUP: View {
                 Capsule()
                     .fill(self.index == 1 ? Color.blue : Color.clear)
                     .frame(width: 90, height: 4)
+                    .offset(y: -35)
                 
             }
         }
@@ -213,7 +351,7 @@ struct SignUP: View {
                 TextField("Your Name", text: self.$usernameInput)
             }
             
-            Divider().background(Color.black)
+            Divider().background(Color.gray)
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -228,7 +366,8 @@ struct SignUP: View {
                 TextField("Email Address", text: self.$emailInput)
             }
             
-            Divider().background(Color.black)
+            Divider().background(Color.gray)
+            emailInUseErrorView
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -242,7 +381,7 @@ struct SignUP: View {
                 
                 SecureField("Password", text: self.$passwordInput)
             }
-            Divider().background(Color.black)
+            Divider().background(Color.gray)
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -256,16 +395,28 @@ struct SignUP: View {
                 
                 SecureField("Confirm Password", text: self.$confirmPasswordInput)
             }
-            Divider().background(Color.black)
+            Divider().background(Color.gray)
         }
         .padding(.horizontal)
         .padding(.top, 40)
     }
     
+    //MARK: - Error Views
+    private var emailInUseErrorView: some View {
+        let view: Text
+        if emailInUseAlready {
+            view = Text(AuthErrorTypes.emailInUse.rawValue)
+        } else {
+            view = Text("")
+        }
+        return view
+            .foregroundColor(.red)
+    }
+    
     //MARK: - Buttons
     
-    private var confirmSignUpButton: some View {
-        Button(action: confirmSignUpTapped) {
+    private var signUpButton: some View {
+        Button(action: signUpTapped) {
             Text("SIGNUP")
                 .foregroundColor(self.index == 1 ? .white : .gray)
                 .fontWeight(.bold)
@@ -281,96 +432,43 @@ struct SignUP: View {
     
     //MARK: - Methods
     
-    private func confirmSignUpTapped() {
+    private func signUpTapped() {
+        auth.signUp(userName: usernameInput, email: emailInput, password: passwordInput, confirmPassword: confirmPasswordInput) { error in
+            switch error {
+            case .passwordsDontMatch:
+                self.passwordsMatch = false
+            case .firebaseTrouble:
+                self.firebaseError = true
+            case .emailInUse:
+                self.emailInUseAlready = true
+            case .failedToSaveUser:
+                self.failedToSaveUser = true
+            case .incorrectEmailOrPassword:
+                break
+            }
+        }
         
     }
     
     private func authTypeSignUpTapped() {
         self.index = 1
     }
-}
-
-
-//MARK: - Home
-struct Home: View {
     
-    @State var index = 0
-    
-    var body: some View {
+    private func signUpSuccess() {
         
-        GeometryReader { _ in
-            VStack {
-                logo
-                
-                ZStack {
-                    SignUP(index: self.$index)
-                        .zIndex(Double(self.index))
-                    Login(index: self.$index)
-                }
-                
-                HStack(spacing: 15) {
-                    
-                    Rectangle()
-                        .fill(Color.black)
-                        .frame(height: 1)
-                    
-                    Text("OR")
-                    
-                    Rectangle()
-                        .fill(Color.black)
-                        .frame(height: 1)
-                    
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 50)
-                
-            
-                HStack(spacing: 25) {
-                    
-                    appleButton
-                    facebookButton
-                    twitterButton
-                    
-                }
-            }
-        }
-        .background(Color.purple.edgesIgnoringSafeArea(.all))
     }
     
-    var logo: some View {
-        LogoImage(image: Image("apple"))
-    }
-    
-    //MARK: - Other Options
-    private var appleButton: some View {
-        LogoImage(image: Image("apple"))
-    }
-    
-    private var facebookButton: some View {
-        LogoImage(image: Image("apple"))
-    }
-    
-    private var twitterButton: some View {
-        LogoImage(image: Image("apple"))
+    private func signUpError() {
+        
     }
 }
 
-struct LogoImage: View {
-    var image: Image
-    var body: some View {
-        image
-            .resizable()
-            .renderingMode(.original)
-            .frame(width: 50, height: 50)
-            .clipShape(Circle()) as! Image
-    }
-}
-
+//MARK: - Helpers
 struct CurvedShapeLeft : Shape {
     
     func path(in rect: CGRect) -> Path {
         return Path { path in
-            path.move(to: CGPoint(x: rect.width, y: 100))
+            path.move(to: CGPoint(x: rect.width, y: 120))
             path.addLine(to: CGPoint(x: rect.width, y: rect.height))
             path.addLine(to: CGPoint(x: 0, y: rect.height))
             path.addLine(to: CGPoint(x: 0, y: 0))
@@ -378,15 +476,24 @@ struct CurvedShapeLeft : Shape {
     }
 }
 
-
 struct CurvedShapeRight : Shape {
     
     func path(in rect: CGRect) -> Path {
         return Path { path in
-            path.move(to: CGPoint(x: 0, y: 100))
+            path.move(to: CGPoint(x: 0, y: 120))
             path.addLine(to: CGPoint(x: 0, y: rect.height))
             path.addLine(to: CGPoint(x: rect.width, y: rect.height))
             path.addLine(to: CGPoint(x: rect.width, y: 0))
         }
+    }
+}
+
+extension Image {
+    func logoStyle() -> some View {
+        return self
+            .resizable()
+            .renderingMode(.original)
+            .frame(width: 50, height: 50)
+            .clipShape(Circle())
     }
 }
