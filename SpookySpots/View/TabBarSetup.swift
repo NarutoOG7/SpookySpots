@@ -46,6 +46,17 @@ struct TabBarSetup: View {
             }
             .tag(1)
     }
+    
+    private var settingsTab: some View {
+        SettingsPage()
+            .tabItem {
+                Text("Settings")
+                Image(systemName: "gear")
+                    .resizable()
+                    .frame(width: 25, height: 25)
+            }
+            .tag(2)
+    }
 }
 
 struct TabBarSetup_Previews: PreviewProvider {
