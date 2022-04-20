@@ -99,10 +99,10 @@ struct LocationCollection: View {
         } else {
             view = AnyView(
                 ForEach(locationStore.nearbyLocations) { location in
-                    let loc = locationStore.nearbyLocations.first{$0.id == location.id }
+
                     VStack(alignment: .leading) {
                         NavigationLink {
-                            LocationDetails(location: loc ?? location)
+                            LocationDetails(location: location)
                         } label: {
                             MainLocCell(location: location)
                                 .padding(isLastInNearbyList(location)

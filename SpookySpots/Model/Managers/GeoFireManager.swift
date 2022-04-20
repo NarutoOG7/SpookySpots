@@ -46,7 +46,7 @@ class GeoFireManager: ObservableObject {
                 if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
                     self.gfNearbyLocations.append(anno)
                     
-                    if self.locationStore.nearbyLocations.contains(where: { "\($0.id)" == key }) {
+                    if !self.locationStore.nearbyLocations.contains(where: { "\($0.id)" == key }) {
                         self.locationStore.nearbyLocations.append(location)
                     }
                 }
