@@ -7,33 +7,33 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "4445C2C2-B1F1-45E3-A1B0-D95AA85C175C"
+            uuid = "9C7460A0-E230-431C-9B0B-4D142C1FF23F"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SpookySpots/Model/Managers/Authorization.swift"
+            filePath = "SpookySpots/Model/Managers/GeoFireManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
-            landmarkName = "signUp(userName:email:password:confirmPassword:error:)"
-            landmarkType = "7">
+            startingLineNumber = "178"
+            endingLineNumber = "178"
+            landmarkName = "getLocationDataFromKey(key:withCompletion:)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D1C6AAFF-DA4F-4D99-A06E-E25787A38044"
-            shouldBeEnabled = "No"
+            uuid = "8D8FE24A-6173-4035-AEC5-2DE705885E1A"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "SpookySpots/Model/Managers/Authorization.swift"
+            filePath = "SpookySpots/Model/Managers/GeoFireManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "86"
-            endingLineNumber = "86"
-            landmarkName = "signUp(userName:email:password:confirmPassword:error:)"
-            landmarkType = "7">
+            startingLineNumber = "41"
+            endingLineNumber = "41"
+            landmarkName = "GeoFireManager"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

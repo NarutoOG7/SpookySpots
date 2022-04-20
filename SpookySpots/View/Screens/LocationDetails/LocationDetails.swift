@@ -14,6 +14,8 @@ struct LocationDetails: View {
     @ObservedObject var userLocManager = UserLocationManager.instance
     @State var topBarShouldBeHidden = true
     
+    @ObservedObject var exploreByListVM = ExploreByListVM.instance
+    
     var body: some View {
         NavigationView {
             
@@ -30,7 +32,7 @@ struct LocationDetails: View {
                     VStack {
                         Rectangle()
                             .fill(Color.clear)
-                            .frame(width: 100, height: 180)
+                            .frame(width: 100, height: 120)
                         VStack(alignment: .leading) {
                             cardHandle
                             title
@@ -68,6 +70,10 @@ struct LocationDetails: View {
             .navigationBarHidden(topBarShouldBeHidden)
             .navigationBarItems(leading: backButton)
             .navigationBarItems(trailing: favoriteButton)
+            
+            .onAppear {
+                exploreByListVM.searchText = ""
+            }
         }
     }
 }

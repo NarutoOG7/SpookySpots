@@ -39,8 +39,8 @@ struct Address {
     }
     
     func geoCodeAddress() -> String {
-        "\(address)"
-//        address + ", " + city + ", " + state
+//        "\(address)"
+        address + ", " + city + ", " + state
     }
 }
 

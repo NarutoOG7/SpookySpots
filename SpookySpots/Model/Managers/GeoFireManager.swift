@@ -32,10 +32,13 @@ class GeoFireManager: ObservableObject {
     @Published var gfOnMapLocations: [LocationAnnotationModel] = [] {
         willSet {
             if let last = newValue.last {
-                self.getLocationDataFromKey(key: last.id) { location in
-                    if self.locationStore.onMapLocations.contains(where: { "\($0.id)" == last.id }) {
-                        self.locationStore.onMapLocations.append(location)
-                    }
+//                self.getLocationDataFromKey(key: last.id) { location in
+//                    if self.locationStore.onMapLocations.contains(where: { "\($0.id)" == last.id }) {
+//                        self.locationStore.onMapLocations.append(location)
+//                    }
+//                }
+                if let location = locationStore.hauntedHotels.first(where: { $0.id == last.id.hashValue }) {
+                    locationStore.onMapLocations.append(location)
                 }
             }
         }
@@ -91,18 +94,42 @@ class GeoFireManager: ObservableObject {
     }
     
     func searchForLocations(region: MKCoordinateRegion) {
+        if gfOnMapLocations.count != locationStore.hauntedHotels.count {
         let geoLocRef = GeoFire(firebaseRef: locationRef)
         
         let regionCenter = region.center
-        let radius = region.distanceMax()
+        let radius = region.distanceMax() / 2
         let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
         circleQuery.observe(.keyEntered, with: { key, loc in
-            let locAnnoModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
-            if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
-                self.gfOnMapLocations.append(locAnnoModel)
+            if let location = self.locationStore.hauntedHotels.first(where: { "\($0.id)" == key }) {
+                print(location)
+                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
+                
+                if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
+                    self.gfOnMapLocations.append(anno)
+                    
+                    if self.locationStore.onMapLocations.contains(where: { "\($0.id)" == key }) {
+                        self.locationStore.onMapLocations.append(location)
+                    }
+                }
             }
+        
+//            print(key)
+//            let locAnnoModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
+//            if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
+//                self.gfOnMapLocations.append(locAnnoModel)
+//
+//                print(self.locationStore.hauntedHotels)
+//                if let location = self.locationStore.hauntedHotels.first(where: { local in
+////                    print(local.id)
+//                    print(locAnnoModel.id.hashValue)
+//                    return local.id == locAnnoModel.id.hashValue }) {
+//                    self.locationStore.onMapLocations.append(location)
+//                }
+//            }
         })
+        }
     }
     
     func startLocationListener() {
@@ -114,10 +141,15 @@ class GeoFireManager: ObservableObject {
         let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: 200)
         locationHandle = circleQuery.observe(.keyEntered, with: { key, loc in
-            let locAnnotationModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
-            if !self.gfOnMapLocations.contains(where: { $0.id == locAnnotationModel.id}) {
-                self.gfOnMapLocations.append(locAnnotationModel)
+            
+            if let loc = self.locationStore.hauntedHotels.first(where: { $0.geoKey == key }) {
+                print(loc)
             }
+            
+//            let locAnnotationModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
+//            if !self.gfOnMapLocations.contains(where: { $0.id == locAnnotationModel.id}) {
+//                self.gfOnMapLocations.append(locAnnotationModel)
+//            }
         })
         //        }
     }
@@ -167,4 +199,37 @@ class GeoFireManager: ObservableObject {
             }
 //        })
     }
+    
+    func createSpookySpotGeoRefForAllLocations() {
+        let geoLocRef = GeoFire(firebaseRef: locationRef)
+        print(locationStore.hauntedHotels.count)
+        for location in locationStore.hauntedHotels {
+            print(location.address?.geoCodeAddress() ?? "")
+            firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
+                geoLocRef.setLocation(cloc, forKey: "\(location.id)") { error in
+                    if let error = error {
+                        print(error)
+                    }
+                    print("Success: \(location.id)")
+                }
+            }
+        }
+    }
+    
+    func createSpookySpotForLocation(_ location: Location, withCompletion completion: @escaping(Bool) -> Void) {
+        let geoLocRef = GeoFire(firebaseRef: locationRef)
+        firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
+            print(location.id)
+                geoLocRef.setLocation(cloc, forKey: "\(location.id)") { error in
+                    if let error = error {
+                        print(error)
+                        completion(false)
+                    } else {
+                        print("Success: \(location.id)")
+                        
+                    }
+                    completion(true)
+                }
+            }
+        }
 }

@@ -28,6 +28,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         getUserIfSignedIn()
         
+        FirebaseManager.instance.getFavoritesForUser()
+        FirebaseManager.instance.getHauntedHotels()
+        
         
         return true
     }

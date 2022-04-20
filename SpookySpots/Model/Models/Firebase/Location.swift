@@ -47,8 +47,9 @@ struct Location: Identifiable, Equatable {
     var distanceToUser: Double?
     var price: Double?
     var hotelKey: String?
+    var geoKey: String?
     
-    init(dictionary: [String : AnyObject]) {
+    init(dictionary: [String : Any]) {
         id = dictionary["id"] as? Int ?? 0
         name = dictionary["name"] as? String ?? ""
      hotelKey = dictionary["hotelKey"] as? String ?? ""
@@ -57,7 +58,12 @@ struct Location: Identifiable, Equatable {
         address?.state = dictionary["state"] as? String ?? ""
         address?.zipCode = dictionary["zipCode"] as? String ?? ""
         address?.country = dictionary["country"] as? String ?? ""
-        
+        description = dictionary["description"] as? String ?? ""
+        moreInfoLink = dictionary["moreInfoLink"] as? String ?? ""
+        tours = dictionary["tours"] as? Bool ?? false
+        imageName = dictionary["imageName"] as? String ?? ""
+        baseImage = dictionary["baseImage"] as? Image ?? Image("bannack")
+        geoKey = dictionary["g"] as? String ?? ""
     }
    
     

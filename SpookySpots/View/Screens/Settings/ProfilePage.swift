@@ -12,7 +12,7 @@ struct ProfilePage: View {
     var userStore = UserStore.instance
     var auth = Authorization.instance
     
-    @State var signOutAlertShown = false
+    @State var wasEdited = false
     
     @State var displayNameInput = ""
     @State var emailInput = ""
@@ -23,13 +23,9 @@ struct ProfilePage: View {
             displayName
             emailView
             Spacer()
-            signOutButton
+            saveButton
         }
-        .alert("Failed To Sign Out", isPresented: $signOutAlertShown) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(AuthErrorTypes.failToSignOut.rawValue)
-        }
+        
     }
     
     private var displayName: some View {
@@ -45,7 +41,9 @@ struct ProfilePage: View {
                             .foregroundColor(.black)
                     }
                     .font(.title)
-                
+                    .onChange(of: displayNameInput) { _ in
+                        wasEdited = true
+                    }
                 Divider().foregroundColor(.gray)
             }
         }.padding()
@@ -64,28 +62,23 @@ struct ProfilePage: View {
                             .foregroundColor(.black)
                     }
                     .font(.title)
-                
+                    .onChange(of: emailInput) { _ in
+                        wasEdited = true
+                    }
                 Divider().foregroundColor(.gray)
             }
         }.padding()
     }
     
-    
-    private var signOutButton: some View {
-        Button(action: signOutTapped) {
-            Text("SIGN OUT")
-                .fontWeight(.medium)
-                .foregroundColor(.red)
-        }.padding(.bottom, 70)
+    private var saveButton: some View {
+        Button(action: saveTapped) {
+            Text("SAVE")
+        }.disabled(!wasEdited)
+        
     }
     
-    
-    private func signOutTapped() {
-        auth.signOut { error in
-            if error == .failToSignOut {
-                self.signOutAlertShown = true
-            }
-        }
+    private func saveTapped() {
+        
     }
     
     
@@ -104,14 +97,14 @@ struct ProfilePage_Previews: PreviewProvider {
 //MARK: - TextViewPlaceholderTextColor
 
 extension TextField {
-func placeholder<Content: View>(
-when shouldShow: Bool,
-alignment: Alignment = .leading,
-@ViewBuilder placeholder: () -> Content) -> some View {
-
-ZStack(alignment: alignment) {
-placeholder().opacity(shouldShow ? 1 : 0)
-self
-}
-}
+    func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content) -> some View {
+            
+            ZStack(alignment: alignment) {
+                placeholder().opacity(shouldShow ? 1 : 0)
+                self
+            }
+        }
 }

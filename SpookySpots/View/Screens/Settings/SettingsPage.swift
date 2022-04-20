@@ -11,6 +11,9 @@ struct SettingsPage: View {
     
     @State var passwordResetAlertShown = false
     @State var firebaseErrorAlertShown = false
+    @State var failSignOutAlertShown = false
+    @State var confirmSignOutAlertShown = false
+    
     
     @ObservedObject var userStore = UserStore.instance
     
@@ -19,23 +22,15 @@ struct SettingsPage: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
-            title
-                accountHeader
-                accountFunctions
-                aboutHeader
-                aboutFunctions
-                Spacer(minLength: 160)
-            }.offset(y: -40)
-
-        .alert("Email Sent", isPresented: $passwordResetAlertShown) {
-            Button("OK", role: .cancel) { }
-        }
-
-        .alert("Trouble with Firebase", isPresented: $firebaseErrorAlertShown) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(AuthErrorTypes.firebaseTrouble.rawValue)
-        }
+                title
+                Account()
+                about
+            }
+            .padding(.bottom)
+            .offset(y: -40)
+            
+            
+            
         }
     }
     
@@ -44,107 +39,30 @@ struct SettingsPage: View {
             .font(.title)
             .fontWeight(.thin)
             .padding(.horizontal)
-    }
-    
-    //MARK: - Account
-    private var accountHeader: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Image(systemName: "person")
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(.pink)
-                Text("Account")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-            }.padding(.horizontal)
-            Rectangle()
-                .fill(.black)
-                .frame(height: 1)
-                .padding(.horizontal)
-        }.padding(.top, 30)
-    }
-    private var accountFunctions: some View {
-        List {
-            NavigationLink("Edit Profile", destination: ProfilePage())
-                .listRowSeparator(.hidden)
-            sendPasswordResetButton
-                .listRowSeparator(.hidden)
-
-        }
-        .listStyle(.plain)
-    }
-    private var sendPasswordResetButton: some View {
-        Button(action: changePasswordTapped) {
-            Text("Change Password")
-        }
-    }
-    private func sendPasswordReset() {
-        auth.passwordReset(email: userStore.user.email) { result in
-            if result == true {
-                self.passwordResetAlertShown = true
-            }
-        } error: { error in
-            if error == .firebaseTrouble {
-                firebaseErrorAlertShown = true
-            }
-        }
-
-    }
-    private func changePasswordTapped() {
-        auth.passwordReset(email: userStore.user.email) { result in
-            if result == true {
-                self.passwordResetAlertShown = true
-            }
-        } error: { error in
-            if error == .firebaseTrouble {
-                self.firebaseErrorAlertShown = true
-            }
-        }
-        
+            .padding(.bottom, 40)
     }
     
     //MARK: - About
-    private var aboutHeader: some View {
-            VStack(alignment: .leading) {
-                HStack {
-                    Image(systemName: "gearshape")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(.pink)
-                    Text("About")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                }.padding(.horizontal)
-                Rectangle()
-                    .fill(.black)
-                    .frame(height: 1)
-                    .padding(.horizontal)
+    
+    private var about: some View {
+        VStack {
+            SettingsHeader(settingType: .about)
+            List {
+                NavigationLink("Rate SpookySpots", destination: RateMyApp())
+                    .listRowSeparator(.hidden)
+                
+                NavigationLink("Follow us on Facebook", destination: FacebookPage())
+                    .listRowSeparator(.hidden)
+                
+                NavigationLink("Privacy Policy", destination: PrivacyPolicyPage())
+                    .listRowSeparator(.hidden)
             }
+            .listStyle(.plain)
         }
-    private var aboutFunctions: some View {
-        List {
-            NavigationLink("Rate SpookySpots", destination: RateMyApp())
-                .listRowSeparator(.hidden)
-
-            NavigationLink("Follow us on Facebook", destination: FacebookPage())
-                .listRowSeparator(.hidden)
-
-            NavigationLink("Privacy Policy", destination: PrivacyPolicyPage())
-                .listRowSeparator(.hidden)
-        }
-        .listStyle(.plain)
     }
-    
 }
 
-struct SettingsPage_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsPage()
-//        EditProfilePage()
-    }
-    
-}
+
 
 
 struct RateMyApp: View {
@@ -152,16 +70,63 @@ struct RateMyApp: View {
         Text("Thanks")
     }
 }
-          
+
 struct FacebookPage: View {
     var body: some View {
         Text("Facebook")
     }
 }
-                
+
 struct PrivacyPolicyPage: View {
     var body: some View {
         Text("Here are the terms and conditions")
     }
 }
 
+
+//MARK: - Header
+struct SettingsHeader: View {
+    
+    var settingType: SettingType
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                settingType.image
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(.pink)
+                Text(settingType.rawValue.capitalized)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+            }.padding(.horizontal)
+            Rectangle()
+                .fill(.black)
+                .frame(height: 1)
+                .padding(.horizontal)
+        }
+    }
+    
+    enum SettingType: String {
+        case account
+        case about
+        
+        var image: Image {
+            switch self {
+            case .account:
+                return Image(systemName: "person")
+            case .about:
+                return Image(systemName: "gearshape")
+            }
+        }
+    }
+}
+
+
+//MARK: - Preview
+struct SettingsPage_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsPage()
+    }
+    
+}

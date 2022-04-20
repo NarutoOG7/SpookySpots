@@ -21,8 +21,25 @@ class ExploreByMapVM: ObservableObject {
     @Published var region = MapDetails.defaultRegion
 
     private var regionBeforeLastMove = MKCoordinateRegion()
+    @Published var highlightedLocation: Location?
     @Published var showingLocationList = false
 
+    @Published var searchedLocations: [Location] = []
+    @Published var searchText = "" {
+        didSet {
+            searchLogic()
+        }
+    }
     
+    //MARK: - Search Logic
+    
+     func searchLogic() {
+        if self.searchText != "" {
+            let locations = locationStore.hauntedHotels.filter({ $0.name.lowercased().contains(self.searchText.lowercased()) })
+            self.searchedLocations = locations
+        } else {
+            self.searchedLocations = []
+        }
+    }
 }
 

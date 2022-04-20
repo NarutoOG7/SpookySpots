@@ -178,4 +178,32 @@ class Authorization {
             }
         }
     }
+    
+    //MARK: - DeletAccount
+    func deleteUserAccount(error onError: @escaping(Error) -> Void, success onSuccess: @escaping(Bool) -> Void) {
+        if let user = auth.currentUser {
+            
+            user.delete { error in
+                if let error = error {
+                    // An error happened.
+                    onError(error)
+                } else {
+                    // Account deleted.
+                    
+                    DispatchQueue.main.async {
+                        self.userStore.isSignedIn = false
+                        self.userStore.isGuest = false
+                        UserDefaults.standard.set(false, forKey: "signedIn")
+                    }
+                    
+                    onSuccess(true)
+                }
+            }
+            
+        }
+    }
+    
+    
+    
+    
 }

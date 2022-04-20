@@ -79,8 +79,8 @@ class UserLocationManager: NSObject, ObservableObject {
             
             request.source = MKMapItem(placemark: MKPlacemark(coordinate: currentLocation.coordinate))
                 
-            firebaseManager.getCoordinatesFrom(address: location.address?.geoCodeAddress() ?? "") { coordinates in
-                    destCoordinates = coordinates
+            firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cllocation in
+                destCoordinates = cllocation.coordinate
                     
                     request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destCoordinates))
                     request.transportType = MKDirectionsTransportType.automobile

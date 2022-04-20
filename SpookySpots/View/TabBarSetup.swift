@@ -20,11 +20,12 @@ struct TabBarSetup: View {
         TabView(selection: $selection) {
             exploreTab
             tripTab
+            settingsTab
         }
     }
     
     private var exploreTab: some View {
-        ExploreByList()
+            ExploreByList()
             .tabItem {
                 Text("Explore")
                 Image(systemName: "magnifyingglass")
@@ -33,6 +34,18 @@ struct TabBarSetup: View {
             }
             .tag(0)
     }
+    
+    private var favoritesTab: some View {
+        Favorites()
+            .tabItem {
+                Text("Favorites")
+                Image(systemName: "heart")
+                    .resizable()
+                    .frame(width: 25, height: 25)
+            }
+            .tag(1)
+    }
+    
     
     private var tripTab: some View {
         TripScreen()
@@ -44,9 +57,10 @@ struct TabBarSetup: View {
                     Text("Trip")
                 }
             }
-            .tag(1)
+            .tag(2)
     }
     
+
     private var settingsTab: some View {
         SettingsPage()
             .tabItem {
@@ -55,8 +69,10 @@ struct TabBarSetup: View {
                     .resizable()
                     .frame(width: 25, height: 25)
             }
-            .tag(2)
+            .tag(3)
     }
+    
+
 }
 
 struct TabBarSetup_Previews: PreviewProvider {

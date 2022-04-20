@@ -84,6 +84,8 @@ struct MapViewUI: UIViewRepresentable {
             case let locAnnotation as LocationAnnotationModel:
                 
                 exploreByMapVM.locAnnoTapped = locAnnotation
+                exploreByMapVM.highlightedLocation = LocationStore.instance.hauntedHotels.first(where: { $0.id
+                    == locAnnotation.id.hashValue })
                 exploreByMapVM.showingLocationList = true
                 print(locAnnotation)
                 

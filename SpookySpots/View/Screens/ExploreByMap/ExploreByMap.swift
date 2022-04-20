@@ -15,41 +15,36 @@ struct ExploreByMap: View {
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
     
     let map = MapViewUI()
-
+    
     var body: some View {
         ZStack {
             map
+                .ignoresSafeArea()
             VStack {
                 HStack {
-                    VStack {
-                        HStack {
-                            SearchBar()
-                            filterButton
-                        }
-                        
-                        searchAreaButton
-                        
-//
-//                        Rectangle().fill(Color.clear).frame(width: 100, height: 50)
-//
-//
-                    }
-                    VStack {
-                    listButton
-                        currentLocationButton
-
-                    }
-                }.padding(.horizontal)
+                    searchAreaButton
+                    Spacer()
+                    currentLocationButton
+                }
                 Spacer()
-                
             }
+            .padding()
+            .offset(y: 60)
             
             VStack {
+                HStack {
+                    SearchBar(type: .exploreByMap)
+                    filterButton
+                    listButton
+                }
+                Spacer()
+            }
+            .padding()
+            
+            VStack{
                 Spacer()
                 locationList
             }
-            
-        
         }
     }
 }
@@ -60,17 +55,20 @@ extension ExploreByMap {
 
     private var locationsList: AnyView {
         AnyView(
+            ScrollViewReader{ scrollView in
         ScrollView(.horizontal) {
             HStack {
-                ForEach(locationStore.tripLocationsExample) { location in
+                ForEach(locationStore.onMapLocations) { location in
 //            LocationPreviewOnMap(location: location)
                     LargeImageLocationView(location: location)
-
+                        .id(location.id)
                 }
-
+//                onChange(of: exploreByMapVM.highlightedLocation, perform: { _ in
+//                    scrollView.scrollTo(exploreByMapVM.highlightedLocation?.id ?? 0)
+//                })
             }
                         } .pagedScrollView()
-
+            }
         )
                 
     }
@@ -86,6 +84,36 @@ extension ExploreByMap {
                     .frame(width: 100, height: 200))
         }
         return view
+    }
+    
+    private var searchLocations: some View {
+        VStack {
+            
+            List(exploreByMapVM.searchedLocations) { location in
+                NavigationLink {
+                    LocationDetails(location: location)
+                } label: {
+                    Text("\(location.name), \(location.address?.state ?? "")")
+                }
+                
+            }
+            .listStyle(.plain)
+            .frame(width: 276, height: 300)
+            Spacer()
+        }.frame(maxHeight: 222)
+            .shadow(color: .black, radius: 2, x: 0, y: 0)
+        
+    }
+    
+    private var searchResults: some View {
+        let view: AnyView
+        if exploreByMapVM.searchedLocations.isEmpty {
+            view = AnyView(EmptyView())
+        } else {
+            view = AnyView(searchLocations)
+        }
+        return view
+            .offset(y: 26)
     }
     
     
@@ -119,7 +147,7 @@ extension ExploreByMap {
                 )
                 
                 .foregroundColor(.blue)
-        }
+        }.padding(.leading, 70)
     }
     
     private var currentLocationButton: some View {
@@ -174,5 +202,6 @@ extension ExploreByMap {
 struct ExploreByMap_Previews: PreviewProvider {
     static var previews: some View {
         ExploreByMap()
+            .previewInterfaceOrientation(.portrait)
     }
 }

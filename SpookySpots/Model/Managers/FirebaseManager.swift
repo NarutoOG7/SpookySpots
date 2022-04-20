@@ -19,67 +19,122 @@ class FirebaseManager: ObservableObject {
     
     //    @ObservedObject var userLocManager = UserLocationManager.instance
     //    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
-
+    
     let locationStore = LocationStore.instance
     //    @Published var images: [Location.Images] = []
     //
     //    init() {
     ////        getImages()
     //    }
-
     
-    func getHauntedHotels(withCompletion completion: @escaping ((_ location: Location) -> Void)) {
+    
+//    func getHauntedHotels(withCompletion completion: @escaping ((_ location: Location) -> Void)) {
+//        let ref = Database.database().reference().child("Haunted Hotels")
+//        ref.observe(DataEventType.value) { (snapshot) in
+//            if snapshot.childrenCount > 0 {
+//                self.locationStore.hauntedHotels.removeAll()
+//
+//                for location in snapshot.children.allObjects as! [DataSnapshot] {
+//                    let data = location.value as? [String : AnyObject]
+//                    let id = data?["id"] as? Int ?? Int.random(in: 200...300)
+//                    let name = data?["name"] as? String ?? ""
+//                    let street = data?["street"] as? String ?? ""
+//                    let city = data?["city"] as? String ?? ""
+//                    let state = data?["state"] as? String ?? ""
+//                    let country = data?["country"] as? String ?? ""
+//                    let zipCode = data?["zipCode"] as? String ?? ""
+//                    let description = data?["description"] as? String ?? ""
+//                    let moreInfoLink = data?["moreInfoLink"] as? String ?? ""
+//                    let avgRating = data?["avgRating"] as? Double ?? 0
+//                    let lastReview = data?["lastReview"] as? String ?? ""
+//                    let lastRating = data?["lastRating"] as? Int ?? 0
+//                    let lastReviewTitle = data?["lastReviewTitle"] as? String ?? ""
+//                    let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
+//                    let imageName = data?["imageName"] as? String ?? ""
+//                    let hasTours = data?["offersGhostTours"] as? Bool ?? false
+//                    let hotelKey = data?["hotelKey"] as? String ?? ""
+//                    let lat = data?["l/0"] as? Double ?? 0
+//                    let lon = data?["l/1"] as? Double ?? 0
+//
+//                    let clloc = CLLocation(latitude: lat, longitude: lon)
+//
+//                    //                    self.getImageFromURLString(imageName) { image in
+//
+//                    //                        HotelPriceManager.instance.getPriceOfHotel(key: hotelKey) { hotelPriceModel in
+//                    //                            let price = hotelPriceModel?.lowestPrice
+//
+//
+//                    let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil, price: 0)
+//
+//                    completion(local)
+//                    self.locationStore.hauntedHotels.append(local)
+//
+//                    //                    }
+//                    //                }
+//                    //                    }
+//
+//
+//
+//
+//                }
+//            }
+//        }
+//
+//    }
+    
+    func getHauntedHotels() {
         let ref = Database.database().reference().child("Haunted Hotels")
-        ref.observe(DataEventType.value) { (snapshot) in
+        ref.observe(.value) { (snapshot) in
             if snapshot.childrenCount > 0 {
                 self.locationStore.hauntedHotels.removeAll()
-
-                for location in snapshot.children.allObjects as! [DataSnapshot] {
-                    let data = location.value as? [String : AnyObject]
-                    let id = data?["id"] as? Int ?? Int.random(in: 200...300)
-                    let name = data?["name"] as? String ?? ""
-                    let street = data?["street"] as? String ?? ""
-                    let city = data?["city"] as? String ?? ""
-                    let state = data?["state"] as? String ?? ""
-                    let country = data?["country"] as? String ?? ""
-                    let zipCode = data?["zipCode"] as? String ?? ""
-                    let description = data?["description"] as? String ?? ""
-                    let moreInfoLink = data?["moreInfoLink"] as? String ?? ""
-                    let avgRating = data?["avgRating"] as? Double ?? 0
-                    let lastReview = data?["lastReview"] as? String ?? ""
-                    let lastRating = data?["lastRating"] as? Int ?? 0
-                    let lastReviewTitle = data?["lastReviewTitle"] as? String ?? ""
-                    let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
-                    let imageName = data?["imageName"] as? String ?? ""
-                    let hasTours = data?["offersGhostTours"] as? Bool ?? false
-                    let hotelKey = data?["hotelKey"] as? String ?? ""
-                    let lat = data?["l/0"] as? Double ?? 0
-                    let lon = data?["l/1"] as? Double ?? 0
-
-                    let clloc = CLLocation(latitude: lat, longitude: lon)
-
-//                    self.getImageFromURLString(imageName) { image in
-
-//                        HotelPriceManager.instance.getPriceOfHotel(key: hotelKey) { hotelPriceModel in
-//                            let price = hotelPriceModel?.lowestPrice
-
-
-                            let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil, price: 0)
-
-                        completion(local)
-                        self.locationStore.hauntedHotels.append(local)
-
-//                    }
-//                }
-                    //                    }
-
-
-
-
+                
+                if let objects = snapshot.children.allObjects as? [DataSnapshot] {
+                    for object in objects {
+                        if let data = object.value as? [String : AnyObject] {
+                            let loc = Location(dictionary: data)
+                            self.locationStore.hauntedHotels.append(loc)
+                        }
+                    }
+                    
+//                                    for object in objects {
+//                                        let data = object.value as? [String : AnyObject]
+//                                        let id = data?["id"] as? Int ?? Int.random(in: 200...300)
+//                                        let name = data?["name"] as? String ?? ""
+//                                        let street = data?["street"] as? String ?? ""
+//                                        let city = data?["city"] as? String ?? ""
+//                                        let state = data?["state"] as? String ?? ""
+//                                        let country = data?["country"] as? String ?? ""
+//                                        let zipCode = data?["zipCode"] as? String ?? ""
+//                                        let description = data?["description"] as? String ?? ""
+//                                        let moreInfoLink = data?["moreInfoLink"] as? String ?? ""
+//                                        let avgRating = data?["avgRating"] as? Double ?? 0
+//                                        let lastReview = data?["lastReview"] as? String ?? ""
+//                                        let lastRating = data?["lastRating"] as? Int ?? 0
+//                                        let lastReviewTitle = data?["lastReviewTitle"] as? String ?? ""
+//                                        let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
+//                                        let imageName = data?["imageName"] as? String ?? ""
+//                                        let hasTours = data?["offersGhostTours"] as? Bool ?? false
+//                                        let hotelKey = data?["hotelKey"] as? String ?? ""
+//                                        let lat = data?["l/0"] as? Double ?? 0
+//                                        let lon = data?["l/1"] as? Double ?? 0
+//
+//                                        let location = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: nil, locationType: nil, cLLocation: nil, tours: nil, imageName: nil, baseImage: nil, distanceToUser: nil, price: nil)
+//
+//                                        DispatchQueue.main.async {
+//                                            self.locationStore.hauntedHotels.append(location)
+//
+////                                            GeoFireManager.instance.createSpookySpotForLocation(location) { result in
+////                                                if result == true {
+////                                                    print("success")
+////                                                }
+////                                            }
+//
+//                                        }
+//                                    }
+                    
                 }
             }
         }
-
     }
     
     
@@ -111,36 +166,36 @@ class FirebaseManager: ObservableObject {
     //    }
     //
     func getImageFromURLString(_ urlString: String, withCompletion completion: @escaping ((_ image: Image) -> (Void))) {
-            var imageToReturn = Image("bannack")
-            let storageRef = Storage.storage().reference().child(urlString)
-            storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                }
-                guard let data = data else { return }
-                if let image = UIImage(data: data) {
-                    imageToReturn = Image(uiImage: image)
-                    completion(imageToReturn)
-                }
+        var imageToReturn = Image("bannack")
+        let storageRef = Storage.storage().reference().child(urlString)
+        storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+            if let error = error {
+                print(error.localizedDescription)
             }
+            guard let data = data else { return }
+            if let image = UIImage(data: data) {
+                imageToReturn = Image(uiImage: image)
+                completion(imageToReturn)
+            }
+        }
         
     }
     
     func getUIImageFromURLString(_ urlString: String, withCompletion completion: @escaping ((_ image: UIImage) -> (Void))) {
-            let storageRef = Storage.storage().reference().child(urlString)
-            storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-                if let error = error {
-                    print(error.localizedDescription)
-                }
-                guard let data = data else { return }
-                if let image = UIImage(data: data) {
-                    completion(image)
-                }
+        let storageRef = Storage.storage().reference().child(urlString)
+        storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+            if let error = error {
+                print(error.localizedDescription)
             }
+            guard let data = data else { return }
+            if let image = UIImage(data: data) {
+                completion(image)
+            }
+        }
         
     }
     
-//    func getTrendingLocations(withCompletion completion: @escaping (Location) -> Void) {
+    //    func getTrendingLocations(withCompletion completion: @escaping (Location) -> Void) {
     
     func getTrendingLocations() {
         
@@ -152,18 +207,39 @@ class FirebaseManager: ObservableObject {
             } else {
                 
                 if let snapshot = querySnapshot {
-                for document in snapshot.documents {
-                    let dict = document.data()
-//                    if !self.locationStore.trendingLocations.contains(where: { "\($0.id)" == (dict["id"] as? String ?? "") }) {
+                    for document in snapshot.documents {
+                        let dict = document.data()
+                        //                    if !self.locationStore.trendingLocations.contains(where: { "\($0.id)" == (dict["id"] as? String ?? "") }) {
                         self.locationStore.trendingLocations.append(Location(dict: dict))
                     }
-//                    }
+                    //                    }
                 }
             }
         }
     }
     
     
+    func getFavoritesForUser() {
+        let db = Firestore.firestore()
+        
+        db.collection("Favorites")
+        
+            .whereField("id", isEqualTo: UserStore.instance.user.id)
+        
+            .getDocuments { querySnapshot, error in
+                
+                if let error = error {
+                    print("error getting favorites: \(error)")
+                } else {
+                    if let snapshot = querySnapshot {
+                        for document in snapshot.documents {
+                            let dict = document.data()
+                            self.locationStore.favoriteLocations.append(Location(dict: dict))
+                        }
+                    }
+                }
+            }
+    }
     
     //MARK: - Queries
     enum Queries: String, CaseIterable {
@@ -191,33 +267,6 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    func getCoordinatesFrom(address: String, withCompletion completion: @escaping ((_ coordinates: CLLocationCoordinate2D) -> (Void))) {
-        
-        let addressString = address
-        let geoCoder = CLGeocoder()
-        geoCoder.geocodeAddressString(addressString) { (placemarks, error) in
-//            guard
-//                let placemarks = placemarks,
-//                let loc = placemarks.first?.location
-//            else {
-            guard
-                let placemarks = placemarks
-            else {
-                // handle no location found
-                print("error on forward geocoding.. getting coordinates from location address: \(addressString)")
-                return
-            }
-            
-            for placemark in placemarks {
-                if let loc = placemark.location {
-                    print(loc.coordinate)
-//                    completion(loc.coordinate)
-                }
-            }
-//            completion(loc.coordinate)
-            //            print("successful geocode with addrress: \(addressString)")
-        }
-    }
     
     func getAddressFrom(coordinates: CLLocationCoordinate2D, withCompletion completion: @escaping ((_ location: Address) -> (Void))) {
         let location  = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)

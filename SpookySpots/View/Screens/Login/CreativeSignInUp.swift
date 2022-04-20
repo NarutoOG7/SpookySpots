@@ -140,6 +140,10 @@ struct CreativeSignInUp: View {
             if error == .troubleConnectingToFirebase {
                 firebaseError = true
             }
+            
+            DispatchQueue.main.async {
+                userStore.isGuest = true
+            }
         }
 
     }
