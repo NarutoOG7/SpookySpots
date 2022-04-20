@@ -12,6 +12,7 @@ struct MapViewUI: UIViewRepresentable {
     
     
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    @ObservedObject var userStore = UserStore.instance
     
     @ObservedObject var geoFireManager = GeoFireManager.instance
     let mapView = MKMapView()
@@ -28,6 +29,14 @@ struct MapViewUI: UIViewRepresentable {
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.addAnnotations(geoFireManager.gfOnMapLocations)
+        addCurrentLocation(to: mapView)
+    }
+    
+    func addCurrentLocation(to view: MKMapView) {
+        if let currentLocation = userStore.currentLocation {
+            view.addAnnotation(
+                MKPlacemark(coordinate: currentLocation.coordinate))
+        }
     }
     
     func makeCoordinator() -> MapCoordinator {
