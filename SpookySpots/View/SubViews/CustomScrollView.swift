@@ -85,7 +85,7 @@ struct HorizontalSnapScrollView: View {
 
 struct HorizontalSnapScrollView_Previews: PreviewProvider {
     static var previews: some View {
-        HorizontalSnapScrollView(items: LocationStore.instance.tripLocationsExample)
+        HorizontalSnapScrollView(items: [Location.example, Location.example, Location.example])
     }
 }
               

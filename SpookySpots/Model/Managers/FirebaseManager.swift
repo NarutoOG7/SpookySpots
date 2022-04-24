@@ -91,51 +91,36 @@ class FirebaseManager: ObservableObject {
                 if let objects = snapshot.children.allObjects as? [DataSnapshot] {
                     for object in objects {
                         if let data = object.value as? [String : AnyObject] {
-                            let loc = Location(dictionary: data)
+                            let loc = Location(data: data)
                             self.locationStore.hauntedHotels.append(loc)
+//                            
+//                            GeoFireManager.instance.createSpookySpotForLocation(loc) { result in
+//                                if result == true {
+//                                    print("Success")
+//                                }
+//                            }
                         }
                     }
-                    
-//                                    for object in objects {
-//                                        let data = object.value as? [String : AnyObject]
-//                                        let id = data?["id"] as? Int ?? Int.random(in: 200...300)
-//                                        let name = data?["name"] as? String ?? ""
-//                                        let street = data?["street"] as? String ?? ""
-//                                        let city = data?["city"] as? String ?? ""
-//                                        let state = data?["state"] as? String ?? ""
-//                                        let country = data?["country"] as? String ?? ""
-//                                        let zipCode = data?["zipCode"] as? String ?? ""
-//                                        let description = data?["description"] as? String ?? ""
-//                                        let moreInfoLink = data?["moreInfoLink"] as? String ?? ""
-//                                        let avgRating = data?["avgRating"] as? Double ?? 0
-//                                        let lastReview = data?["lastReview"] as? String ?? ""
-//                                        let lastRating = data?["lastRating"] as? Int ?? 0
-//                                        let lastReviewTitle = data?["lastReviewTitle"] as? String ?? ""
-//                                        let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
-//                                        let imageName = data?["imageName"] as? String ?? ""
-//                                        let hasTours = data?["offersGhostTours"] as? Bool ?? false
-//                                        let hotelKey = data?["hotelKey"] as? String ?? ""
-//                                        let lat = data?["l/0"] as? Double ?? 0
-//                                        let lon = data?["l/1"] as? Double ?? 0
-//
-//                                        let location = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: nil, locationType: nil, cLLocation: nil, tours: nil, imageName: nil, baseImage: nil, distanceToUser: nil, price: nil)
-//
-//                                        DispatchQueue.main.async {
-//                                            self.locationStore.hauntedHotels.append(location)
-//
-////                                            GeoFireManager.instance.createSpookySpotForLocation(location) { result in
-////                                                if result == true {
-////                                                    print("success")
-////                                                }
-////                                            }
-//
-//                                        }
-//                                    }
-                    
                 }
             }
         }
     }
+    
+    func setFavoriteLocation(location: Location) {
+        let db = Firestore.firestore()
+        
+        db.document(UUID().uuidString).setData( [
+            "locationID" : "\(location.id)",
+            "userID" : "\(UserStore.instance.user.id)"
+        ]) { error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+    }
+    
+    
+    
     
     
     func getImages() {
@@ -209,10 +194,13 @@ class FirebaseManager: ObservableObject {
                 if let snapshot = querySnapshot {
                     for document in snapshot.documents {
                         let dict = document.data()
-                        //                    if !self.locationStore.trendingLocations.contains(where: { "\($0.id)" == (dict["id"] as? String ?? "") }) {
-                        self.locationStore.trendingLocations.append(Location(dict: dict))
+                        
+                        if let location = self.locationStore.hauntedHotels.first(where: { $0.id == dict["id"] as? Int ?? 0}) {
+                            if !self.locationStore.trendingLocations.contains(location) {
+                                self.locationStore.trendingLocations.append(location)
+                            }
+                        }
                     }
-                    //                    }
                 }
             }
         }
@@ -234,7 +222,10 @@ class FirebaseManager: ObservableObject {
                     if let snapshot = querySnapshot {
                         for document in snapshot.documents {
                             let dict = document.data()
-                            self.locationStore.favoriteLocations.append(Location(dict: dict))
+                            
+                            if let location = self.locationStore.hauntedHotels.first(where: { $0.id == dict["id"] as? Int ?? 0 }) {
+                                self.locationStore.favoriteLocations.append(location)
+                            }
                         }
                     }
                 }

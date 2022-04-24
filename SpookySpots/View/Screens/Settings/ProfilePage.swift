@@ -17,6 +17,9 @@ struct ProfilePage: View {
     @State var displayNameInput = ""
     @State var emailInput = ""
     
+    @State var deleteAcctAlertShown = false
+
+    
     var body: some View {
         VStack {
             Spacer()
@@ -24,8 +27,17 @@ struct ProfilePage: View {
             emailView
             Spacer()
             saveButton
+            Spacer()
+            deleteAcctButton
+            Spacer()
         }
-        
+        /////MARK: - Delete Account Confirmation Alert
+        .alert("Are You Sure?", isPresented: $deleteAcctAlertShown) {
+            Button(role: .destructive, action: confirmDeleteTapped) {
+                Text("DELETE")
+            }
+            Button("CANCEL", role: .cancel) { }
+        }
     }
     
     private var displayName: some View {
@@ -40,6 +52,8 @@ struct ProfilePage: View {
                         Text(userStore.user.name)
                             .foregroundColor(.black)
                     }
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
                     .font(.title)
                     .onChange(of: displayNameInput) { _ in
                         wasEdited = true
@@ -61,6 +75,8 @@ struct ProfilePage: View {
                         Text(userStore.user.email)
                             .foregroundColor(.black)
                     }
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
                     .font(.title)
                     .onChange(of: emailInput) { _ in
                         wasEdited = true
@@ -70,17 +86,49 @@ struct ProfilePage: View {
         }.padding()
     }
     
+    //MARK: - Buttons
+    
     private var saveButton: some View {
         Button(action: saveTapped) {
             Text("SAVE")
         }.disabled(!wasEdited)
+            .padding()
         
     }
+    
+    private var deleteAcctButton: some View {
+        HStack {
+            Spacer()
+            Spacer()
+        Button(action: deleteAcctTapped) {
+            Text("Delete Account")
+                .font(.callout)
+                .fontWeight(.light)
+                .foregroundColor(Color.gray)
+        }.padding(.horizontal)
+        }
+    }
+    
+    //MARK: - Methods
     
     private func saveTapped() {
-        
+        auth.setCurrentUsersName(displayNameInput)
     }
     
+    
+    private func deleteAcctTapped() {
+        self.deleteAcctAlertShown = true
+    }
+    
+    private func confirmDeleteTapped() {
+        auth.deleteUserAccount { error in
+            self.deleteAcctAlertShown = true
+        } success: { result in
+            if result == true {
+                
+            }
+        }
+    }
     
 }
 

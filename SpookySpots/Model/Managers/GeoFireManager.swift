@@ -34,24 +34,27 @@ class GeoFireManager: ObservableObject {
     
     func getNearbyLocations(region: MKCoordinateRegion, radius: Double) {
         
-        let geoLocRef = GeoFire(firebaseRef: locationRef)
-        let regionCenter = region.center
-        let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
-        let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
-        circleQuery.observe(.keyEntered, with: { key, loc in
-            if let location = self.locationStore.hauntedHotels.first(where: { "\($0.id)" == key }) {
-                print(location)
-                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
-                
-                if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
-                    self.gfNearbyLocations.append(anno)
+        if UserStore.instance.currentLocation != nil {
+        
+            let geoLocRef = GeoFire(firebaseRef: locationRef)
+            let regionCenter = region.center
+            let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
+            let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
+            circleQuery.observe(.keyEntered, with: { key, loc in
+                if let location = self.locationStore.hauntedHotels.first(where: { "\($0.id)" == key }) {
+                    print(location)
+                    let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
                     
-                    if !self.locationStore.nearbyLocations.contains(where: { "\($0.id)" == key }) {
-                        self.locationStore.nearbyLocations.append(location)
+                    if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
+                        self.gfNearbyLocations.append(anno)
+                        
+                        if !self.locationStore.nearbyLocations.contains(where: { "\($0.id)" == key }) {
+                            self.locationStore.nearbyLocations.append(location)
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     }
     
     func searchForLocations(region: MKCoordinateRegion) {
@@ -122,7 +125,7 @@ class GeoFireManager: ObservableObject {
                 
             if let data = snapshot.value as? [String : AnyObject] {
                         
-                        var location = Location(dictionary: data)
+                        var location = Location(data: data)
                     
                     print(location.id)
                         
@@ -147,21 +150,21 @@ class GeoFireManager: ObservableObject {
 //        })
     }
     
-    func createSpookySpotGeoRefForAllLocations() {
-        let geoLocRef = GeoFire(firebaseRef: locationRef)
-        print(locationStore.hauntedHotels.count)
-        for location in locationStore.hauntedHotels {
-            print(location.address?.geoCodeAddress() ?? "")
-            firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
-                geoLocRef.setLocation(cloc, forKey: "\(location.id)") { error in
-                    if let error = error {
-                        print(error)
-                    }
-                    print("Success: \(location.id)")
-                }
-            }
-        }
-    }
+//    func createSpookySpotGeoRefForAllLocations() {
+//        let geoLocRef = GeoFire(firebaseRef: locationRef)
+//        print(locationStore.hauntedHotels.count)
+//        for location in locationStore.hauntedHotels {
+//            print(location.address?.geoCodeAddress() ?? "")
+//            firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
+//                geoLocRef.setLocation(cloc, forKey: "\(location.id)") { error in
+//                    if let error = error {
+//                        print(error)
+//                    }
+//                    print("Success: \(location.id)")
+//                }
+//            }
+//        }
+//    }
     
     func createSpookySpotForLocation(_ location: Location, withCompletion completion: @escaping(Bool) -> Void) {
         let geoLocRef = GeoFire(firebaseRef: locationRef)

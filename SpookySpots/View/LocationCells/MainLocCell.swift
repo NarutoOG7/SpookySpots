@@ -22,8 +22,8 @@ struct MainLocCell: View {
     
     private var image: some View {
         let image: Image
-        if let baseImage = location.baseImage {
-            image = baseImage
+        if let baseImage = location.imageName {
+            image = Image(baseImage)
         } else {
             image = Image("bannack")
         }

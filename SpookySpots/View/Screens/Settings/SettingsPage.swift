@@ -20,26 +20,18 @@ struct SettingsPage: View {
     var auth = Authorization.instance
     
     var body: some View {
-        NavigationView {
+//        NavigationView {
+            ScrollView {
             VStack(alignment: .leading) {
-                title
                 Account()
                 about
+                admin
             }
-            .padding(.bottom)
-            .offset(y: -40)
-            
-            
-            
+            .padding(.vertical)
+            .navigationTitle("Settings")
+            .navigationBarHidden(false)
+//        }
         }
-    }
-    
-    private var title: some View {
-        Text("Settings")
-            .font(.title)
-            .fontWeight(.thin)
-            .padding(.horizontal)
-            .padding(.bottom, 40)
     }
     
     //MARK: - About
@@ -57,12 +49,35 @@ struct SettingsPage: View {
                 NavigationLink("Privacy Policy", destination: PrivacyPolicyPage())
                     .listRowSeparator(.hidden)
             }
+            .frame(height: 160)
+            .listStyle(.plain)
+        }
+
+    }
+    
+    private var admin: some View {
+        let view: AnyView
+        if userStore.user.id == K.adminKey {
+            view = AnyView(adminView)
+        } else {
+            view = AnyView(EmptyView())
+        }
+        return view
+    }
+    
+    private var adminView: some View {
+        VStack {
+            SettingsHeader(settingType: .admin)
+            List {
+                NavigationLink("Database", destination: DatabaseView())
+                    .listRowSeparator(.hidden)
+                
+            }
+            .frame(height: 160)
             .listStyle(.plain)
         }
     }
 }
-
-
 
 
 struct RateMyApp: View {
@@ -110,6 +125,7 @@ struct SettingsHeader: View {
     enum SettingType: String {
         case account
         case about
+        case admin
         
         var image: Image {
             switch self {
@@ -117,6 +133,8 @@ struct SettingsHeader: View {
                 return Image(systemName: "person")
             case .about:
                 return Image(systemName: "gearshape")
+            case .admin:
+                return Image(systemName: "checkerboard.shield")
             }
         }
     }
@@ -126,7 +144,9 @@ struct SettingsHeader: View {
 //MARK: - Preview
 struct SettingsPage_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsPage()
+        Group {
+            SettingsPage()
+        }
     }
     
 }

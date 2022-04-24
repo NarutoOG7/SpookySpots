@@ -225,6 +225,8 @@ struct Login: View {
                 
                 TextField("Email Address", text: self.$emailInput)
                     .foregroundColor(.white)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
             
             Divider().background(Color.gray)
@@ -240,6 +242,8 @@ struct Login: View {
                     .foregroundColor(.white)
                 
                 SecureField("Password", text: self.$passwordInput)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
             Divider().background(Color.gray)
             
@@ -394,6 +398,8 @@ struct SignUP: View {
                     .foregroundColor(.white)
                 
                 TextField("Your Name", text: self.$usernameInput)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
             
             Divider().background(Color.gray)
@@ -409,6 +415,8 @@ struct SignUP: View {
                     .foregroundColor(.white)
                 
                 TextField("Email Address", text: self.$emailInput)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
             
             Divider().background(Color.gray)
@@ -425,6 +433,8 @@ struct SignUP: View {
                     .foregroundColor(.white)
                 
                 SecureField("Password", text: self.$passwordInput)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
             Divider().background(Color.gray)
         }
@@ -439,6 +449,8 @@ struct SignUP: View {
                     .foregroundColor(.white)
                 
                 SecureField("Confirm Password", text: self.$confirmPasswordInput)
+                    .disableAutocorrection(true)
+                    .textInputAutocapitalization(.never)
             }
             Divider().background(Color.gray)
             

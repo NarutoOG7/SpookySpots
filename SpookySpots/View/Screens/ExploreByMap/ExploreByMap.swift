@@ -46,6 +46,8 @@ struct ExploreByMap: View {
                 locationList
             }
         }
+        .navigationTitle("Map")
+        .navigationBarHidden(true)
     }
 }
 

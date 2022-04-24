@@ -264,11 +264,7 @@ extension LocationDetails {
     //MARK: - Methods
     
     func addOrSubtractFromTrip() {
-        if (tripPageVM.trip?.listContainsLocation(location: location) ?? false) {
-            tripPageVM.trip?.removeLocationFromList(location: location)
-        } else {
-            tripPageVM.trip?.addLocationToList(location: location)
-        }
+        tripPageVM.trip.addOrSubtractFromTrip(location: location)
     }
     func getDirections() {
         // show directions page
@@ -279,7 +275,7 @@ extension LocationDetails {
     }
     
     func isInTrip() -> Bool {
-        (tripPageVM.trip?.listContainsLocation(location: location)) ?? false
+        tripPageVM.trip.listContainsLocation(location: location)
     }
     
     func getMoreInfoByUsingWebLink() {

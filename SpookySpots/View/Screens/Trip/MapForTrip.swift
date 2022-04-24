@@ -19,6 +19,7 @@ struct MapForTrip: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
         mapView.setRegion(tripPageVM.mapRegion, animated: true)
+        mapView.addAnnotations(tripPageVM.tripLocationsForAnnotations)
         return mapView
     }
     
@@ -51,10 +52,9 @@ struct MapForTrip: UIViewRepresentable {
     }
     
     func addPlacemarks(to view: MKMapView) {
-        guard let locations = tripPageVM.trip?.locations else { return }
+        let locations = tripPageVM.trip.locations
         for location in locations {
-            guard let cLLocation = location.cLLocation else { return }
-            let placemark = MKPlacemark(coordinate: cLLocation.coordinate)
+            let placemark = MKPlacemark(coordinate: location.cLLocation.coordinate)
             view.addAnnotation(placemark)
         }
     }

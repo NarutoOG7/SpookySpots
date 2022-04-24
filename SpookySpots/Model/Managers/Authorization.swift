@@ -29,12 +29,12 @@ class Authorization {
     let auth = Auth.auth()
     
     
-    func isUserAlready(id: String) -> Bool {
-        id == auth.currentUser?.uid
+    var isSignedIn: Bool {
+        auth.currentUser != nil
     }
     
-    func isSignedIn() -> Bool {
-        auth.currentUser != nil
+    func isUserAlready(id: String) -> Bool {
+        id == auth.currentUser?.uid
     }
     
     func signIn(email: String, password: String, error onError: @escaping(AuthErrorTypes) -> Void) {
@@ -50,20 +50,17 @@ class Authorization {
             
                 let user = User(id: result.user.uid, name: result.user.displayName ?? "", email: result.user.email ?? "")
                 
-                do {
-                    let encoder = JSONEncoder()
-                    let data = try encoder.encode(user)
-                    
-                    UserDefaults.standard.set(data, forKey: "user")
-                } catch {
-                    print(AuthErrorTypes.failedToSaveUser.rawValue)
-                    onError(.failedToSaveUser)
-                }
                 
                 DispatchQueue.main.async {
                     self.userStore.isSignedIn = true
                     self.userStore.user = user
                     UserDefaults.standard.set(true, forKey: "signedIn")
+                    
+                    self.saveUserToUserDefaults(user: user) { error in
+                        if let error = error {
+                            print(error.rawValue)
+                        }
+                    }
 
                 }
             }
@@ -79,7 +76,7 @@ class Authorization {
                 
             if let error = error {
                 if error.localizedDescription.contains("email in use") {
-                    print("Its in use")
+                    print("Email is in use")
                     onError(.emailInUse)
                 } else {
                 print("Trouble creating account \(error)")
@@ -94,20 +91,17 @@ class Authorization {
                 
                 let user = User(id: result.user.uid, name: userName, email: result.user.email ?? "")
                 
-                do {
-                    let encoder = JSONEncoder()
-                    let data = try encoder.encode(user)
-                    
-                    UserDefaults.standard.set(data, forKey: "user")
-                } catch {
-                    print(AuthErrorTypes.failedToSaveUser.rawValue)
-                    onError(.failedToSaveUser)
-                }
                 
                 DispatchQueue.main.async {
                     self.userStore.isSignedIn = true
                     self.userStore.user = user
                     UserDefaults.standard.set(true, forKey: "signedIn")
+                    
+                    self.saveUserToUserDefaults(user: user) { error in
+                        if let error = error {
+                            print(error.rawValue)
+                        }
+                    }
 
                 }
                 
@@ -131,7 +125,14 @@ class Authorization {
             changeRequest.commitChanges { error in
                 if let error = error {
                     print(error.localizedDescription)
-                    // handle
+                    // handle error
+                }
+                // handle success
+                self.userStore.user.name = name
+                self.saveUserToUserDefaults(user: self.userStore.user) { error in
+                    if let error = error {
+                        print(error.rawValue)
+                    }
                 }
             }
         }
@@ -143,6 +144,13 @@ class Authorization {
         do {
             try auth.signOut()
             self.userStore.isSignedIn = false
+            self.userStore.user = User()
+            UserDefaults.standard.set(false, forKey: "signedIn")
+            self.saveUserToUserDefaults(user: User()) { error in
+                if let error = error {
+                    print(error.rawValue)
+                }
+            }
         } catch {
             print("Trouble siging out. \(error)")
             // handle error
@@ -162,6 +170,12 @@ class Authorization {
                     self.userStore.isSignedIn = true
                     self.userStore.isGuest = true
                     UserDefaults.standard.set(true, forKey: "signedIn")
+                    
+                }
+                self.saveUserToUserDefaults(user: User()) { error in
+                    if let error = error {
+                        print(error.rawValue)
+                    }
                 }
             }
         }
@@ -194,12 +208,32 @@ class Authorization {
                         self.userStore.isSignedIn = false
                         self.userStore.isGuest = false
                         UserDefaults.standard.set(false, forKey: "signedIn")
+                        self.saveUserToUserDefaults(user: User()) { error in
+                            if let error = error {
+                                print(error.rawValue)
+                            }
+                        }
                     }
                     
                     onSuccess(true)
                 }
             }
             
+        }
+    }
+    
+    
+    //MARK: - Save User To UserDefaults
+    
+    func saveUserToUserDefaults(user: User, error onError: @escaping(AuthErrorTypes?) -> Void) {
+        do {
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(user)
+            
+            UserDefaults.standard.set(data, forKey: "user")
+        } catch {
+            print(AuthErrorTypes.failedToSaveUser.rawValue)
+            onError(.failedToSaveUser)
         }
     }
     

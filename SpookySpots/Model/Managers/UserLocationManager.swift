@@ -127,12 +127,12 @@ extension UserLocationManager: CLLocationManagerDelegate {
                 center: CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude),
                 span: MKCoordinateSpan(latitudeDelta: 2, longitudeDelta: 2))
         }
-        if let trip = TripPageVM.instance.trip {
+        let trip = TripPageVM.instance.trip
             if !trip.hasEditedStartOrEnd {
-                TripPageVM.instance.trip?.setCurrentLocationTo(TripDetails.start)
-                TripPageVM.instance.trip?.setCurrentLocationTo(TripDetails.end)
+                TripPageVM.instance.trip.setCurrentLocationTo(TripDetails.start)
+                TripPageVM.instance.trip.setCurrentLocationTo(TripDetails.end)
             }
-        }
+        
     }
     
     //MARK: - Handling user loction choice

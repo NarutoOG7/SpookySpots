@@ -28,8 +28,8 @@ struct DefaultLocationCell: View {
     
     private var mainImage: some View {
         VStack {
-        if let image = location.baseImage {
-        image
+        if let image = location.imageName {
+        Image(image)
             .resizable()
             .frame(width: 300, height: 160)
         } else {

@@ -49,8 +49,8 @@ struct LocationPreviewOnMap: View {
     
     private var image: some View {
         let img: Image
-        if let image = location.baseImage {
-            img = image
+        if let image = location.imageName {
+            img = Image(image)
         } else {
             img = Image("Bannack")
         }
@@ -140,11 +140,11 @@ struct LocationPreviewOnMap: View {
     }
     
     private func isInTrip() -> Bool {
-        tripPageVM.trip?.listContainsLocation(location: location) ?? false
+        tripPageVM.trip.listContainsLocation(location: location)
     }
     
     private func addOrSubtractFromTrip() {
-        tripPageVM.trip?.addOrSubtractFromTrip(location: location)
+        tripPageVM.trip.addOrSubtractFromTrip(location: location)
     }
     
 }

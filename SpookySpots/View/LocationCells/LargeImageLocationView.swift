@@ -54,8 +54,8 @@ struct LargeImageLocationView: View {
     //MARK: - SubViews
     private var image: some View {
         let img: Image
-        if let image = location.baseImage {
-            img = image
+        if let image = location.imageName {
+            img = Image(image)
         } else {
             img = Image("bannack")
         }

@@ -17,10 +17,10 @@ struct LocationCollection: View {
     var collectionType: LocationCollectionTypes
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             titleView
             locationsList
-        }.padding(.bottom)
+        }
     }
     
     //MARK: - Subviews
@@ -95,7 +95,7 @@ struct LocationCollection: View {
     private var nearbyLocations: some View {
         let view: AnyView
         if userStore.currentLocation == nil {
-            view = AnyView(Text("Need Current Location To Fetch Nearby Locations"))
+            view = AnyView(Text("Need Current Location").fontWeight(.light).padding())
         } else {
             view = AnyView(
                 ForEach(locationStore.nearbyLocations) { location in

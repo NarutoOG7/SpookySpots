@@ -21,25 +21,23 @@ struct ExploreByList: View {
     @State var showingSearchResults = false
     
     var body: some View {
-        if exploreByListVM.isShowingMap {
-            //            VStack {
-            //                Spacer(minLength: 45)
-            ExploreByMap()
-            //            }
-        } else {
-            NavigationView {
-                
-                
-                
+//        if exploreByListVM.isShowingMap {
+//            //            VStack {
+//            //                Spacer(minLength: 45)
+//            ExploreByMap()
+//            //            }
+//        } else {
+//
                 ZStack {
                     locationsCollections
-                    VStack {
+                    VStack(spacing: -4) {
                         greeting
+                            .padding(.bottom, 10)
                         HStack {
                             VStack {
                                 HStack {
                                     SearchBar(type: .exploreByList)
-                                    filterButton
+//                                    filterButton
                                     mapButton
                                 }
                                 Divider()
@@ -55,22 +53,26 @@ struct ExploreByList: View {
                         }
                         Spacer()
                     }
-                }.offset(y: -70)
-            }
-            .onAppear {
-                exploreByListVM.supplyLocationLists()
-            }
-        }
+                }.padding(.top, 30)
+                    .navigationBarHidden(true)
+                    .onAppear {
+                        exploreByListVM.supplyLocationLists()
+                    }
+            
+//        }
     }
     
     
     //MARK: - SubViews
     var greeting: some View {
-        HStack {
-            Text("\(exploreByListVM.greetingLogic()), \(userStore.user.name)")
+        HStack(spacing: -7) {
+            Text("\(exploreByListVM.greetingLogic()),")
                 .font(.title)
-                .fontWeight(.bold)
+                .fontWeight(.ultraLight)
                 .padding(.horizontal)
+            Text("\(userStore.user.name)")
+                .font(.title)
+                .fontWeight(.medium)
             Spacer()
         }
     }
@@ -78,10 +80,11 @@ struct ExploreByList: View {
     private var locationsCollections: some View {
         VStack {
             
-            Spacer(minLength: 140)
+            Spacer(minLength: 130)
             VStack {
                 ScrollView(.vertical, showsIndicators: false, content: {
-                    VStack(spacing: 2) {
+//                    VStack {
+                    VStack(spacing: -14) {
                         LocationCollection(collectionType: .search)
                         LocationCollection(collectionType: .nearby)
                         LocationCollection(collectionType: .trending)

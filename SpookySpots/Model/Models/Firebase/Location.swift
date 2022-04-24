@@ -11,7 +11,7 @@ import SwiftUI
 import Firebase
 import Contacts
 
-struct Location: Identifiable, Equatable {
+struct Location: Identifiable, Equatable, Codable {
     static func == (lhs: Location, rhs: Location) -> Bool {
         return lhs.id == rhs.id && lhs.name == rhs.name
     }
@@ -24,10 +24,8 @@ struct Location: Identifiable, Equatable {
                                   moreInfoLink: "https://fwp.mt.gov/stateparks/bannack-state-park",
                                   review: Review(avgRating: 5, lastRating: 5, lastReview: "Must visit anytime you are in Montana!", lastReviewTitle: "Breathtaking", user: "Spencer"),
                                   locationType: "Ghost Town",
-                                  cLLocation: nil,
                                   tours: true,
                                   imageName: "FairbanksBridge.jpg",
-                                  baseImage: Image("bannack"),
                                   distanceToUser: nil,
                                   price: 120)
     
@@ -38,36 +36,59 @@ struct Location: Identifiable, Equatable {
     var moreInfoLink: String?
     var review: Review?
     var locationType: String?
-    var cLLocation: CLLocation?
     var tours: Bool?
     var hours: String?
     var likes: Int?
     var imageName: String?
-    var baseImage: Image?
     var distanceToUser: Double?
     var price: Double?
     var hotelKey: String?
     var geoKey: String?
     
-    init(dictionary: [String : Any]) {
-        id = dictionary["id"] as? Int ?? 0
-        name = dictionary["name"] as? String ?? ""
-     hotelKey = dictionary["hotelKey"] as? String ?? ""
-        address?.address = dictionary["street"] as? String ?? ""
-        address?.city = dictionary["city"] as? String ?? ""
-        address?.state = dictionary["state"] as? String ?? ""
-        address?.zipCode = dictionary["zipCode"] as? String ?? ""
-        address?.country = dictionary["country"] as? String ?? ""
-        description = dictionary["description"] as? String ?? ""
-        moreInfoLink = dictionary["moreInfoLink"] as? String ?? ""
-        tours = dictionary["tours"] as? Bool ?? false
-        imageName = dictionary["imageName"] as? String ?? ""
-        baseImage = dictionary["baseImage"] as? Image ?? Image("bannack")
-        geoKey = dictionary["g"] as? String ?? ""
+    init(data: [String : AnyObject]) {
+        
+        let id = data["id"] as? Int ?? Int.random(in: 200...300)
+        let name = data["name"] as? String ?? ""
+        let street = data["street"] as? String ?? ""
+        let city = data["city"] as? String ?? ""
+        let state = data["state"] as? String ?? ""
+        let country = data["country"] as? String ?? ""
+        let zipCode = data["zipCode"] as? String ?? ""
+        let description = data["description"] as? String ?? ""
+        let moreInfoLink = data["moreInfoLink"] as? String ?? ""
+        let avgRating = data["avgRating"] as? Double ?? 0
+        let lastReview = data["lastReview"] as? String ?? ""
+        let lastRating = data["lastRating"] as? Int ?? 0
+        let lastReviewTitle = data["lastReviewTitle"] as? String ?? ""
+        let lastReviewUser = data["lastReviewUser"] as? String ?? ""
+        let imageName = data["imageName"] as? String ?? ""
+        let hasTours = data["offersGhostTours"] as? Bool ?? false
+        let hotelKey = data["hotelKey"] as? String ?? ""
+
+        self.id = id
+        self.name = name
+        self.address = Address(
+            address: street,
+            city: city,
+            state: state,
+            zipCode: zipCode,
+            country: country)
+        self.description = description
+        self.moreInfoLink = moreInfoLink
+        self.review = Review(
+            avgRating: avgRating,
+            lastRating: lastRating,
+            lastReview: lastReview,
+            lastReviewTitle: lastReviewTitle,
+            user: lastReviewUser)
+        self.imageName = imageName
+        self.tours = hasTours
+        self.hotelKey = hotelKey
+
     }
    
     
-        init(id: Int, name: String, address: Address?, description: String?, moreInfoLink: String?, review: Review?, locationType: String?, cLLocation: CLLocation?, tours: Bool?, imageName: String?, baseImage: Image?, distanceToUser: Double?, price: Double?) {
+        init(id: Int, name: String, address: Address?, description: String?, moreInfoLink: String?, review: Review?, locationType: String?, tours: Bool?, imageName: String?, distanceToUser: Double?, price: Double?) {
             self.id = id
             self.name = name
             self.address = address
@@ -75,39 +96,19 @@ struct Location: Identifiable, Equatable {
             self.moreInfoLink = moreInfoLink
             self.review = review
             self.locationType = locationType
-            self.cLLocation = cLLocation
             self.tours = tours
             self.imageName = imageName
-            self.baseImage = baseImage
             self.distanceToUser = distanceToUser
             self.price = price
         }
     
-    init(id: Int, name: String, cLLocation: CLLocation, baseImage: Image?) {
+    init(id: Int, name: String) {
             self.id = id
             self.name = name
-        self.cLLocation = cLLocation
-        self.baseImage = baseImage
-        }
-    
-    init(dict: [String : Any]) {
-        id = dict["id"] as? Int ?? 00
-        name = dict["name"] as? String ?? ""
-        imageName = dict["imageName"] as? String ?? ""
     }
     
-    
-    mutating func addCLoc(_ cllocation: CLLocation) {
-        
-        var result = self
-        
-        let address = address?.geoCodeAddress()
-        FirebaseManager.instance.getCoordinatesFromAddress(address: address ?? "") { cloc in
-            print(cloc.coordinate)
-            result.cLLocation = cloc
-        }
-        self = result
-    }
+
+
 
     mutating func addPrice(_ price: Double) {
         var result = self
@@ -125,10 +126,29 @@ struct Location: Identifiable, Equatable {
 
 
 
-struct FavoriteLocation: Identifiable {
-    var id: UUID
-    var location: Location
-    var user: User
+struct FavoriteLocation: Identifiable, Codable {
+    var id: String = ""
+    var locationID: String = ""
+    var userID: String = ""
+ 
+    
+    private enum CodingKeys: String, CodingKey {
+            case userID
+            case locationID
+            case id
+        }
+    
+//    init(from encoder: Encoder) throws {
+//        
+//        var values = encoder.container(keyedBy: CodingKeys.self)
+//        
+//        try values.encode(userID, forKey: .userID)
+//        try values.encode(locationID, forKey: .locationID)
+//        try values.encode(id, forKey: .id)
+//
+//        try encode(to: encoder)
+//
+//    }
     
 }
 

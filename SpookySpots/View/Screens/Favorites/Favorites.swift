@@ -12,22 +12,12 @@ struct Favorites: View {
     @ObservedObject var locationStore = LocationStore.instance
     
     var body: some View {
-        VStack(alignment: .leading) {
-            title
-            
             locationsList
-        }
-    }
-    
-    var title: some View {
-        Text("Favorite Spots")
-            .font(.title)
-            .fontWeight(.thin)
-            .padding()
+        
     }
     
     var locationsList: some View {
-        List(locationStore.tripLocationsExample) { location in
+        List(locationStore.favoriteLocations) { location in
             DefaultLocationCell(location: location)
         }
     }

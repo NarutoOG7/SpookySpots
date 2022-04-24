@@ -69,6 +69,9 @@
 		C9D36C5E2808ED6D00C9AFAF /* AppleSigIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D36C5D2808ED6D00C9AFAF /* AppleSigIn.swift */; };
 		C9D36C622808F32800C9AFAF /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9D36C612808F32800C9AFAF /* MapKit.framework */; };
 		C9D36C642808F34300C9AFAF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9D36C632808F34300C9AFAF /* AudioToolbox.framework */; };
+		C9FC76D728149AA1005777AF /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76D628149AA1005777AF /* Constants.swift */; };
+		C9FC76D928149ECF005777AF /* DatabaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76D828149ECF005777AF /* DatabaseView.swift */; };
+		C9FC76DB2814EFE3005777AF /* TripLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76DA2814EFE3005777AF /* TripLocation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -159,6 +162,9 @@
 		C9D36C602808F32800C9AFAF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C9D36C612808F32800C9AFAF /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		C9D36C632808F34300C9AFAF /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C9FC76D628149AA1005777AF /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		C9FC76D828149ECF005777AF /* DatabaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseView.swift; sourceTree = "<group>"; };
+		C9FC76DA2814EFE3005777AF /* TripLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLocation.swift; sourceTree = "<group>"; };
 		E53B0095E74CC9BCF80AFF55 /* Pods-SpookySpots.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots.release.xcconfig"; path = "Target Support Files/Pods-SpookySpots/Pods-SpookySpots.release.xcconfig"; sourceTree = "<group>"; };
 		FC76E2FFECCDCA9ACE2BDDA9 /* Pods_SpookySpots.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpots.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -212,6 +218,7 @@
 				C9187F3A280AFB520064627C /* Account.swift */,
 				C92C63A6280A81140035C793 /* ProfilePage.swift */,
 				C9087BE72809AC1D00372502 /* SettingsPage.swift */,
+				C9FC76D828149ECF005777AF /* DatabaseView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -264,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				C96A50C627F14CA600E44B9F /* AppDelegate.swift */,
+				C9FC76D628149AA1005777AF /* Constants.swift */,
 				C9A8CA2727ED77BD00116B61 /* Model */,
 				C9A8CA2627ED77B100116B61 /* View */,
 				C9A8CA2527ED779E00116B61 /* ViewModel */,
@@ -364,6 +372,7 @@
 				C94046E627F946D0006837D6 /* HotelPrice */,
 				C96A50C027EE2EF600E44B9F /* LocationAnnotationModel.swift */,
 				C9A8CA3127ED78FA00116B61 /* Trip.swift */,
+				C9FC76DA2814EFE3005777AF /* TripLocation.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -726,6 +735,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9A8CA4927ED7B0B00116B61 /* ExploreByList.swift in Sources */,
+				C9FC76DB2814EFE3005777AF /* TripLocation.swift in Sources */,
 				C9187F39280A8C550064627C /* Favorites.swift in Sources */,
 				C94046E227F9469B006837D6 /* HotelPriceData.swift in Sources */,
 				C9A8CA5927ED7D4100116B61 /* TabBarSetup.swift in Sources */,
@@ -760,6 +770,7 @@
 				C9D36C5E2808ED6D00C9AFAF /* AppleSigIn.swift in Sources */,
 				C9A8CA6727ED7EA400116B61 /* CircularButton.swift in Sources */,
 				C9A8CA6927ED7F1000116B61 /* ExploreByListVM.swift in Sources */,
+				C9FC76D728149AA1005777AF /* Constants.swift in Sources */,
 				C9A8CA6027ED7DC300116B61 /* FiveStars.swift in Sources */,
 				C9A8CA3027ED78C800116B61 /* Address.swift in Sources */,
 				C9A8CA3827ED795600116B61 /* UserLocationManager.swift in Sources */,
@@ -772,6 +783,7 @@
 				C9A8CA5327ED7BFF00116B61 /* MapForTrip.swift in Sources */,
 				C96A50C727F14CA600E44B9F /* AppDelegate.swift in Sources */,
 				C94046A127F56C97006837D6 /* PagedScrollViewModifier.swift in Sources */,
+				C9FC76D928149ECF005777AF /* DatabaseView.swift in Sources */,
 				C94046E027F93867006837D6 /* HotelPriceManager.swift in Sources */,
 				C9A8CA4D27ED7B3F00116B61 /* Login.swift in Sources */,
 			);

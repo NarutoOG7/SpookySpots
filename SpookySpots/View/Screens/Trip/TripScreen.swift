@@ -13,10 +13,8 @@ struct TripScreen: View {
     
     @ObservedObject var tripPageVM = TripPageVM.instance
     
-    @State var draggedItem: Location?
-    
-    @State var trip = TripPageVM.instance.trip
-    
+    @State var draggedItem: TripLocation?
+        
     var body: some View {
         
         
@@ -32,11 +30,9 @@ struct TripScreen: View {
                                 distance
                                 duration
                             }.padding(.vertical, 3)
-                            //                            .padding(.bottom, 40)
                         }
                         .frame(height: 120)
                         .offset(y: -10)
-                        Spacer()
                         locationsList
                         Spacer()
                         
@@ -44,6 +40,8 @@ struct TripScreen: View {
                 }
             }
         }
+        .navigationBarTitle("")
+        .navigationBarHidden(true)
         
     }
 }
@@ -71,7 +69,6 @@ extension TripScreen {
             Rectangle()
                 .foregroundColor(.white)
                 .frame(width: UIScreen.main.bounds.width)
-//                .offset(y: -10)
             
             Spacer()
         }
@@ -80,14 +77,13 @@ extension TripScreen {
     private var mainCover: some View {
         Rectangle()
             .frame(width: (UIScreen.main.bounds.width / 2))
-//            .offset(y: -15)
     }
     
     private var distance: some View {
         ZStack {
             mainCover
             VStack(spacing: 3) {
-                Text(trip?.milesAsString ?? "100 mi")
+                Text(tripPageVM.trip.milesAsString)
                     .font(.largeTitle)
                     .fontWeight(.light)
                     .foregroundColor(Color.white)
@@ -107,7 +103,7 @@ extension TripScreen {
             
             mainCover
             VStack(spacing: 3) {
-                Text(trip?.durationAsString ?? "6 hrs")
+                Text(tripPageVM.trip.durationAsString)
                     .font(.largeTitle)
                     .fontWeight(.light)
                     .foregroundColor(Color.white)
@@ -123,7 +119,7 @@ extension TripScreen {
     
     private var locationsList: some View {
         VStack(alignment: .leading) {
-            ForEach(tripPageVM.tripLocations) { location in
+            ForEach(tripPageVM.trip.locations) { location in
                 HStack {
                     Text(location.name)
                         .font(.title2)
@@ -141,7 +137,7 @@ extension TripScreen {
                     self.draggedItem = location
                     return NSItemProvider(item: nil, typeIdentifier: location.name)
                 })
-                .onDrop(of: [UTType.text], delegate: MyDropDelegate(location: location, locations: $tripPageVM.tripLocations, draggedItem: $draggedItem))
+                .onDrop(of: [UTType.text], delegate: MyDropDelegate(location: location, locations: $tripPageVM.trip.locations, draggedItem: $draggedItem))
                 
             }
         }
@@ -163,9 +159,9 @@ extension TripScreen {
 //MARK: - MyDropDelegate
 struct MyDropDelegate: DropDelegate {
     
-    let location: Location
-    @Binding var locations : [Location]
-    @Binding var draggedItem: Location?
+    let location: TripLocation
+    @Binding var locations : [TripLocation]
+    @Binding var draggedItem: TripLocation?
     @ObservedObject var tripPageVM = TripPageVM.instance
     
     func performDrop(info: DropInfo) -> Bool {
@@ -182,7 +178,7 @@ struct MyDropDelegate: DropDelegate {
                let to = locations.firstIndex(of: location) {
                 withAnimation(.default) {
                     self.locations.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
-                    tripPageVM.trip?.locations = locations
+                    tripPageVM.trip.locations = locations
                 }
             }
         }

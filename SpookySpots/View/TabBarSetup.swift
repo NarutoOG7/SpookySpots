@@ -11,21 +11,29 @@ struct TabBarSetup: View {
     
     @State private var selection = 0
     
+    @ObservedObject var exploreByListVM = ExploreByListVM.instance
     
     init() {
         TripPageVM.instance.initTrip()
     }
     
     var body: some View {
+//        NavigationView {
         TabView(selection: $selection) {
             exploreTab
+            favoritesTab
             tripTab
             settingsTab
         }
+//        }
     }
     
     private var exploreTab: some View {
-            ExploreByList()
+        NavigationView {
+            
+            exploreHelperView
+                .navigationTitle("Explore")
+        }
             .tabItem {
                 Text("Explore")
                 Image(systemName: "magnifyingglass")
@@ -36,7 +44,10 @@ struct TabBarSetup: View {
     }
     
     private var favoritesTab: some View {
-        Favorites()
+        NavigationView {
+            Favorites()
+                .navigationTitle("Favorites")
+        }
             .tabItem {
                 Text("Favorites")
                 Image(systemName: "heart")
@@ -48,7 +59,10 @@ struct TabBarSetup: View {
     
     
     private var tripTab: some View {
-        TripScreen()
+        NavigationView {
+            TripScreen()
+                .navigationTitle("Trip")
+        }
             .tabItem {
                 VStack {
                     Image(systemName: "car.fill")
@@ -62,7 +76,10 @@ struct TabBarSetup: View {
     
 
     private var settingsTab: some View {
-        SettingsPage()
+        NavigationView {
+            SettingsPage()
+                .navigationTitle("Settings")
+        }
             .tabItem {
                 Text("Settings")
                 Image(systemName: "gear")
@@ -72,7 +89,16 @@ struct TabBarSetup: View {
             .tag(3)
     }
     
-
+    
+    private var exploreHelperView: some View {
+        let view: AnyView
+        if exploreByListVM.isShowingMap {
+            view = AnyView(ExploreByMap())
+        } else {
+            view = AnyView(ExploreByList())
+        }
+        return view
+    }
 }
 
 struct TabBarSetup_Previews: PreviewProvider {

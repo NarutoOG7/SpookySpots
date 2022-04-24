@@ -68,8 +68,8 @@ struct ChangeStartAndStop: View {
     @ObservedObject var localSearchService = LocalSearchService.instance
     @ObservedObject var tripPageVM = TripPageVM.instance
     
-    @State var startInput = TripPageVM.instance.trip?.startLocation?.name ?? ""
-    @State var endInput = TripPageVM.instance.trip?.endLocation?.name ?? ""
+    @State var startInput = TripPageVM.instance.trip.startLocation.name
+    @State var endInput = TripPageVM.instance.trip.endLocation.name
     
     @State var isEditingStart = false
     @State var isEditingEnd = false
@@ -143,8 +143,10 @@ struct ChangeStartAndStop: View {
         tripPageVM.isShowingSheetForStartOrStop = false
     }
     
+
     func addStartAndStopToTrip() {
-        guard let trip = TripPageVM.instance.trip else { return }
+//        guard let trip = TripPageVM.instance.trip else { return }
+        let trip = tripPageVM.trip
         if !startInput.isEmpty && startInput != "Current Location" && !endInput.isEmpty && endInput != "Current Location" {
             
             let startLat = startMKItem.placemark.coordinate.latitude
@@ -153,16 +155,12 @@ struct ChangeStartAndStop: View {
             let newLat = endMKItem.placemark.coordinate.latitude
             let newLon = endMKItem.placemark.coordinate.longitude
             
-            let newStartingLocation = Location(
-                id: TripDetails.startLocationID,
-                name: startInput,
-                cLLocation: CLLocation(latitude: startLat, longitude: startLon), baseImage: nil)
+            let newStartingLocation = TripLocation(id: "\(TripDetails.startLocationID)", name: startInput,
+                cLLocation: CLLocation(latitude: startLat, longitude: startLon))
             
-            let newEndingLocation = Location(
-                id: TripDetails.endLocationID,
-                name: endInput,
-                cLLocation: CLLocation(latitude: newLat, longitude: newLon), baseImage: nil)
-            let newTrip = Trip(start: newStartingLocation, end: newEndingLocation, locations: trip.locations, duration: trip.duration, miles: trip.miles)
+            let newEndingLocation = TripLocation(id: "\(TripDetails.endLocationID)", name: endInput, cLLocation: CLLocation(latitude: newLat, longitude: newLon))
+                    
+            let newTrip = Trip(startLocation: newStartingLocation, endLocation: newEndingLocation, locations: trip.locations, duration: trip.duration, miles: trip.miles)
 //            trip.startLocation = newStartingLocation
 //            trip.endLocation = newEndingLocation
             tripPageVM.trip = newTrip

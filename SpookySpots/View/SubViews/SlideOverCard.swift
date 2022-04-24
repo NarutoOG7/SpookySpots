@@ -110,9 +110,9 @@ enum DragState {
 
 //MARK: - Card Position
 enum CardPosition: CGFloat {
-    case bottom = 750
-    case middle = 500
-    case top = 100
+    case bottom = 600
+    case middle = 300
+    case top = 70
 }
 
 

@@ -11,49 +11,26 @@ import SwiftUI
 class TripPageVM: ObservableObject {
     static let instance = TripPageVM()
     
-    @Published var isShowingSheetForStartOrStop = false
-    
     @ObservedObject var userLocationManager = UserLocationManager.instance
     @ObservedObject var userStore = UserStore.instance
-    var placemarks: [MKPlacemark] = []
+    @ObservedObject var locationStore = LocationStore.instance
+    
+    @Published var isShowingSheetForStartOrStop = false
+    @Published var trip = Trip()
     @Published var routes: [MKRoute] = []
-    
-    @Published var trip: Trip?
     @Published var mapRegion = MKCoordinateRegion(center: (UserStore.instance.currentLocation != nil) ? UserStore.instance.currentLocation!.coordinate : MapDetails.startingLocation.coordinate, span: MapDetails.defaultSpan)
-    let locationStore = LocationStore.instance
-    @Published var tripLocations: [Location] = []
     
-//    init() {
-//        initTrip()
-//    }
+    @Published var tripLocationsForAnnotations: [LocationAnnotationModel] = []
     
-//    func getRoutes(withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
-//
-//        var last = locationStore.tripLocations.first
-//        for location in locationStore.tripLocations {
-//            if location != last {
-//                guard let locCoordinates = location.coordinates,
-//                      let lastCoordinates = last?.coordinates else { return }
-//                let lastPlacemark = MKPlacemark(coordinate: lastCoordinates)
-//                let destPlacemark = MKPlacemark(coordinate: locCoordinates)
-//                getRouteFromPointsAB(a: lastPlacemark, b: destPlacemark) { (route) -> (Void) in
-//                    completion(route)
-//                }
-//                last = location
-//            }
-//        }
-//    }
-//
-    
+
     func getRoutes(withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
-        guard let trip = trip else { return }
+//        guard let trip = trip else { return }
         var last = trip.startLocation
         for location in trip.locations {
             if location != last {
-                guard let cLLocation = location.cLLocation,
-                      let lastCLLocation = last?.cLLocation else { return }
+                let lastCLLocation = last.cLLocation 
                 let lastPlacemark = MKPlacemark(coordinate: lastCLLocation.coordinate)
-                let destPlacemark = MKPlacemark(coordinate: cLLocation.coordinate)
+                let destPlacemark = MKPlacemark(coordinate: location.cLLocation.coordinate)
                 
                 getRouteFromPointsAB(a: lastPlacemark, b: destPlacemark) { (route) -> (Void) in
                     completion(route)
@@ -82,13 +59,13 @@ class TripPageVM: ObservableObject {
 
 
     func initTrip() {
-        if self.trip == nil {
-            self.trip = Trip()
-        }
-        if trip != nil {
+//        if self.trip == nil {
+//            self.trip = Trip()
+//        }
+//        if trip != nil {
             getRoutesInTrip()
-            trip?.setTripDuration()
-        }
+            trip.setTripDuration()
+//        }
     }
     
     func getRoutesInTrip() {

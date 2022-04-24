@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Review {
+struct Review: Codable {
     var avgRating: Double
     var lastRating: Int
     var lastReview: String

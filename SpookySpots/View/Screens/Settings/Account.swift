@@ -13,7 +13,6 @@ struct Account: View {
     @State var failSignOutAlertShown = false
     @State var confirmSignOutAlertShown = false
     @State var firebaseErrorAlertShown = false
-    @State var deleteAcctAlertShown = false
     
     @ObservedObject var userStore = UserStore.instance
     
@@ -27,12 +26,12 @@ struct Account: View {
                     .listRowSeparator(.hidden)
                 sendPasswordResetButton
                     .listRowSeparator(.hidden)
-                signOutOrDeleteButton
+                signOutButton
                     .listRowSeparator(.hidden)
             }
             .listStyle(.plain)
+            .frame(height: 160)
         }
-        .frame(height: 230)
         /// //MARK: - Confirm Sign Out Alert
         .alert("Sign Out?", isPresented: $confirmSignOutAlertShown) {
             Button(role: .destructive, action: confirmSignOutTapped) {
@@ -57,14 +56,6 @@ struct Account: View {
         } message: {
             Text(AuthErrorTypes.firebaseTrouble.rawValue)
         }
-        
-        /////MARK: - Delete Account Confirmation Alert
-        .alert("Are You Sure?", isPresented: $deleteAcctAlertShown) {
-            Button(role: .destructive, action: confirmDeleteTapped) {
-                Text("DELETE")
-            }
-            Button("CANCEL", role: .cancel) { }
-        }
     }
     
     //MARK: - Buttons
@@ -82,27 +73,7 @@ struct Account: View {
                 .foregroundColor(.red)
         }
     }
-    
-    private var signOutOrDeleteButton: some View {
-        HStack {
-            signOutButton
-            Spacer()
-            deleteAcctButton
-        }
-    }
-    
-    private var deleteAcctButton: some View {
-        HStack {
-            Spacer()
-            Spacer()
-        Button(action: deleteAcctTapped) {
-            Text("Delete Account")
-                .font(.callout)
-                .fontWeight(.light)
-                .foregroundColor(Color.gray)
-        }.padding(.horizontal)
-        }
-    }
+  
     
     //MARK: - Methods
     
@@ -128,22 +99,11 @@ struct Account: View {
             if error == .failToSignOut {
                 self.failSignOutAlertShown = true
             }
+            userStore.user = User()
         }
     }
     
-    private func deleteAcctTapped() {
-        self.deleteAcctAlertShown = true
-    }
-    
-    private func confirmDeleteTapped() {
-        auth.deleteUserAccount { error in
-            self.deleteAcctAlertShown = true
-        } success: { result in
-            if result == true {
-                
-            }
-        }
-    }
+
 }
 
 

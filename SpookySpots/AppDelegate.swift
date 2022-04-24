@@ -12,7 +12,6 @@ import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    private var launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
     private var signedInUser = UserDefaults.standard.data(forKey: "user")
     
     @ObservedObject var locationManager = UserLocationManager.instance
@@ -21,9 +20,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
             FirebaseApp.configure()
         Database.database().isPersistenceEnabled = true
-        if !launchedBefore {
-            UserDefaults.standard.set(true, forKey: "launchedBefore")
-        }
+
         locationManager.checkIfLocationServicesIsEnabled()
 
         getUserIfSignedIn()
