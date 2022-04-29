@@ -10,14 +10,12 @@ import SDWebImageSwiftUI
 
 struct LD: View {
     
+    @Environment(\.presentationMode) var presentationMode
+    
     var location: LocationModel
     
     @State private var imageURL = URL(string: "")
-    @State private var titleRect: CGRect = .zero
-    @State private var headerImageRect: CGRect = .zero
-    
-    @ObservedObject private var articleContent: ViewFrame = ViewFrame()
-    
+
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
     
@@ -88,7 +86,6 @@ struct LD: View {
             .font(.avenirNext(size: 28))
             .fontWeight(.bold)
             .foregroundColor(.white)
-//            .offset(y: 80)
     }
     
     private var image: some View {
@@ -97,21 +94,20 @@ struct LD: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .blur(radius: self.getBlurRadiusForImage(geo))
+                .shadow(radius: self.calculateShadow(geo))
                 .overlay(header
                     .opacity(self.getBlurRadiusForImage(geo) - 0.35))
                 .frame(width: geo.size.width, height: self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
                 .offset(y: geo.frame(in: .global).origin.y < 0
                                ? abs(geo.frame(in: .global).origin.y)
                                : -geo.frame(in: .global).origin.y)
-                
-        
+
         }
     }
-    
+
     private var title: some View {
         Text(location.location.name)
             .font(.avenirNext(size: 28))
-            .background(GeometryGetter(rect: self.$titleRect))
     }
     
     
@@ -120,7 +116,6 @@ struct LD: View {
             .font(.avenirNextRegular(size: 17))
             .lineLimit(nil)
             .foregroundColor(Color(red: 73/255, green: 77/255, blue: 73/255))
-        //            .padding(.top, 1)
     }
     
     private var avgRatingDisplay: some View {
@@ -238,25 +233,14 @@ struct LD: View {
     }
     
     private func backButtonTapped() {
-        
+        self.presentationMode.wrappedValue.dismiss()
     }
     
     private func favoritesTapped() {
         
     }
     
-    private func calculateHeight(minHeight: CGFloat, maxHeight: CGFloat, yOffset: CGFloat) -> CGFloat {
-        // If scrolling up, yOffset will be a negative number
-        if maxHeight + yOffset < minHeight {
-            // SCROLLING UP
-            // Never go smaller than our minimum height
-            return minHeight
-        }
-        
-        // SCROLLING DOWN
-        return maxHeight + yOffset
-    }
-    
+
     private func loadImageFromFirebase()  {
         if let imageString = location.location.imageName {
             FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
@@ -278,11 +262,26 @@ struct LD_Previews: PreviewProvider {
 
 extension LD {
     
-    /////MARK: - Get Scroll Offset
-    func getScrollOffset(_ geometry: GeometryProxy) -> CGFloat {
-        geometry.frame(in: .global).minY
+    /////MARK: - Calculate Height
+    private func calculateHeight(minHeight: CGFloat, maxHeight: CGFloat, yOffset: CGFloat) -> CGFloat {
+        /// If scrolling up, yOffset will be a negative number
+        if maxHeight + yOffset < minHeight {
+            /// SCROLLING UP
+            /// Never go smaller than our minimum height
+            return minHeight
+        }
+        /// SCROLLING DOWN
+        return maxHeight + yOffset
     }
     
+    
+    /////MARK: - Header Shadow
+    func calculateShadow(_ geo: GeometryProxy) -> Double {
+        self.calculateHeight(
+            minHeight: collapsedImageHeight,
+            maxHeight: imageMaxHeight,
+            yOffset: geo.frame(in: .global).origin.y) < 140 ? 8 : 0
+    }
     
     /////MARK: - Blur Image
     func getBlurRadiusForImage(_ geometry: GeometryProxy) -> CGFloat {
@@ -293,97 +292,5 @@ extension LD {
         
         return blur * 6
     }
-    
-    /////MARK: - Header Title Offset
-    private func getHeaderTitleOffset() -> CGFloat {
-        let currentYPos = titleRect.midY
-        
-        if currentYPos < headerImageRect.maxY {
-            let minYValue: CGFloat = 50.0
-            let maxYValue: CGFloat = collapsedImageHeight
-            let currentYValue = currentYPos
-
-            let percentage = max(-1, (currentYValue - maxYValue) / (maxYValue - minYValue))
-            let finalOffset: CGFloat = -30.0
-            
-            return 20 - (percentage * finalOffset)
-        }
-        
-        return .infinity
-    }
-    
-
-    /////MARK: - Get Image Height
-    func getHeightForHeaderImage(_ geometry: GeometryProxy) -> CGFloat {
-        let offset = getScrollOffset(geometry)
-//        let imageHeight = self.imageMaxHeight
-        let imageHeight = geometry.size.height
-
-        if offset > 0 {
-            return imageHeight + offset
-        }
-
-        return imageHeight
-    }
-    
-    
-    /////MARK: - Offset For Image
-    func getOffsetForHeaderImage(_ geometry: GeometryProxy) -> CGFloat {
-        let offset = getScrollOffset(geometry)
-        let sizeOffScreen = imageMaxHeight - collapsedImageHeight
-        
-        if offset < -sizeOffScreen {
-
-            let imageOffset = abs(min(-sizeOffScreen, offset))
-            
-            return imageOffset - sizeOffScreen
-        }
-        
-        if offset > 0 {
-            return -offset
-            
-        }
-        
-        return 0
-    }
-    
 }
 
-
-class ViewFrame: ObservableObject {
-    var startingRect: CGRect?
-    
-    @Published var frame: CGRect {
-        willSet {
-            if startingRect == nil {
-                startingRect = newValue
-            }
-        }
-    }
-    
-    init() {
-        self.frame = .zero
-    }
-}
-
-struct GeometryGetter: View {
-    @Binding var rect: CGRect
-    
-    var body: some View {
-        GeometryReader { geometry in
-            AnyView(Color.clear)
-                .preference(key: RectanglePreferenceKey.self, value: geometry.frame(in: .global))
-        }.onPreferenceChange(RectanglePreferenceKey.self) { (value) in
-            self.rect = value
-        }
-    }
-}
-
-
-struct RectanglePreferenceKey: PreferenceKey {
-    static var defaultValue: CGRect = .zero
-    
-    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-        value = nextValue()
-    }
-}

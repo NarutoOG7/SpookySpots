@@ -101,7 +101,7 @@ struct ExploreByList: View {
             
             List(exploreByListVM.searchedLocations) { location in
                 NavigationLink {
-                    LocationDetails(location: location)
+                    LD(location: location)
                 } label: {
                     Text("\(location.location.name), \(location.location.address?.state ?? "")")
                 }
