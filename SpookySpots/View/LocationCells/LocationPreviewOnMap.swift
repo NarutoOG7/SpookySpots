@@ -6,14 +6,16 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 
 struct LocationPreviewOnMap: View {
     
-    let location: Location
+    let location: LocationModel
     
     @ObservedObject var tripPageVM = TripPageVM.instance
 
+    @State private var imageURL = URL(string: "")
     
     var body: some View {
         ZStack {
@@ -42,30 +44,23 @@ struct LocationPreviewOnMap: View {
         .frame(width: UIScreen.main.bounds.width - 20, height: UIScreen.main.bounds.height / 5)
         .background(RoundedRectangle(cornerRadius: 25.0))
 
-        
+        .onAppear {
+            loadImageFromFirebase()
+        }
     }
     
     //MARK: - SubViews
     
     private var image: some View {
-        let img: Image
-        if let image = location.imageName {
-            img = Image(image)
-        } else {
-            img = Image("Bannack")
-        }
-        return HStack {
-        img
-                .resizable()
-                .aspectRatio(1, contentMode: .fit)
-                .frame(width: 200)
-                .offset(x: -35)
-            Spacer()
-        }
+        WebImage(url: self.imageURL)
+            .resizable()
+            .aspectRatio(1, contentMode: .fit)
+            .frame(width: 200)
+            .offset(x: -35)
     }
     
     private var title: some View {
-        Text(location.name)
+        Text(location.location.name)
             .font(.title3)
             .fontWeight(.medium)
             .lineLimit(2)
@@ -75,7 +70,7 @@ struct LocationPreviewOnMap: View {
     }
     
     private var address: some View {
-        Text(location.address?.streetCityState() ?? "")
+        Text(location.location.address?.streetCityState() ?? "")
             .font(.subheadline)
             .foregroundColor(Color(red: 153/255, green: 128/255, blue: 250/255))
             .lineLimit(2)
@@ -85,7 +80,7 @@ struct LocationPreviewOnMap: View {
     
     private var milesAway: some View {
 
-        Text(String(format: "%.0f miles", location.distanceToUser ?? 0))
+        Text(String(format: "%.0f miles", location.location.distanceToUser ?? 0))
             .font(.headline)
             .fontWeight(.medium)
             .foregroundColor(Color(red: 153/255, green: 128/255, blue: 250/255))
@@ -140,17 +135,25 @@ struct LocationPreviewOnMap: View {
     }
     
     private func isInTrip() -> Bool {
-        tripPageVM.trip.listContainsLocation(location: location)
+        tripPageVM.trip.listContainsLocation(location: location.location)
     }
     
     private func addOrSubtractFromTrip() {
-        tripPageVM.trip.addOrSubtractFromTrip(location: location)
+        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
+    }
+    
+    private func loadImageFromFirebase()  {
+        if let imageString = location.location.imageName {
+            FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
+                self.imageURL = url
+            }
+        }
     }
     
 }
 
 struct LocationPreviewOnMap_Previews: PreviewProvider {
     static var previews: some View {
-        LocationPreviewOnMap(location: Location.example)
+        LocationPreviewOnMap(location: LocationModel(location: .example, imageURLs: [], reviews: []))
     }
 }

@@ -15,24 +15,24 @@ class LocationStore: ObservableObject {
         
     @Published var srchcText = ""
     
-    @Published var locations: [Location] = []
-    @Published var favoriteLocations: [Location] = []
-    @Published var hauntedHotels: [Location] = [] 
-    @Published var onMapLocations: [Location] = [] {
+    @Published var locations: [LocationModel] = []
+    @Published var favoriteLocations: [LocationModel] = []
+    @Published var hauntedHotels: [LocationModel] = []
+    @Published var onMapLocations: [LocationModel] = [] {
         willSet {
-            print(newValue.last!)
+            print(newValue.count)
         }
     }
-    @Published var nearbyLocations: [Location] = []
+    @Published var nearbyLocations: [LocationModel] = []
     @Published var everyFavoritedLocation: [FavoriteLocation] = []
-    @Published var trendingLocations: [Location] = []
-    @Published var selectedLocation: Location? {
+    @Published var trendingLocations: [LocationModel] = []
+    @Published var selectedLocation: LocationModel? {
         willSet {
             if newValue != nil {
                 UserLocationManager.instance.getDistanceToLocation(location: newValue!) { distance in
                     UserStore.instance.selectedLocationDistanceToUser = distance
                 }
-                print(newValue!.name)
+                print(newValue!.location.name)
             }
         }
     }

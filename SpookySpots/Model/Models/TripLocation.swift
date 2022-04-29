@@ -12,5 +12,5 @@ struct TripLocation: Equatable, Identifiable {
     var id: String = ""
     var name: String = ""
     var cLLocation = CLLocation()
-    var location: Location?
+    var location: LocationData?
 }

@@ -90,7 +90,7 @@ class Trip {
             self.duration = time
         }
     }
-    func addLocationToList(location: Location) {
+    func addLocationToList(location: LocationData) {
         
         FirebaseManager.instance.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
         
@@ -110,7 +110,7 @@ class Trip {
         }
     }
     
-    func addOrSubtractFromTrip(location: Location) {
+    func addOrSubtractFromTrip(location: LocationData) {
         if listContainsLocation(location: location) {
             removeLocationFromList(tripLoc: TripLocation(id: "\(location.id)", name: location.name, cLLocation: CLLocation()))
         } else {
@@ -123,7 +123,7 @@ class Trip {
         locations.contains(tripLoc)
     }
     /// both needed
-    func listContainsLocation(location: Location) -> Bool {
+    func listContainsLocation(location: LocationData) -> Bool {
         let tripLoc = TripLocation(id: "\(location.id)", name: location.name, cLLocation: CLLocation())
         return locations.contains(tripLoc)
     }

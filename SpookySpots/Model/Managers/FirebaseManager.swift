@@ -20,67 +20,27 @@ class FirebaseManager: ObservableObject {
     //    @ObservedObject var userLocManager = UserLocationManager.instance
     //    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     
-    let locationStore = LocationStore.instance
-    //    @Published var images: [Location.Images] = []
-    //
-    //    init() {
-    ////        getImages()
-    //    }
+    @ObservedObject var locationStore = LocationStore.instance
     
-    
-//    func getHauntedHotels(withCompletion completion: @escaping ((_ location: Location) -> Void)) {
-//        let ref = Database.database().reference().child("Haunted Hotels")
-//        ref.observe(DataEventType.value) { (snapshot) in
-//            if snapshot.childrenCount > 0 {
-//                self.locationStore.hauntedHotels.removeAll()
-//
-//                for location in snapshot.children.allObjects as! [DataSnapshot] {
-//                    let data = location.value as? [String : AnyObject]
-//                    let id = data?["id"] as? Int ?? Int.random(in: 200...300)
-//                    let name = data?["name"] as? String ?? ""
-//                    let street = data?["street"] as? String ?? ""
-//                    let city = data?["city"] as? String ?? ""
-//                    let state = data?["state"] as? String ?? ""
-//                    let country = data?["country"] as? String ?? ""
-//                    let zipCode = data?["zipCode"] as? String ?? ""
-//                    let description = data?["description"] as? String ?? ""
-//                    let moreInfoLink = data?["moreInfoLink"] as? String ?? ""
-//                    let avgRating = data?["avgRating"] as? Double ?? 0
-//                    let lastReview = data?["lastReview"] as? String ?? ""
-//                    let lastRating = data?["lastRating"] as? Int ?? 0
-//                    let lastReviewTitle = data?["lastReviewTitle"] as? String ?? ""
-//                    let lastReviewUser = data?["lastReviewUser"] as? String ?? ""
-//                    let imageName = data?["imageName"] as? String ?? ""
-//                    let hasTours = data?["offersGhostTours"] as? Bool ?? false
-//                    let hotelKey = data?["hotelKey"] as? String ?? ""
-//                    let lat = data?["l/0"] as? Double ?? 0
-//                    let lon = data?["l/1"] as? Double ?? 0
-//
-//                    let clloc = CLLocation(latitude: lat, longitude: lon)
-//
-//                    //                    self.getImageFromURLString(imageName) { image in
-//
-//                    //                        HotelPriceManager.instance.getPriceOfHotel(key: hotelKey) { hotelPriceModel in
-//                    //                            let price = hotelPriceModel?.lowestPrice
-//
-//
-//                    let local = Location(id: id, name: name, address: Address(address: street, city: city, state: state, zipCode: zipCode, country: country), description: description, moreInfoLink: moreInfoLink, review: Review(avgRating: avgRating, lastRating: lastRating, lastReview: lastReview, lastReviewTitle: lastReviewTitle, user: lastReviewUser), locationType: "Haunted Hotel", cLLocation: clloc, tours: hasTours, imageName: imageName, baseImage: nil, distanceToUser: nil, price: 0)
-//
-//                    completion(local)
-//                    self.locationStore.hauntedHotels.append(local)
-//
-//                    //                    }
-//                    //                }
-//                    //                    }
-//
-//
-//
-//
-//                }
-//            }
-//        }
-//
-//    }
+    func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
+        
+        let db = Firestore.firestore()
+        
+        db.collection("Images").whereField("locID", isEqualTo: locID).getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                
+                if let snapshot = querySnapshot {
+                    for document in snapshot.documents {
+                        let dict = document.data()
+                        let image = FSImage(dict: dict)
+                        completion(image)
+                    }
+                }
+            }
+        }
+    }
     
     func getHauntedHotels() {
         let ref = Database.database().reference().child("Haunted Hotels")
@@ -91,14 +51,15 @@ class FirebaseManager: ObservableObject {
                 if let objects = snapshot.children.allObjects as? [DataSnapshot] {
                     for object in objects {
                         if let data = object.value as? [String : AnyObject] {
-                            let loc = Location(data: data)
-                            self.locationStore.hauntedHotels.append(loc)
-//                            
-//                            GeoFireManager.instance.createSpookySpotForLocation(loc) { result in
-//                                if result == true {
-//                                    print("Success")
-//                                }
-//                            }
+                            let locData = LocationData(data: data)
+                            var imageURLs: [URL] = []
+                            self.getLocationImages(locID: "\(locData.id)") { fsImage in
+                                if let url = URL(string: "\(fsImage.imageURL)") {
+                                    imageURLs.append(url)
+                                }
+                            }
+                            let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
+                            self.locationStore.hauntedHotels.append(locModel)
                         }
                     }
                 }
@@ -106,11 +67,11 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    func setFavoriteLocation(location: Location) {
+    func setFavoriteLocation(location: LocationModel) {
         let db = Firestore.firestore()
         
         db.document(UUID().uuidString).setData( [
-            "locationID" : "\(location.id)",
+            "locationID" : "\(location.location.id)",
             "userID" : "\(UserStore.instance.user.id)"
         ]) { error in
             if let error = error {
@@ -119,69 +80,19 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    
-    
-    
-    
-    func getImages() {
+    func getImageURLFromFBPath(_ urlString: String, withCompletion completion: @escaping ((_ url: URL) -> (Void))) {
         
-        let ref = Database.database().reference().child("Images")
-        ref.observe(DataEventType.value) { (snapshot) in
-            if snapshot.childrenCount > 0 {
-                for image in snapshot.children.allObjects as! [DataSnapshot] {
-                    let data = image.value as? NSDictionary
-                    let imageLocationID = data?["locationID"] as? Int ?? Int.random(in: 1000...2000)
-                    let imageURL = data?["imageURL"] as? String ?? ""
-                    let id = data?["id"] as? Int ?? Int.random(in: 3000...4000)
-                    
-                    _ = Location.Images(id: id, imageURL: imageURL, locationID: imageLocationID)
-                    //                    self.images.append(img)
-                }
-            }
-        }
-    }
-    
-    //    func getImageFromLocationID(id: Int, withCompletion completion: @escaping ((_ image: Location.Images) -> (Void))) {
-    //        for image in self.images {
-    //            if image.locationID == id {
-    //                completion(image)
-    //            }
-    //        }
-    //
-    //    }
-    //
-    func getImageFromURLString(_ urlString: String, withCompletion completion: @escaping ((_ image: Image) -> (Void))) {
-        var imageToReturn = Image("bannack")
         let storageRef = Storage.storage().reference().child(urlString)
-        storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+        
+        storageRef.downloadURL { url, error in
             if let error = error {
                 print(error.localizedDescription)
             }
-            guard let data = data else { return }
-            if let image = UIImage(data: data) {
-                imageToReturn = Image(uiImage: image)
-                completion(imageToReturn)
-            }
+            guard let url = url else { return }
+            completion(url)
         }
-        
     }
-    
-    func getUIImageFromURLString(_ urlString: String, withCompletion completion: @escaping ((_ image: UIImage) -> (Void))) {
-        let storageRef = Storage.storage().reference().child(urlString)
-        storageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            }
-            guard let data = data else { return }
-            if let image = UIImage(data: data) {
-                completion(image)
-            }
-        }
         
-    }
-    
-    //    func getTrendingLocations(withCompletion completion: @escaping (Location) -> Void) {
-    
     func getTrendingLocations() {
         
         let db = Firestore.firestore()
@@ -195,7 +106,7 @@ class FirebaseManager: ObservableObject {
                     for document in snapshot.documents {
                         let dict = document.data()
                         
-                        if let location = self.locationStore.hauntedHotels.first(where: { $0.id == dict["id"] as? Int ?? 0}) {
+                        if let location = self.locationStore.hauntedHotels.first(where: { $0.location.id == dict["id"] as? Int ?? 0}) {
                             if !self.locationStore.trendingLocations.contains(location) {
                                 self.locationStore.trendingLocations.append(location)
                             }
@@ -223,7 +134,7 @@ class FirebaseManager: ObservableObject {
                         for document in snapshot.documents {
                             let dict = document.data()
                             
-                            if let location = self.locationStore.hauntedHotels.first(where: { $0.id == dict["id"] as? Int ?? 0 }) {
+                            if let location = self.locationStore.hauntedHotels.first(where: { $0.location.id == dict["id"] as? Int ?? 0 }) {
                                 self.locationStore.favoriteLocations.append(location)
                             }
                         }

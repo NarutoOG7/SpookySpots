@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LargeImageLocationView: View {
-    var location: Location
+    var location: LocationModel
     
     var body: some View {
         ZStack {
@@ -54,7 +54,7 @@ struct LargeImageLocationView: View {
     //MARK: - SubViews
     private var image: some View {
         let img: Image
-        if let image = location.imageName {
+        if let image = location.location.imageName {
             img = Image(image)
         } else {
             img = Image("bannack")
@@ -68,7 +68,7 @@ struct LargeImageLocationView: View {
     
     
     private var title: some View {
-        Text(location.name)
+        Text(location.location.name)
             .font(.headline)
             .fontWeight(.medium)
             .lineLimit(2)
@@ -77,7 +77,7 @@ struct LargeImageLocationView: View {
     }
     
     private var address: some View {
-        Text(location.address?.streetCityState() ?? "")
+        Text(location.location.address?.streetCityState() ?? "")
             .font(.footnote)
             .foregroundColor(Color(white: 1, opacity: 0.7))
             .lineLimit(1)
@@ -86,7 +86,7 @@ struct LargeImageLocationView: View {
     
     private var price: some View {
         let txt: Text
-        if let price = location.price {
+        if let price = location.location.price {
            if price != 0 {
                txt = Text(String(format: "$%.0f", price))
            } else {
@@ -141,6 +141,6 @@ struct LargeImageLocationView: View {
 //MARK: - Preview
 struct LargeImageLocationView_Previews: PreviewProvider {
     static var previews: some View {
-        LargeImageLocationView(location: Location.example)
+        LargeImageLocationView(location: LocationModel(location: .example, imageURLs: [], reviews: []))
     }
 }

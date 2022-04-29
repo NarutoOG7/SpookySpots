@@ -18,7 +18,7 @@ struct Favorites: View {
     
     var locationsList: some View {
         List(locationStore.favoriteLocations) { location in
-            DefaultLocationCell(location: location)
+            LargeImageLocationView(location: location)
         }
     }
 }

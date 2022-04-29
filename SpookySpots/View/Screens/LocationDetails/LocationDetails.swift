@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct LocationDetails: View {
-    let location: Location
+    let location: LocationModel
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @ObservedObject var tripPageVM = TripPageVM.instance
     @ObservedObject var userLocManager = UserLocationManager.instance
@@ -16,12 +17,15 @@ struct LocationDetails: View {
     
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
     
+    @State private var imageURL = URL(string: "")
+    
     var body: some View {
         NavigationView {
-            
+            GeometryReader { geo in
             ZStack {
                 VStack {
                     image
+                        .offset(y: geo.frame(in: .global).minY)
                     Spacer()
                 }
                 //            VStack {
@@ -73,7 +77,9 @@ struct LocationDetails: View {
             
             .onAppear {
                 exploreByListVM.searchText = ""
+                loadImageFromFirebase()
             }
+        }
         }
     }
 }
@@ -84,10 +90,17 @@ struct LocationDetails: View {
 extension LocationDetails {
     
     private var image: some View {
-        Image("bannack")
-            .resizable()
-            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3)
-            .ignoresSafeArea()
+        
+        NavigationLink {
+            FullImageDisplay(location: location)
+        } label: {
+            WebImage(url: self.imageURL)
+                .resizable()
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3)
+                .ignoresSafeArea()
+        }
+
+        
     }
     
     private var cardHandle: some View {
@@ -102,21 +115,21 @@ extension LocationDetails {
     }
     
     private var title: some View {
-        Text(location.name)
+        Text(location.location.name)
             .font(.title)
             .fontWeight(.semibold)
             .padding()
     }
     
     private var address: some View {
-        Text(location.address?.fullAddress() ?? "missing address")
+        Text(location.location.address?.fullAddress() ?? "missing address")
             .fontWeight(.medium)
             .foregroundColor(Color(#colorLiteral(red: 0.4834827094, green: 0.4834827094, blue: 0.4834827094, alpha: 1)))
             .padding(.horizontal)
     }
     
     private var locationType: some View {
-        Text(location.locationType ?? "")
+        Text(location.location.locationType ?? "")
             .font(.subheadline)
             .fontWeight(.light)
             .foregroundColor(.black)
@@ -130,7 +143,7 @@ extension LocationDetails {
                 .font(.custom("Avenir", size: 17))
                 .fontWeight(.light)
                 .foregroundColor(Color(#colorLiteral(red: 0.3913586612, green: 0.3913586612, blue: 0.3913586612, alpha: 0.8491545377)))
-            Text(location.description ?? "")
+            Text(location.location.description ?? "")
                 .lineSpacing(7)
                 .font(.body)
                 .padding(.top, 1)
@@ -150,7 +163,7 @@ extension LocationDetails {
     
     private var avgRatingDisplay: some View {
         HStack {
-            FiveStars(location: location)
+            FiveStars(location: location.location)
             Text(getAvgRating())
         }
     }
@@ -175,17 +188,17 @@ extension LocationDetails {
                     HStack {
                         
                         VStack(alignment: .leading, spacing: 12) {
-                            Text(location.review?.lastReviewTitle ?? "")
+                            Text(location.location.review?.lastReviewTitle ?? "")
                                 .font(.title3)
                                 .fontWeight(.medium)
                                 .offset(x: 2)
-                            FiveStars(location: location)
+                            FiveStars(location: location.location)
                         }
                         Spacer()
-                        Text(location.review?.user ?? "")
+                        Text(location.location.review?.user ?? "")
                             .offset(y: -15)
                     }
-                    Text(location.review?.lastReview ?? "")
+                    Text(location.location.review?.lastReview ?? "")
                         .offset(x: 3)
                 }
                 .padding()
@@ -242,7 +255,7 @@ extension LocationDetails {
     
     private var getMoreInfoButton: some View {
         Button(action: getMoreInfoByUsingWebLink) {
-            Text(location.moreInfoLink ?? "")
+            Text(location.location.moreInfoLink ?? "")
                 .underline(true, color: Color(#colorLiteral(red: 0.04680434317, green: 0.3292598999, blue: 0.6950621868, alpha: 0.6714736729)))
                 .fontWeight(.light)
                 .lineLimit(1)
@@ -264,7 +277,7 @@ extension LocationDetails {
     //MARK: - Methods
     
     func addOrSubtractFromTrip() {
-        tripPageVM.trip.addOrSubtractFromTrip(location: location)
+        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
     }
     func getDirections() {
         // show directions page
@@ -275,7 +288,7 @@ extension LocationDetails {
     }
     
     func isInTrip() -> Bool {
-        tripPageVM.trip.listContainsLocation(location: location)
+        tripPageVM.trip.listContainsLocation(location: location.location)
     }
     
     func getMoreInfoByUsingWebLink() {
@@ -287,26 +300,37 @@ extension LocationDetails {
     }
     
     func isAvgRatingAboveOne() -> Bool {
-        location.review?.avgRating ?? 0 >= 1.0
+        location.location.review?.avgRating ?? 0 >= 1.0
     }
     
     func getAvgRating() -> String {
         var avgRatingString = ""
-        if let review = location.review {
+        if let review = location.location.review {
             let avgRating = review.avgRating
             if avgRating / avgRating == 1 {
                 avgRatingString = "\(avgRating)"
             } else {
                 avgRatingString = String(format: "%.1f", avgRating)
             }
+            if avgRatingString == "" {
+                avgRatingString = "(No Reviews Yet)"
+            }
         }
         return avgRatingString
+    }
+ 
+    private func loadImageFromFirebase()  {
+        if let imageString = location.location.imageName {
+            FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
+                self.imageURL = url
+            }
+        }
     }
 }
 
 
 struct LocationDetails_Previews: PreviewProvider {
     static var previews: some View {
-        LocationDetails(location: Location.example)
+        LocationDetails(location: LocationModel(location: .example, imageURLs: [], reviews: []))
     }
 }

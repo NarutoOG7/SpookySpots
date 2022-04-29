@@ -65,6 +65,13 @@ extension ExploreByMap {
                     LargeImageLocationView(location: location)
                         .id(location.id)
                 }
+            
+                .onChange(of: exploreByMapVM.highlightedLocationIndex) { _ in
+                    scrollView.scrollTo(exploreByMapVM.highlightedLocationIndex ?? 0)
+                }
+                
+                
+                
 //                onChange(of: exploreByMapVM.highlightedLocation, perform: { _ in
 //                    scrollView.scrollTo(exploreByMapVM.highlightedLocation?.id ?? 0)
 //                })
@@ -95,7 +102,7 @@ extension ExploreByMap {
                 NavigationLink {
                     LocationDetails(location: location)
                 } label: {
-                    Text("\(location.name), \(location.address?.state ?? "")")
+                    Text("\(location.location.name), \(location.location.address?.state ?? "")")
                 }
                 
             }
@@ -193,7 +200,7 @@ extension ExploreByMap {
     }
     
     func currentLocationPressed() {
-        
+        map.setCurrentLocationRegion()
     }
     
 }

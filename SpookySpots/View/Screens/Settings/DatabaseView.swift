@@ -11,7 +11,7 @@ struct DatabaseView: View {
     
     @ObservedObject var locationStore = LocationStore.instance
     
-    @State var failedLocations: [Location] = []
+    @State var failedLocations: [LocationModel] = []
     
     @State var showingMoreAllLocations = false
     @State var showingMoreFailedLocations = false
@@ -46,7 +46,7 @@ struct DatabaseView: View {
     var allLocationsList: some View {
         VStack(alignment: .leading) {
             ForEach(locationStore.hauntedHotels.prefix(self.showingMoreAllLocations ? .max : 4)) { location in
-                Text("\(location.id): \(location.name)")
+                Text("\(location.location.id): \(location.location.name)")
             }.padding(3)
         }
     }
@@ -71,7 +71,7 @@ struct DatabaseView: View {
     
     var failedLocationsList: some View {
         List(failedLocations) { location in
-            Text("\(location.id), \(location.name)")
+            Text("\(location.location.id), \(location.location.name)")
         }
         .lineLimit(self.showingMoreFailedLocations ? .none : 4)
     }

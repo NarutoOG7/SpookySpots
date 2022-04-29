@@ -33,7 +33,7 @@ struct TabBarSetup: View {
             
             exploreHelperView
                 .navigationTitle("Explore")
-        }
+        }.background(Color.clear)
             .tabItem {
                 Text("Explore")
                 Image(systemName: "magnifyingglass")

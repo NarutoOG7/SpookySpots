@@ -46,7 +46,7 @@ struct LocationCollection: View {
                     case .topRated:
                         ForEach(locationStore.locations) { location in
                             VStack(alignment: .leading) {
-                                DefaultLocationCell(location: location)
+                                MainLocCell(location: location)
                             }
                         }
                     }
@@ -61,9 +61,9 @@ struct LocationCollection: View {
 //        List {
         VStack {
 //            ForEach(exploreByListVM.searchedLocations) { location in
-                NavigationLink("\(location.name), \(location.address?.state ?? "")", destination:  LocationDetails(location: location))
+            NavigationLink("\(location.location.name), \(location.location.address?.state ?? "")", destination: LD(location: location) )
                     .listRowSeparator(.hidden)
-            
+//            LocationDetails(location: location)
             }
         }
     }
@@ -73,7 +73,8 @@ struct LocationCollection: View {
         ForEach(locationStore.trendingLocations) { location in
             VStack(alignment: .leading) {
                 NavigationLink {
-                    LocationDetails(location: location)
+//                    LocationDetails(location: location)
+                    LD(location: location)
                 } label: {
                     
                     
@@ -86,8 +87,8 @@ struct LocationCollection: View {
         }
     }
     
-    private func isLastInTrending(_ location: Location) -> Bool {
-        location.id == locationStore.trendingLocations.last?.id ?? UUID().hashValue
+    private func isLastInTrending(_ location: LocationModel) -> Bool {
+        location.location.id == locationStore.trendingLocations.last?.location.id ?? UUID().hashValue
     }
     
     
@@ -102,7 +103,7 @@ struct LocationCollection: View {
 
                     VStack(alignment: .leading) {
                         NavigationLink {
-                            LocationDetails(location: location)
+                            LD(location: location)
                         } label: {
                             MainLocCell(location: location)
                                 .padding(isLastInNearbyList(location)
@@ -115,8 +116,8 @@ struct LocationCollection: View {
         return view
     }
     
-    private func isLastInNearbyList(_ location: Location) -> Bool {
-        location.id == locationStore.nearbyLocations.last?.id ?? UUID().hashValue
+    private func isLastInNearbyList(_ location: LocationModel) -> Bool {
+        location.location.id == locationStore.nearbyLocations.last?.location.id ?? UUID().hashValue
     }
 }
 

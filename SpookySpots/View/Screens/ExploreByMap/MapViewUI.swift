@@ -22,6 +22,7 @@ struct MapViewUI: UIViewRepresentable {
         setCurrentLocationRegion()
         mapView.mapType = .standard
         mapView.isRotateEnabled = false
+        mapView.isPitchEnabled = false
         mapView.addAnnotations(geoFireManager.gfOnMapLocations)
         mapView.delegate = context.coordinator
         return mapView
@@ -93,11 +94,13 @@ struct MapViewUI: UIViewRepresentable {
             case let locAnnotation as LocationAnnotationModel:
                 
                 exploreByMapVM.locAnnoTapped = locAnnotation
-                exploreByMapVM.highlightedLocation = LocationStore.instance.hauntedHotels.first(where: { $0.id
-                    == locAnnotation.id.hashValue })
+                if let loc = LocationStore.instance.onMapLocations.first(where: { "\($0.location.id)"
+                    == locAnnotation.id }) {
+                exploreByMapVM.highlightedLocation = loc
                 exploreByMapVM.showingLocationList = true
-                print(locAnnotation)
-                
+
+                exploreByMapVM.highlightedLocationIndex = LocationStore.instance.onMapLocations.firstIndex(of: loc)
+                }
             default: break
             }
         }

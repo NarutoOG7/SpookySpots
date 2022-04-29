@@ -30,7 +30,7 @@ class UserStore: ObservableObject {
         }
         }
     }
-    @Published var favoriteLocations: [Location] = []
+    @Published var favoriteLocations: [LocationModel] = []
     @Published var trip: Trip?
     @Published var selectedLocationDistanceToUser: Double = 0
     

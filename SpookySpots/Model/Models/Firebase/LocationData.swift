@@ -11,13 +11,13 @@ import SwiftUI
 import Firebase
 import Contacts
 
-struct Location: Identifiable, Equatable, Codable {
-    static func == (lhs: Location, rhs: Location) -> Bool {
+struct LocationData: Identifiable, Equatable, Codable {
+    static func == (lhs: LocationData, rhs: LocationData) -> Bool {
         return lhs.id == rhs.id && lhs.name == rhs.name
     }
     
     
-    static let example = Location(id: 1111,
+    static let example = LocationData(id: 1111,
                                   name: "Bannack",
                                   address: Address(address: "721 Bannack Rd", city: "Dillon", state: "MT", zipCode: "59725", country: "USA"),
                                   description: "Bannack State Park is a National Historic Landmark and is the best preserved of all Montana ghost towns. Back in the “Old West”, during the mighty gold rush of 1862, Bannack’s population grew over 3,000. Today, no residents remain in this town.",
@@ -33,17 +33,20 @@ struct Location: Identifiable, Equatable, Codable {
     var name: String
     var address: Address?
     var description: String?
-    var moreInfoLink: String?
-    var review: Review?
+    var moreInfoLink: String?     //
+    var review: Review?           
     var locationType: String?
-    var tours: Bool?
-    var hours: String?
+    var tours: Bool?              //
+    var hours: String?            //
     var likes: Int?
     var imageName: String?
     var distanceToUser: Double?
-    var price: Double?
+    var price: Double?            //
     var hotelKey: String?
     var geoKey: String?
+    var imageURL: URL?
+    
+    var imageURLS: [URL] = []
     
     init(data: [String : AnyObject]) {
         
@@ -102,25 +105,11 @@ struct Location: Identifiable, Equatable, Codable {
             self.price = price
         }
     
-    init(id: Int, name: String) {
-            self.id = id
-            self.name = name
-    }
-    
-
-
 
     mutating func addPrice(_ price: Double) {
         var result = self
         result.price = price
         self = result
-    }
-    
-    //MARK: - Images
-    struct Images {
-        var id: Int
-        var imageURL: String
-        var locationID: Int
     }
 }
 
@@ -138,18 +127,16 @@ struct FavoriteLocation: Identifiable, Codable {
             case id
         }
     
-//    init(from encoder: Encoder) throws {
-//        
-//        var values = encoder.container(keyedBy: CodingKeys.self)
-//        
-//        try values.encode(userID, forKey: .userID)
-//        try values.encode(locationID, forKey: .locationID)
-//        try values.encode(id, forKey: .id)
-//
-//        try encode(to: encoder)
-//
-//    }
-    
 }
 
+
+struct FSImage {
+    var locID: String
+    var imageURL: String
+    
+    init(dict: [String: Any]) {
+        self.locID = dict["locID"] as? String ?? ""
+        self.imageURL = dict["imageURL"] as? String ?? ""
+    }
+}
 

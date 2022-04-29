@@ -103,7 +103,7 @@ struct ExploreByList: View {
                 NavigationLink {
                     LocationDetails(location: location)
                 } label: {
-                    Text("\(location.name), \(location.address?.state ?? "")")
+                    Text("\(location.location.name), \(location.location.address?.state ?? "")")
                 }
                 
             }

@@ -16,15 +16,16 @@ class ExploreByMapVM: ObservableObject {
     @ObservedObject var userStore       = UserStore.instance
     
     var selectedLocationDistance: Double = 0
-    @Published var locationShownOnList: Location?
+    @Published var locationShownOnList: LocationModel?
     @Published var locAnnoTapped: LocationAnnotationModel?
     @Published var region = MapDetails.defaultRegion
 
     private var regionBeforeLastMove = MKCoordinateRegion()
-    @Published var highlightedLocation: Location?
+    @Published var highlightedLocation: LocationModel?
+    @Published var highlightedLocationIndex: Int?
     @Published var showingLocationList = false
 
-    @Published var searchedLocations: [Location] = []
+    @Published var searchedLocations: [LocationModel] = []
     @Published var searchText = "" {
         didSet {
             searchLogic()
@@ -35,11 +36,12 @@ class ExploreByMapVM: ObservableObject {
     
      func searchLogic() {
         if self.searchText != "" {
-            let locations = locationStore.hauntedHotels.filter({ $0.name.lowercased().contains(self.searchText.lowercased()) })
+            let locations = locationStore.hauntedHotels.filter({ $0.location.name.lowercased().contains(self.searchText.lowercased()) })
             self.searchedLocations = locations
         } else {
             self.searchedLocations = []
         }
     }
+
 }
 

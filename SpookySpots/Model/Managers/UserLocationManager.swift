@@ -72,14 +72,14 @@ class UserLocationManager: NSObject, ObservableObject {
     }
     
     
-    func getDistanceToLocation(location: Location, withCompletion completion: @escaping ((_ distance: Double) -> (Void))) {
+    func getDistanceToLocation(location: LocationModel, withCompletion completion: @escaping ((_ distance: Double) -> (Void))) {
         let request = MKDirections.Request()
         if let currentLocation = userStore.currentLocation {
             var destCoordinates = CLLocationCoordinate2D()
             
             request.source = MKMapItem(placemark: MKPlacemark(coordinate: currentLocation.coordinate))
                 
-            firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cllocation in
+            firebaseManager.getCoordinatesFromAddress(address: location.location.address?.geoCodeAddress() ?? "") { cllocation in
                 destCoordinates = cllocation.coordinate
                     
                     request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destCoordinates))

@@ -14,7 +14,7 @@ class ExploreByListVM: ObservableObject {
     @Published var isShowingMap = false
     
     @Published var showingSearchLocations = false
-    @Published var searchedLocations: [Location] = []
+    @Published var searchedLocations: [LocationModel] = []
     
     @ObservedObject var geoFireManager = GeoFireManager.instance
     @ObservedObject var locationStore = LocationStore.instance
@@ -84,7 +84,7 @@ class ExploreByListVM: ObservableObject {
     
      func searchLogic() {
         if self.searchText != "" {
-            let locations = locationStore.hauntedHotels.filter({ $0.name.lowercased().contains(self.searchText.lowercased()) })
+            let locations = locationStore.hauntedHotels.filter({ $0.location.name.lowercased().contains(self.searchText.lowercased()) })
             self.searchedLocations = locations
         } else {
             self.searchedLocations = []

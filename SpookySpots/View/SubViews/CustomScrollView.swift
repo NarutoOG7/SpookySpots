@@ -69,7 +69,7 @@ struct HorizontalSnap: ViewModifier {
 
 struct HorizontalSnapScrollView: View {
      
-    var items: [Location]
+    var items: [LocationModel]
     
     
     @ObservedObject var locationStore = LocationStore.instance
@@ -77,7 +77,7 @@ struct HorizontalSnapScrollView: View {
     var body: some View {
         HStack {
             ForEach(items) { location in
-                DefaultLocationCell(location: location)
+                MainLocCell(location: location)
             }
         }.modifier(HorizontalSnap(items: items.count, itemWidth: UIScreen.main.bounds.width - 60, itemSpacing: 20))
     }
@@ -85,7 +85,10 @@ struct HorizontalSnapScrollView: View {
 
 struct HorizontalSnapScrollView_Previews: PreviewProvider {
     static var previews: some View {
-        HorizontalSnapScrollView(items: [Location.example, Location.example, Location.example])
+        HorizontalSnapScrollView(items: [
+            LocationModel(location: .example, imageURLs: [], reviews: []),
+            LocationModel(location: .example, imageURLs: [], reviews: [])
+        ])
     }
 }
               

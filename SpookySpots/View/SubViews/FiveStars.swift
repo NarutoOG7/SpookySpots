@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FiveStars: View {
-    var location: Location
+    var location: LocationData
     
     var body: some View {
          HStack(alignment: .top) {
@@ -32,6 +32,6 @@ struct StarIcon: View {
 
 struct FiveStars_Previews: PreviewProvider {
     static var previews: some View {
-        FiveStars(location: Location.example)
+        FiveStars(location: LocationData.example)
     }
 }

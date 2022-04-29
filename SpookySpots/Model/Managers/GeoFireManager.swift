@@ -41,14 +41,14 @@ class GeoFireManager: ObservableObject {
             let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
             let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
             circleQuery.observe(.keyEntered, with: { key, loc in
-                if let location = self.locationStore.hauntedHotels.first(where: { "\($0.id)" == key }) {
+                if let location = self.locationStore.hauntedHotels.first(where: { "\($0.location.id)" == key }) {
                     print(location)
                     let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
                     
                     if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
                         self.gfNearbyLocations.append(anno)
                         
-                        if !self.locationStore.nearbyLocations.contains(where: { "\($0.id)" == key }) {
+                        if !self.locationStore.nearbyLocations.contains(where: { "\($0.location.id)" == key }) {
                             self.locationStore.nearbyLocations.append(location)
                         }
                     }
@@ -66,14 +66,14 @@ class GeoFireManager: ObservableObject {
         let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
         circleQuery.observe(.keyEntered, with: { key, loc in
-            if let location = self.locationStore.hauntedHotels.first(where: { "\($0.id)" == key }) {
+            if let location = self.locationStore.hauntedHotels.first(where: { "\($0.location.id)" == key }) {
                 print(location)
                 let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
                 
                 if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
                     self.gfOnMapLocations.append(anno)
                     
-                    if self.locationStore.onMapLocations.contains(where: { "\($0.id)" == key }) {
+                    if !self.locationStore.onMapLocations.contains(where: { "\($0.location.id)" == key }) {
                         self.locationStore.onMapLocations.append(location)
                     }
                 }
@@ -92,7 +92,7 @@ class GeoFireManager: ObservableObject {
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: 200)
         locationHandle = circleQuery.observe(.keyEntered, with: { key, loc in
             
-            if let loc = self.locationStore.hauntedHotels.first(where: { $0.geoKey == key }) {
+            if let loc = self.locationStore.hauntedHotels.first(where: { $0.location.geoKey == key }) {
                 print(loc)
             }
             
@@ -111,7 +111,7 @@ class GeoFireManager: ObservableObject {
         }
     }
     
-    func getLocationDataFromKey(key: String, withCompletion completion: @escaping ((_ location: Location) -> (Void))) {
+    func getLocationDataFromKey(key: String, withCompletion completion: @escaping ((_ location: LocationData) -> (Void))) {
         
         let ref = Database.database().reference().child("Haunted Hotels")
         print(key)
@@ -125,7 +125,7 @@ class GeoFireManager: ObservableObject {
                 
             if let data = snapshot.value as? [String : AnyObject] {
                         
-                        var location = Location(data: data)
+                        var location = LocationData(data: data)
                     
                     print(location.id)
                         
@@ -166,11 +166,11 @@ class GeoFireManager: ObservableObject {
 //        }
 //    }
     
-    func createSpookySpotForLocation(_ location: Location, withCompletion completion: @escaping(Bool) -> Void) {
+    func createSpookySpotForLocation(_ location: LocationModel, withCompletion completion: @escaping(Bool) -> Void) {
         let geoLocRef = GeoFire(firebaseRef: locationRef)
-        firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
+        firebaseManager.getCoordinatesFromAddress(address: location.location.address?.geoCodeAddress() ?? "") { cloc in
             print(location.id)
-                geoLocRef.setLocation(cloc, forKey: "\(location.id)") { error in
+            geoLocRef.setLocation(cloc, forKey: "\(location.location.id)") { error in
                     if let error = error {
                         print(error)
                         completion(false)
