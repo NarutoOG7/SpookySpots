@@ -67,19 +67,6 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    func setFavoriteLocation(location: LocationModel) {
-        let db = Firestore.firestore()
-        
-        db.document(UUID().uuidString).setData( [
-            "locationID" : "\(location.location.id)",
-            "userID" : "\(UserStore.instance.user.id)"
-        ]) { error in
-            if let error = error {
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
     func getImageURLFromFBPath(_ urlString: String, withCompletion completion: @escaping ((_ url: URL) -> (Void))) {
         
         let storageRef = Storage.storage().reference().child(urlString)
@@ -92,7 +79,7 @@ class FirebaseManager: ObservableObject {
             completion(url)
         }
     }
-        
+    
     func getTrendingLocations() {
         
         let db = Firestore.firestore()
@@ -117,13 +104,18 @@ class FirebaseManager: ObservableObject {
         }
     }
     
+    func fetchFavorites() {
+        getFavoritesForUser(UserStore.instance.user.user) { favLoc in
+            self.locationStore.favoriteLocations.append(favLoc)
+        }
+    }
     
-    func getFavoritesForUser() {
+    func getFavoritesForUser(_ user: User, withCompletion completion: @escaping(_ favLoc: LocationModel) -> Void) {
         let db = Firestore.firestore()
         
         db.collection("Favorites")
         
-            .whereField("id", isEqualTo: UserStore.instance.user.id)
+            .whereField("id", isEqualTo: user.id)
         
             .getDocuments { querySnapshot, error in
                 
@@ -135,13 +127,55 @@ class FirebaseManager: ObservableObject {
                             let dict = document.data()
                             
                             if let location = self.locationStore.hauntedHotels.first(where: { $0.location.id == dict["id"] as? Int ?? 0 }) {
-                                self.locationStore.favoriteLocations.append(location)
+                                
+                                completion(location)
                             }
                         }
                     }
                 }
             }
     }
+    
+    func getReviewsForUser(_ user: User, withCompletion completion: @escaping(_ review: ReviewModel) -> Void) {
+        let db = Firestore.firestore()
+        
+        db.collection("Reviews")
+        
+            .whereField("userID", isEqualTo: user.id)
+        
+            .getDocuments { querySnapshot, error in
+                if let error = error {
+                    print("Error getting reviews: \(error.localizedDescription)")
+                } else {
+                    if let snapshot = querySnapshot {
+                        for doc in snapshot.documents {
+                            let dict = doc.data()
+                            
+                            let review = ReviewModel(dictionary: dict)
+                            
+                            completion(review)
+                        }
+                    }
+                }
+            }
+    }
+    
+    func addLocToFavoritesBucket(_ loc: LocationModel, withCompletion completion: @escaping(_ result: Bool) -> Void) {
+        let db = Firestore.firestore()
+        
+        db.collection("Favorites").document(UUID().uuidString).setData([
+            "locationID" : "\(loc.location.id)",
+            "userID" : "\(UserStore.instance.user.user.id)"
+        ]) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
     
     //MARK: - Queries
     enum Queries: String, CaseIterable {

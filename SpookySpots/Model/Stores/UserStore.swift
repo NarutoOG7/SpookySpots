@@ -19,7 +19,7 @@ class UserStore: ObservableObject {
     
 //    @Published var isSignedIn = false
     @Published var isGuest = false
-    @Published var user = User()
+    @Published var user = UserModel(user: User(), favoriteLocations: [], reviews: [])
     @Published var currentLocation: CLLocation? {
         willSet {
             if let newValue = newValue {

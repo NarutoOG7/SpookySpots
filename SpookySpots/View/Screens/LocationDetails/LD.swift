@@ -10,58 +10,71 @@ import SDWebImageSwiftUI
 
 struct LD: View {
     
-    @Environment(\.presentationMode) var presentationMode
-    
     var location: LocationModel
     
     @State private var imageURL = URL(string: "")
+    @State private var isSharing = false
+    @State private var imageIsAvailable = false
+    @State private var isFavorited = false
 
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
+    
+    @ObservedObject var tripPageVM = TripPageVM.instance
+    
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ScrollView {
             ZStack {
                 VStack(alignment: .leading, spacing: 7) {
+                    
                     title
                     address
                     avgRatingDisplay
                     
-                    HStack(spacing: 26) {
+                    HStack {
                         Spacer()
                         directionsButton
                         shareButton
-                        addToTripButton
+                        addRemoveFromTrip
+                        favoriteButton
                         Spacer()
                     }.padding(.vertical)
                     
                     Divider()
                     description
                     Spacer()
-                    mainReview
-                    Spacer()
                     moreInfoLink
+                    Spacer()
+                    mainReview
                 }
+                .clipped()
                 .padding(.horizontal)
                 .padding(.vertical, imageMaxHeight + 16.0)
-            
+                
                 
                 image
-            
-                VStack {
-                HStack {
-                    backButton
-                    Spacer()
-                }.padding(.horizontal)
-                        .padding(.top, 60)
-                    Spacer()
-                }
                 
-            .onAppear {
-                loadImageFromFirebase()
+                VStack {
+                    HStack {
+                backButton
+                Spacer()
+            }.padding(.horizontal)
+                .padding(.top, 60)
+            Spacer()
+        }
+                
+                
+                    .onAppear {
+                        loadImageFromFirebase()
+                    }
+                    .sheet(isPresented: $isSharing) {
+                        ShareActivitySheet(itemsToShare: [location.location.name])
+                    }
             }
         }
-        }.edgesIgnoringSafeArea(.vertical)
+        .edgesIgnoringSafeArea(.vertical)
         .navigationBarHidden(true)
     }
     
@@ -78,12 +91,12 @@ struct LD: View {
             Spacer()
         }
         .offset(y: 80)
-
+        
     }
     
     private var headerText: some View {
         Text(location.location.name)
-            .font(.avenirNext(size: 28))
+            .font(.avenirNext(size: 20))
             .fontWeight(.bold)
             .foregroundColor(.white)
     }
@@ -99,15 +112,17 @@ struct LD: View {
                     .opacity(self.getBlurRadiusForImage(geo) - 0.35))
                 .frame(width: geo.size.width, height: self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
                 .offset(y: geo.frame(in: .global).origin.y < 0
-                               ? abs(geo.frame(in: .global).origin.y)
-                               : -geo.frame(in: .global).origin.y)
-
+                        ? abs(geo.frame(in: .global).origin.y)
+                        : -geo.frame(in: .global).origin.y)
+            
+                
         }
     }
-
+    
     private var title: some View {
         Text(location.location.name)
-            .font(.avenirNext(size: 28))
+            .font(.avenirNext(size: 34))
+            .fontWeight(.medium)
     }
     
     
@@ -130,9 +145,9 @@ struct LD: View {
     
     private var description: some View {
         VStack {
-        Text(location.location.description ?? "")
-            .font(.avenirNext(size: 17))
-            .lineLimit(nil)
+            Text(location.location.description ?? "")
+                .font(.avenirNext(size: 17))
+                .lineLimit(nil)
             Text(location.location.description ?? "")
                 .font(.avenirNext(size: 17))
                 .lineLimit(nil)
@@ -143,26 +158,37 @@ struct LD: View {
     }
     
     private var mainReview: some View {
-        VStack(alignment: .leading) {
-            Divider()
-            HStack {
-                Text(location.location.review?.lastReviewTitle ?? "")
-                    .font(.avenirNext(size: 23))
-                Spacer()
-                FiveStars(location: location.location)
-            }
-            
-            Text(location.location.review?.lastReview ?? "")
-                .font(.avenirNextRegular(size: 17))
-                .padding(.vertical, 1)
-            moreReviewsButton
+        let view: AnyView
+        if location.location.review?.lastReview != "" {
+            view = AnyView(VStack(alignment: .leading) {
+                Divider()
+                HStack {
+                    Text(location.location.review!.lastReviewTitle)
+                        .font(.avenirNext(size: 17))
+                    Spacer()
+                    FiveStars(location: location.location)
+                }
+                
+                Text(location.location.review!.lastReview)
+                    .font(.avenirNextRegular(size: 15))
+                    .padding(.vertical, 1)
+                moreReviewsButton
+            })
+        } else {
+            view = AnyView(Rectangle().fill(.clear).frame(width: 10, height: 200))
         }
+        return view
     }
     
     private var moreInfoLink: some View {
         let view: AnyView
         if let url = URL(string: location.location.moreInfoLink ?? "") {
-            view = AnyView(Link("Get More Info", destination: url))
+            view = AnyView(
+                Link(destination: url, label: {
+                    Text("Get More Info")
+                        .underline()
+                })
+            )
         } else {
             view = AnyView(EmptyView())
         }
@@ -172,18 +198,43 @@ struct LD: View {
     //MARK: - Buttons
     
     private var directionsButton: some View {
-        BorderedCircularButton(image: Image(systemName: "arrow.triangle.turn.up.right.diamond.fill"), color: .green, tapped: directionsTapped)
+        BorderedCircularButton(
+            image: Image(systemName: "arrow.triangle.turn.up.right.diamond.fill"),
+            title: "Directions",
+            color: .green,
+            tapped: directionsTapped)
     }
     
     private var shareButton: some View {
         BorderedCircularButton(
             image: Image(systemName: "square.and.arrow.up"),
+            title: "Share",
             color: .green,
             tapped: shareTapped)
     }
     
-    private var addToTripButton: some View {
-        BorderedCircularButton(image: Image(systemName: "plus"), color: .green, tapped: addToTripTapped)
+    private var addRemoveFromTrip: some View {
+        BorderedCircularButton(
+            image: Image(systemName: tripPageVM.trip.listContainsLocation(location: location.location) ? "minus" : "plus"),
+            title: tripPageVM.trip.listContainsLocation(location: location.location) ? "Remove From Trip" : "Add To Trip",
+            color: .green,
+            tapped: addToTripTapped)
+    }
+    
+    private var favoriteButton: some View {
+        BorderedCircularButton(
+            image: self.isFavorited ?
+                Image(systemName: "heart.fill") :
+                Image(systemName: "heart"),
+            title: "Favorites",
+            color: .green,
+            tapped: favoritesTapped)
+//        Button(action: favoritesTapped) {
+//            Image(systemName: "heart")
+//                .resizable()
+//                .frame(width: 35, height: 35)
+//                .tint(.red)
+//        }
     }
     
     private var moreReviewsButton: some View {
@@ -191,40 +242,46 @@ struct LD: View {
             Spacer()
             Button(action: moreReviewsTapped) {
                 Text("More Reviews")
+                    .font(.avenirNextRegular(size: 17))
+                    .fontWeight(.medium)
             }
         }.padding(.vertical)
     }
     
     private var backButton: some View {
-        Button(action: backButtonTapped) {
-            Image(systemName: "chevron.left")
-                .resizable()
-                .frame(width: 25, height: 35)
-                .tint(.cyan)
-        }
-        
+
+                Button(action: backButtonTapped) {
+                    Image(systemName: "chevron.left")
+                        .resizable()
+                        .frame(width: 25, height: 35)
+                        .tint(.pink)
+                }
+  
     }
     
-    private var favoriteButton: some View {
-        Button(action: favoritesTapped) {
-            Image(systemName: "heart")
-                .resizable()
-                .frame(width: 35, height: 35)
-                .tint(.red)
-        }
-    }
     
     //MARK: - Methods
     
     private func directionsTapped() {
-        // Open directions in apple maps
+        // Open directions in apple maps //move!!
+        // need to test with all locations... may need to use address instead of location name
+        var addressString: String {
+            location.location.name.replacingOccurrences(of: " ", with: "+")
+        }
+        
+        guard let url = URL(string: "maps://?daddr=\(addressString)") else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
     
     private func shareTapped() {
-        
+        self.isSharing = true
     }
     
     private func addToTripTapped() {
+        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
         
     }
     
@@ -237,10 +294,16 @@ struct LD: View {
     }
     
     private func favoritesTapped() {
-        
+        UserStore.instance.user.addOrRemoveFromFavorites(location, withCompletion: { isFavorited in
+            if isFavorited == true {
+                self.isFavorited = true
+            } else {
+                self.isFavorited = false
+            }
+        })
     }
     
-
+    
     private func loadImageFromFirebase()  {
         if let imageString = location.location.imageName {
             FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
@@ -293,4 +356,21 @@ extension LD {
         return blur * 6
     }
 }
+
+
+//MARK: - Share Activity View
+struct ShareActivitySheet: UIViewControllerRepresentable {
+    
+    var itemsToShare: [Any]
+    var servicesToShareItem: [UIActivity]? = nil
+    
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareActivitySheet>) -> UIActivityViewController {
+        
+        let controller = UIActivityViewController(activityItems: itemsToShare, applicationActivities: servicesToShareItem)
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareActivitySheet>) { }
+}
+
 

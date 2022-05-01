@@ -57,7 +57,7 @@ struct SettingsPage: View {
     
     private var admin: some View {
         let view: AnyView
-        if userStore.user.id == K.adminKey {
+        if userStore.user.user.id == K.adminKey {
             view = AnyView(adminView)
         } else {
             view = AnyView(EmptyView())

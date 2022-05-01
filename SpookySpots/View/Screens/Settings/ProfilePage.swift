@@ -49,7 +49,7 @@ struct ProfilePage: View {
                 
                 TextField("", text: $displayNameInput)
                     .placeholder(when: displayNameInput.isEmpty) {
-                        Text(userStore.user.name)
+                        Text(userStore.user.user.name)
                             .foregroundColor(.black)
                     }
                     .disableAutocorrection(true)
@@ -72,7 +72,7 @@ struct ProfilePage: View {
             VStack {
                 TextField("", text: $emailInput)
                     .placeholder(when: emailInput.isEmpty) {
-                        Text(userStore.user.email)
+                        Text(userStore.user.user.email)
                             .foregroundColor(.black)
                     }
                     .disableAutocorrection(true)

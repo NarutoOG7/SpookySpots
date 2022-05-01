@@ -85,23 +85,6 @@ struct CreativeSignInUp: View {
     }
     
     //MARK: - Other Options
-    private var appleButton: some View {
-        //        Button(action: appleTapped) {
-        //            Image("apple")
-        //                .logoStyle()
-        //        }
-        //
-        //
-        SignInWithAppleButton(
-            onRequest: { request in
-                AppleSignIn().signIn(request)
-            },
-            onCompletion: { result in
-                AppleSignIn().completion(result: result)
-            }
-        ).frame(width: 50, height: 50)
-        
-    }
     
     private var facebookButton: some View {
         Button(action: facebookTapped) {

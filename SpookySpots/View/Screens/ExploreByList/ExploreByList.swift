@@ -70,7 +70,7 @@ struct ExploreByList: View {
                 .font(.title)
                 .fontWeight(.ultraLight)
                 .padding(.horizontal)
-            Text("\(userStore.user.name)")
+            Text("\(userStore.user.user.name)")
                 .font(.title)
                 .fontWeight(.medium)
             Spacer()

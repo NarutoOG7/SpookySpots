@@ -22,7 +22,7 @@ struct LocationData: Identifiable, Equatable, Codable {
                                   address: Address(address: "721 Bannack Rd", city: "Dillon", state: "MT", zipCode: "59725", country: "USA"),
                                   description: "Bannack State Park is a National Historic Landmark and is the best preserved of all Montana ghost towns. Back in the “Old West”, during the mighty gold rush of 1862, Bannack’s population grew over 3,000. Today, no residents remain in this town.",
                                   moreInfoLink: "https://fwp.mt.gov/stateparks/bannack-state-park",
-                                  review: Review(avgRating: 5, lastRating: 5, lastReview: "Must visit anytime you are in Montana!", lastReviewTitle: "Breathtaking", user: "Spencer"),
+                                  review: Review(avgRating: 5, lastRating: 5, lastReview: "Must visit anytime you are in Montana!", lastReviewTitle: "Breathtaking", userName: "Spencer"),
                                   locationType: "Ghost Town",
                                   tours: true,
                                   imageName: "FairbanksBridge.jpg",
@@ -83,7 +83,7 @@ struct LocationData: Identifiable, Equatable, Codable {
             lastRating: lastRating,
             lastReview: lastReview,
             lastReviewTitle: lastReviewTitle,
-            user: lastReviewUser)
+            userName: lastReviewUser)
         self.imageName = imageName
         self.tours = hasTours
         self.hotelKey = hotelKey
