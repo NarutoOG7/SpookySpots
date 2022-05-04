@@ -115,18 +115,10 @@ struct LocationData: Identifiable, Equatable, Codable {
 
 
 
-struct FavoriteLocation: Identifiable, Codable {
-    var id: String = ""
-    var locationID: String = ""
-    var userID: String = ""
- 
-    
-    private enum CodingKeys: String, CodingKey {
-            case userID
-            case locationID
-            case id
-        }
-    
+struct FavoriteLocation {
+    var id: String
+    var locationID: String
+    var userID: String
 }
 
 

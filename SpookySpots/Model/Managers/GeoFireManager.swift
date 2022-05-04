@@ -16,22 +16,14 @@ class GeoFireManager: ObservableObject {
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     @ObservedObject var locationStore = LocationStore.instance
     
-    //        var geoFireRef: DatabaseReference!
-    //    var geoFire: GeoFire?
-    //    lazy var locationRef = GeoFire(firebaseRef: Database.database().reference().child("Haunted Hotels"))
+
     lazy var locationRef = Database.database().reference().child("Haunted Hotels")
     @Published var gfNearbyLocations: [LocationAnnotationModel] = []
     @Published var gfOnMapLocations: [LocationAnnotationModel] = []
     
     var locationHandle: DatabaseHandle?
     
-    //    init() {
-    //        geoFireRef = Database.database().reference()
-    //        geoFire = GeoFire(firebaseRef: geoFireRef)
-    //
-    //    }
-   
-    
+    /// for display on the EXPLORE by LIST page.
     func getNearbyLocations(region: MKCoordinateRegion, radius: Double) {
         
         if UserStore.instance.currentLocation != nil {
@@ -41,15 +33,15 @@ class GeoFireManager: ObservableObject {
             let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
             let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
             circleQuery.observe(.keyEntered, with: { key, loc in
-                if let location = self.locationStore.hauntedHotels.first(where: { "\($0.location.id)" == key }) {
-                    print(location)
+                
+                self.firebaseManager.getSelectHotel(key) { locModel in
                     let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
                     
                     if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
                         self.gfNearbyLocations.append(anno)
                         
                         if !self.locationStore.nearbyLocations.contains(where: { "\($0.location.id)" == key }) {
-                            self.locationStore.nearbyLocations.append(location)
+                            self.locationStore.nearbyLocations.append(locModel)
                         }
                     }
                 }
@@ -57,8 +49,9 @@ class GeoFireManager: ObservableObject {
         }
     }
     
+    
+    /// used by "search area" button..  want to get rid of.
     func searchForLocations(region: MKCoordinateRegion) {
-        if gfOnMapLocations.count != locationStore.hauntedHotels.count {
         let geoLocRef = GeoFire(firebaseRef: locationRef)
         
         let regionCenter = region.center
@@ -66,42 +59,48 @@ class GeoFireManager: ObservableObject {
         let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
         circleQuery.observe(.keyEntered, with: { key, loc in
-            if let location = self.locationStore.hauntedHotels.first(where: { "\($0.location.id)" == key }) {
-                print(location)
+            
+            self.firebaseManager.getSelectHotel(key) { locModel in
+                
                 let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
                 
                 if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
                     self.gfOnMapLocations.append(anno)
                     
                     if !self.locationStore.onMapLocations.contains(where: { "\($0.location.id)" == key }) {
-                        self.locationStore.onMapLocations.append(location)
+                        self.locationStore.onMapLocations.append(locModel)
                     }
                 }
             }
         })
-        }
     }
     
+    
+    //MARK: - Location Listener
+    /// need to try this out to get rid of the "search area" button.. haha lame ass button gtfo....
     func startLocationListener() {
-        print(gfOnMapLocations.count)
-        //        if let geoFire = geoFire {
+        let region = exploreByMapVM.region
         let geoLocRef = GeoFire(firebaseRef: locationRef)
         
-        let regionCenter = exploreByMapVM.region.center
+        let regionCenter = region.center
+        let radius = region.distanceMax() / 2
         let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
-        let circleQuery = geoLocRef.query(at: cllocation, withRadius: 200)
-        locationHandle = circleQuery.observe(.keyEntered, with: { key, loc in
+        let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
+        circleQuery.observe(.keyEntered, with: { key, loc in
             
-            if let loc = self.locationStore.hauntedHotels.first(where: { $0.location.geoKey == key }) {
-                print(loc)
+            self.firebaseManager.getSelectHotel(key) { locModel in
+                
+                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
+                
+                if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
+                    self.gfOnMapLocations.append(anno)
+                    
+                    if !self.locationStore.onMapLocations.contains(where: { "\($0.location.id)" == key }) {
+                        self.locationStore.onMapLocations.append(locModel)
+                    }
+                }
             }
-            
-//            let locAnnotationModel = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
-//            if !self.gfOnMapLocations.contains(where: { $0.id == locAnnotationModel.id}) {
-//                self.gfOnMapLocations.append(locAnnotationModel)
-//            }
         })
-        //        }
     }
     
     func endLocationListener() {
@@ -110,62 +109,11 @@ class GeoFireManager: ObservableObject {
             print(gfOnMapLocations.count)
         }
     }
+         
     
-    func getLocationDataFromKey(key: String, withCompletion completion: @escaping ((_ location: LocationData) -> (Void))) {
-        
-        let ref = Database.database().reference().child("Haunted Hotels")
-        print(key)
-        ref.child(key).getData { error, snapshot in
-            
-            if let error = error {
-                print(error.localizedDescription)
-            }
-            
-//            for object in snapshot.children.allObjects as! [DataSnapshot] {
-                
-            if let data = snapshot.value as? [String : AnyObject] {
-                        
-                        var location = LocationData(data: data)
-                    
-                    print(location.id)
-                        
-//                        if let hotelPriceKey = location.hotelKey {
-                            
-//                            HotelPriceManager.instance.getPriceOfHotel(key: hotelPriceKey) { hotelPriceModel in
-//
-//                                let price = hotelPriceModel.lowestPrice
-//
-//                                location.addPrice(price)
-//                                //
-                                print(location)
-//                                self.firebaseManager.getImageFromURLString(imageName) { image in
-                                completion(location)
-                                //                            }
-//                            }
-//
-//                        }
-//                    }
-                }
-            }
-//        })
-    }
+    //MARK: - GeoFire wire into RTD
     
-//    func createSpookySpotGeoRefForAllLocations() {
-//        let geoLocRef = GeoFire(firebaseRef: locationRef)
-//        print(locationStore.hauntedHotels.count)
-//        for location in locationStore.hauntedHotels {
-//            print(location.address?.geoCodeAddress() ?? "")
-//            firebaseManager.getCoordinatesFromAddress(address: location.address?.geoCodeAddress() ?? "") { cloc in
-//                geoLocRef.setLocation(cloc, forKey: "\(location.id)") { error in
-//                    if let error = error {
-//                        print(error)
-//                    }
-//                    print("Success: \(location.id)")
-//                }
-//            }
-//        }
-//    }
-    
+    ///  This should only be accessible by  admin
     func createSpookySpotForLocation(_ location: LocationModel, withCompletion completion: @escaping(Bool) -> Void) {
         let geoLocRef = GeoFire(firebaseRef: locationRef)
         firebaseManager.getCoordinatesFromAddress(address: location.location.address?.geoCodeAddress() ?? "") { cloc in

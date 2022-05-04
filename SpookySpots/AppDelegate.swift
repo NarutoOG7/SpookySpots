@@ -25,10 +25,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         getUserIfSignedIn()
         
-        FirebaseManager.instance.fetchFavorites()
-        FirebaseManager.instance.getHauntedHotels()
-        
-        
         return true
     }
     
@@ -41,8 +37,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 // Decode Note
                 let user = try decoder.decode(User.self, from: data)
 
-                let userModel = UserModel(user: user, favoriteLocations: [], reviews: [])
-                userStore.user = userModel
+                userStore.user = user
             } catch {
                 print("Unable to Decode Note (\(error))")
             }

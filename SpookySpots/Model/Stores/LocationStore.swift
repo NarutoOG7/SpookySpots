@@ -12,19 +12,11 @@ import SwiftUI
 
 class LocationStore: ObservableObject {
     static let instance = LocationStore()
-        
-    @Published var srchcText = ""
-    
-    @Published var locations: [LocationModel] = []
+            
     @Published var favoriteLocations: [LocationModel] = []
-    @Published var hauntedHotels: [LocationModel] = []
-    @Published var onMapLocations: [LocationModel] = [] {
-        willSet {
-            print(newValue.count)
-        }
-    }
+    @Published var onMapLocations: [LocationModel] = []
     @Published var nearbyLocations: [LocationModel] = []
-    @Published var everyFavoritedLocation: [FavoriteLocation] = []
+    @Published var hauntedHotels: [LocationModel] = []
     @Published var trendingLocations: [LocationModel] = []
     @Published var selectedLocation: LocationModel? {
         willSet {

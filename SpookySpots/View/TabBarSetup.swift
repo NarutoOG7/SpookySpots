@@ -10,7 +10,7 @@ import SwiftUI
 struct TabBarSetup: View {
     
     @State private var selection = 0
-    
+    @StateObject var favoritesLogic = FavoritesLogic()
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
     
     init() {
@@ -25,6 +25,7 @@ struct TabBarSetup: View {
             tripTab
             settingsTab
         }
+        .environmentObject(favoritesLogic)
 //        }
     }
     

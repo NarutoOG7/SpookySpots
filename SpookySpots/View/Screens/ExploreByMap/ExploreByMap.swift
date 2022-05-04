@@ -10,9 +10,10 @@ import CoreLocation
 
 struct ExploreByMap: View {
     
-    @ObservedObject var locationStore = LocationStore.instance
-    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    @State var onMapLocs = LocationStore.instance.onMapLocations
+    
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
+    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     
     let map = MapViewUI()
     
@@ -60,7 +61,7 @@ extension ExploreByMap {
             ScrollViewReader{ scrollView in
         ScrollView(.horizontal) {
             HStack {
-                ForEach(locationStore.onMapLocations) { location in
+                ForEach(onMapLocs) { location in
 //            LocationPreviewOnMap(location: location)
                     LargeImageLocationView(location: location)
                         .id(location.id)
@@ -100,7 +101,7 @@ extension ExploreByMap {
             
             List(exploreByMapVM.searchedLocations) { location in
                 NavigationLink {
-                    LD(location: location)
+                    LD(location: .constant(location))
                 } label: {
                     Text("\(location.location.name), \(location.location.address?.state ?? "")")
                 }

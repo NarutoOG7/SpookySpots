@@ -10,12 +10,13 @@ import SDWebImageSwiftUI
 
 struct LD: View {
     
-    var location: LocationModel
+    @Binding var location: LocationModel
     
     @State private var imageURL = URL(string: "")
     @State private var isSharing = false
     @State private var imageIsAvailable = false
-    @State private var isFavorited = false
+    
+    @EnvironmentObject var favoritesLogic: FavoritesLogic
 
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
@@ -223,18 +224,14 @@ struct LD: View {
     
     private var favoriteButton: some View {
         BorderedCircularButton(
-            image: self.isFavorited ?
+            image: favoritesLogic.contains(location) ?
                 Image(systemName: "heart.fill") :
                 Image(systemName: "heart"),
             title: "Favorites",
             color: .green,
             tapped: favoritesTapped)
-//        Button(action: favoritesTapped) {
-//            Image(systemName: "heart")
-//                .resizable()
-//                .frame(width: 35, height: 35)
-//                .tint(.red)
-//        }
+        
+
     }
     
     private var moreReviewsButton: some View {
@@ -294,13 +291,11 @@ struct LD: View {
     }
     
     private func favoritesTapped() {
-        UserStore.instance.user.addOrRemoveFromFavorites(location, withCompletion: { isFavorited in
-            if isFavorited == true {
-                self.isFavorited = true
-            } else {
-                self.isFavorited = false
-            }
-        })
+        if favoritesLogic.contains(location) {
+            favoritesLogic.removeHotel(location)
+        } else {
+            favoritesLogic.addHotel(location)
+        }
     }
     
     
@@ -313,9 +308,11 @@ struct LD: View {
     }
 }
 
+//MARK: - Previews
 struct LD_Previews: PreviewProvider {
     static var previews: some View {
-        LD(location: LocationModel(location: .example, imageURLs: [], reviews: []))
+        LD(location: .constant(LocationModel.example))
+            .environmentObject(FavoritesLogic())
     }
 }
 

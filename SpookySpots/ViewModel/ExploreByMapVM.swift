@@ -36,8 +36,9 @@ class ExploreByMapVM: ObservableObject {
     
      func searchLogic() {
         if self.searchText != "" {
-            let locations = locationStore.hauntedHotels.filter({ $0.location.name.lowercased().contains(self.searchText.lowercased()) })
-            self.searchedLocations = locations
+            FirebaseManager.instance.searchForLocationInFullDatabase(text: searchText) { locModel in
+                self.searchedLocations.append(locModel)
+            }
         } else {
             self.searchedLocations = []
         }

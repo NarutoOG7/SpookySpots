@@ -9,10 +9,10 @@ import SwiftUI
 
 struct LocationCollection: View {
     
+    @State var userCurrentLocation = UserStore.instance.currentLocation
+    @State var searchedLocations = ExploreByListVM.instance.searchedLocations
+    
     @ObservedObject var locationStore = LocationStore.instance
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var userLocManager = UserLocationManager.instance
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
     
     var collectionType: LocationCollectionTypes
     
@@ -44,11 +44,7 @@ struct LocationCollection: View {
                     case .trending:
                         trendingLocations
                     case .topRated:
-                        ForEach(locationStore.locations) { location in
-                            VStack(alignment: .leading) {
-                                MainLocCell(location: location)
-                            }
-                        }
+                        topRated
                     }
                 }
             })
@@ -57,11 +53,11 @@ struct LocationCollection: View {
     
     //MARK: - Search Locations
     private var searchLocations: some View {
-                List(exploreByListVM.searchedLocations, id: \.self.id) { location in
+        List(searchedLocations, id: \.self.id) { location in
 //        List {
         VStack {
 //            ForEach(exploreByListVM.searchedLocations) { location in
-            NavigationLink("\(location.location.name), \(location.location.address?.state ?? "")", destination: LD(location: location) )
+            NavigationLink("\(location.location.name), \(location.location.address?.state ?? "")", destination: LD(location: .constant(location)) )
                     .listRowSeparator(.hidden)
 //            LocationDetails(location: location)
             }
@@ -74,7 +70,7 @@ struct LocationCollection: View {
             VStack(alignment: .leading) {
                 NavigationLink {
 //                    LocationDetails(location: location)
-                    LD(location: location)
+                    LD(location: .constant(location))
                 } label: {
                     
                     
@@ -91,11 +87,17 @@ struct LocationCollection: View {
         location.location.id == locationStore.trendingLocations.last?.location.id ?? UUID().hashValue
     }
     
+    //MARK: - TopRated
+    
+    private var topRated: some View {
+        Text("Top Rated")
+    }
+    
     
     //MARK: - Nearby Locations
     private var nearbyLocations: some View {
         let view: AnyView
-        if userStore.currentLocation == nil {
+        if userCurrentLocation == nil {
             view = AnyView(Text("Need Current Location").fontWeight(.light).padding())
         } else {
             view = AnyView(
@@ -103,7 +105,7 @@ struct LocationCollection: View {
 
                     VStack(alignment: .leading) {
                         NavigationLink {
-                            LD(location: location)
+                            LD(location: .constant(location))
                         } label: {
                             MainLocCell(location: location)
                                 .padding(isLastInNearbyList(location)

@@ -11,16 +11,16 @@ import MapKit
 
 class ExploreByListVM: ObservableObject {
     static let instance = ExploreByListVM()
-    @Published var isShowingMap = false
     
+    @Published var isShowingMap = false
     @Published var showingSearchLocations = false
     @Published var searchedLocations: [LocationModel] = []
+    @Published var searchRegion = MapDetails.defaultRegion
     
     @ObservedObject var geoFireManager = GeoFireManager.instance
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var userLocManager = UserLocationManager.instance
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
-    @Published var searchRegion = MapDetails.defaultRegion
     
     @Published var searchText = "" {
         didSet {
@@ -84,8 +84,9 @@ class ExploreByListVM: ObservableObject {
     
      func searchLogic() {
         if self.searchText != "" {
-            let locations = locationStore.hauntedHotels.filter({ $0.location.name.lowercased().contains(self.searchText.lowercased()) })
-            self.searchedLocations = locations
+            FirebaseManager.instance.searchForLocationInFullDatabase(text: searchText) { locModel in
+                self.searchedLocations.append(locModel)
+            }
         } else {
             self.searchedLocations = []
         }

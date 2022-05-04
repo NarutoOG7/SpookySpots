@@ -21,12 +21,20 @@ class FirebaseManager: ObservableObject {
     //    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     
     @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var userStore = UserStore.instance
+    
+    @Published var favoriteLocations: [FavoriteLocation] = []
     
     func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
         
         let db = Firestore.firestore()
         
-        db.collection("Images").whereField("locID", isEqualTo: locID).getDocuments() { (querySnapshot, err) in
+        db.collection("Images")
+        
+            .whereField("locID", isEqualTo: locID)
+        
+            .getDocuments() { (querySnapshot, err) in
+                
             if let err = err {
                 print("Error getting documents: \(err)")
             } else {
@@ -40,6 +48,32 @@ class FirebaseManager: ObservableObject {
                 }
             }
         }
+    }
+    
+    func getSelectHotel(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
+        
+        let ref = Database.database().reference().child("Haunted Hotels/\(locID)")
+        
+        ref.observeSingleEvent(of: .value) { snapshot in
+            
+            if let data = snapshot.value as? [String : AnyObject] {
+                
+                let locData = LocationData(data: data)
+                
+                var imageURLS: [URL] = []
+                self.getLocationImages(locID: "\(locData.id)") { fsImage in
+                    if let url = URL(string: "\(fsImage.imageURL)") {
+                        imageURLS.append(url)
+                    }
+                }
+                                
+                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
+                
+                completion(locModel)
+                
+            }
+        }
+        
     }
     
     func getHauntedHotels() {
@@ -58,14 +92,32 @@ class FirebaseManager: ObservableObject {
                                     imageURLs.append(url)
                                 }
                             }
-                            let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
-                            self.locationStore.hauntedHotels.append(locModel)
+                            
+  
+                                let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
+                                self.locationStore.hauntedHotels.append(locModel)
+                            
                         }
                     }
                 }
             }
         }
     }
+    
+//    func isLocationFavorited(_ locData: LocationData, withCompletion completion: @escaping(_ result: Bool) -> Void) {
+//        let db = Firestore.firestore()
+//        db.collection("Favorites")
+//            .whereField("locationID", isEqualTo: locData.id)
+//            .whereField("userID", isEqualTo: UserStore.instance.user.user.id)
+//
+//            .getDocuments { snapshot, error in
+//                if let error = error {
+//                    print(error.localizedDescription)
+//                } else {
+//                    completion(true)
+//                }
+//            }
+//    }
     
     func getImageURLFromFBPath(_ urlString: String, withCompletion completion: @escaping ((_ url: URL) -> (Void))) {
         
@@ -92,10 +144,11 @@ class FirebaseManager: ObservableObject {
                 if let snapshot = querySnapshot {
                     for document in snapshot.documents {
                         let dict = document.data()
+                        let key = dict["id"] as? Int ?? 0
                         
-                        if let location = self.locationStore.hauntedHotels.first(where: { $0.location.id == dict["id"] as? Int ?? 0}) {
-                            if !self.locationStore.trendingLocations.contains(location) {
-                                self.locationStore.trendingLocations.append(location)
+                        self.getSelectHotel("\(key)") { locModel in
+                            if !self.locationStore.trendingLocations.contains(locModel) {
+                                self.locationStore.trendingLocations.append(locModel)
                             }
                         }
                     }
@@ -104,37 +157,28 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    func fetchFavorites() {
-        getFavoritesForUser(UserStore.instance.user.user) { favLoc in
-            self.locationStore.favoriteLocations.append(favLoc)
-        }
-    }
-    
-    func getFavoritesForUser(_ user: User, withCompletion completion: @escaping(_ favLoc: LocationModel) -> Void) {
+    func getFavoritesAsIDsOnly(withCompletion completion: @escaping(FavoriteLocation) -> Void) {
         let db = Firestore.firestore()
-        
         db.collection("Favorites")
-        
-            .whereField("id", isEqualTo: user.id)
-        
-            .getDocuments { querySnapshot, error in
-                
+            .whereField("userID", isEqualTo: UserStore.instance.user.id)
+            .getDocuments { snapshot, error in
                 if let error = error {
-                    print("error getting favorites: \(error)")
-                } else {
-                    if let snapshot = querySnapshot {
-                        for document in snapshot.documents {
-                            let dict = document.data()
-                            
-                            if let location = self.locationStore.hauntedHotels.first(where: { $0.location.id == dict["id"] as? Int ?? 0 }) {
-                                
-                                completion(location)
-                            }
-                        }
+                    print(error.localizedDescription)
+                } else if let snapshot = snapshot {
+                    for doc in snapshot.documents {
+                        let dict = doc.data()
+                        let favLocation = FavoriteLocation(
+                            id: dict["id"] as? String ?? "",
+                            locationID: dict["locationID"] as? String ?? "",
+                            userID: dict["userID"] as? String ?? "")
+                        
+                        completion(favLocation)
                     }
                 }
             }
+
     }
+    
     
     func getReviewsForUser(_ user: User, withCompletion completion: @escaping(_ review: ReviewModel) -> Void) {
         let db = Firestore.firestore()
@@ -160,18 +204,61 @@ class FirebaseManager: ObservableObject {
             }
     }
     
-    func addLocToFavoritesBucket(_ loc: LocationModel, withCompletion completion: @escaping(_ result: Bool) -> Void) {
+    func addLocToFavoritesBucket(_ favLoc: FavoriteLocation, withCompletion completion: ((Bool) -> ())? = nil) {
         let db = Firestore.firestore()
         
-        db.collection("Favorites").document(UUID().uuidString).setData([
-            "locationID" : "\(loc.location.id)",
-            "userID" : "\(UserStore.instance.user.user.id)"
+        db.collection("Favorites").document(favLoc.id).setData([
+            "id" : favLoc.id,
+            "locationID" : "\(favLoc.locationID)",
+            "userID" : "\(favLoc.userID)"
         ]) { error in
             if let error = error {
                 print(error.localizedDescription)
-                completion(false)
+                completion?(false)
             } else {
-                completion(true)
+                completion?(true)
+            }
+        }
+    }
+    
+    func removeFavoriteFromBucket(_ favLoc: FavoriteLocation, withCompletion completion: ((Bool) -> ())? = nil) {
+        
+        let db = Firestore.firestore()
+        
+        db.collection("Favorites").document(favLoc.id)
+            .delete() { err in
+            if let err = err {
+                print("Error removing document: \(err)")
+            } else {
+                print("Document successfully removed!")
+            }
+        }
+    }
+    
+    //MARK: - Search
+    
+    func searchForLocationInFullDatabase(text: String, withCompletion completion: @escaping(LocationModel) -> Void) {
+        let ref = Database.database().reference().child("Haunted Hotels")
+
+        ref.queryStarting(atValue: text)
+        ref.queryEnding(atValue: text)
+        ref.getData { error, snapshot in
+            
+            if let data = snapshot.value as? [String : AnyObject] {
+                
+                let locData = LocationData(data: data)
+                
+                var imageURLS: [URL] = []
+                self.getLocationImages(locID: "\(locData.id)") { fsImage in
+                    if let url = URL(string: "\(fsImage.imageURL)") {
+                        imageURLS.append(url)
+                    }
+                }
+                                
+                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
+                
+                completion(locModel)
+                
             }
         }
     }

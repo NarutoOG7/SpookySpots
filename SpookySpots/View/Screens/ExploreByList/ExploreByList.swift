@@ -9,68 +9,56 @@ import SwiftUI
 
 
 struct ExploreByList: View {
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var locationStore = LocationStore.instance
-    //    @ObservedObject var locationManager = UserLocationManager.instance
     
-    //    init() {
-    //        exploreByListVM.supplyNearbyLocations()
-    //    }
     @State var searchText = ""
     @State var showingSearchResults = false
+    @State var user = UserStore.instance.user
     
+    @ObservedObject var exploreByListVM = ExploreByListVM.instance
+        
     var body: some View {
-//        if exploreByListVM.isShowingMap {
-//            //            VStack {
-//            //                Spacer(minLength: 45)
-//            ExploreByMap()
-//            //            }
-//        } else {
-//
-                ZStack {
-                    locationsCollections
-                    VStack(spacing: -4) {
-                        greeting
-                            .padding(.bottom, 10)
+        ZStack {
+            locationsCollections
+            VStack(spacing: -4) {
+                greeting
+                    .padding(.bottom, 10)
+                HStack {
+                    VStack {
                         HStack {
-                            VStack {
-                                HStack {
-                                    SearchBar(type: .exploreByList)
-//                                    filterButton
-                                    mapButton
-                                }
-                                Divider()
-                                    .frame(height: 1.5)
-                                    .background(Color.black)
-                                    .padding(.top, 12)
-                                
-                                HStack {
-                                    searchResults
-                                    Spacer()
-                                }
-                            } .padding()
+                            SearchBar(type: .exploreByList)
+                            mapButton
                         }
-                        Spacer()
-                    }
-                }.padding(.top, 30)
-                    .navigationBarHidden(true)
-                    .onAppear {
-                        exploreByListVM.supplyLocationLists()
-                    }
-            
-//        }
+                        Divider()
+                            .frame(height: 1.5)
+                            .background(Color.black)
+                            .padding(.top, 12)
+                        
+                        HStack {
+                            searchResults
+                            Spacer()
+                        }
+                    } .padding()
+                }
+                Spacer()
+            }
+        }.padding(.top, 30)
+            .navigationBarHidden(true)
+            .onAppear {
+                ExploreByListVM.instance.supplyLocationLists()
+            }
+        
+        //        }
     }
     
     
     //MARK: - SubViews
     var greeting: some View {
         HStack(spacing: -7) {
-            Text("\(exploreByListVM.greetingLogic()),")
+            Text("\(ExploreByListVM.instance.greetingLogic()),")
                 .font(.title)
                 .fontWeight(.ultraLight)
                 .padding(.horizontal)
-            Text("\(userStore.user.user.name)")
+            Text("\(user.name)")
                 .font(.title)
                 .fontWeight(.medium)
             Spacer()
@@ -83,7 +71,7 @@ struct ExploreByList: View {
             Spacer(minLength: 130)
             VStack {
                 ScrollView(.vertical, showsIndicators: false, content: {
-//                    VStack {
+                    //                    VStack {
                     VStack(spacing: -14) {
                         LocationCollection(collectionType: .search)
                         LocationCollection(collectionType: .nearby)
@@ -101,7 +89,7 @@ struct ExploreByList: View {
             
             List(exploreByListVM.searchedLocations) { location in
                 NavigationLink {
-                    LD(location: location)
+                    LD(location: .constant(location))
                 } label: {
                     Text("\(location.location.name), \(location.location.address?.state ?? "")")
                 }

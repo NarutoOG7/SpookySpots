@@ -19,7 +19,7 @@ class UserStore: ObservableObject {
     
 //    @Published var isSignedIn = false
     @Published var isGuest = false
-    @Published var user = UserModel(user: User(), favoriteLocations: [], reviews: [])
+    @Published var user = User()
     @Published var currentLocation: CLLocation? {
         willSet {
             if let newValue = newValue {
@@ -30,7 +30,6 @@ class UserStore: ObservableObject {
         }
         }
     }
-    @Published var favoriteLocations: [LocationModel] = []
     @Published var trip: Trip?
     @Published var selectedLocationDistanceToUser: Double = 0
     

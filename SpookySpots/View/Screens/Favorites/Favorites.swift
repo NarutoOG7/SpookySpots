@@ -10,10 +10,9 @@ import SwiftUI
 struct Favorites: View {
     
     @ObservedObject var locationStore = LocationStore.instance
-    
-    var body: some View {
-            locationsList
         
+    var body: some View {
+        locationsList
     }
     
     var locationsList: some View {

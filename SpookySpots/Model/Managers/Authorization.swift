@@ -50,8 +50,8 @@ class Authorization {
             
                 let user = User(id: result.user.uid, name: result.user.displayName ?? "", email: result.user.email ?? "")
                 
-                var favorites: [LocationModel] = []
-                FirebaseManager.instance.getFavoritesForUser(user) { favLoc in
+                var favorites: [FavoriteLocation] = []
+                FirebaseManager.instance.getFavoritesAsIDsOnly { favLoc in
                     favorites.append(favLoc)
                 }
                 
@@ -60,11 +60,9 @@ class Authorization {
                     reviews.append(review)
                 }
                 
-                let userModel = UserModel(user: user, favoriteLocations: favorites, reviews: reviews)
-                
                 DispatchQueue.main.async {
                     self.userStore.isSignedIn = true
-                    self.userStore.user = userModel
+                    self.userStore.user = user
                     UserDefaults.standard.set(true, forKey: "signedIn")
                     
                     self.saveUserToUserDefaults(user: user) { error in
@@ -105,7 +103,7 @@ class Authorization {
                 
                 DispatchQueue.main.async {
                     self.userStore.isSignedIn = true
-                    self.userStore.user = UserModel(user: user, favoriteLocations: [], reviews: [])
+                    self.userStore.user = user
                     UserDefaults.standard.set(true, forKey: "signedIn")
                     
                     self.saveUserToUserDefaults(user: user) { error in
@@ -139,8 +137,8 @@ class Authorization {
                     // handle error
                 }
                 // handle success
-                self.userStore.user.user.name = name
-                self.saveUserToUserDefaults(user: self.userStore.user.user) { error in
+                self.userStore.user.name = name
+                self.saveUserToUserDefaults(user: self.userStore.user) { error in
                     if let error = error {
                         print(error.rawValue)
                     }
@@ -155,7 +153,7 @@ class Authorization {
         do {
             try auth.signOut()
             self.userStore.isSignedIn = false
-            self.userStore.user = UserModel.emptyUser
+            self.userStore.user = User()
             UserDefaults.standard.set(false, forKey: "signedIn")
             self.saveUserToUserDefaults(user: User()) { error in
                 if let error = error {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CDLocation" representedClassName="CDLocation" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <relationship name="trip" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDTrip" inverseName="locations" inverseEntity="CDTrip"/>
+    </entity>
+    <entity name="CDTrip" representedClassName="CDTrip" syncable="YES" codeGenerationType="class">
+        <relationship name="locations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDLocation" inverseName="trip" inverseEntity="CDLocation"/>
+    </entity>
+    <elements>
+        <element name="CDTrip" positionX="-27" positionY="18" width="128" height="44"/>
+        <element name="CDLocation" positionX="18" positionY="63" width="128" height="59"/>
+    </elements>
+</model>

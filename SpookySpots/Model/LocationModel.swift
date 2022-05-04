@@ -22,6 +22,10 @@ struct LocationModel: Identifiable, Equatable {
         imageURLs.first
     }
     
+    static let example = LocationModel(location: LocationData.example, imageURLs: [], reviews: [])
+    
+    
+    
     func getAvgRating() -> String {
         var avgRatingString = ""
         if let review = location.review {

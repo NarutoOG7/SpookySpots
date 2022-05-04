@@ -78,7 +78,7 @@ struct Account: View {
     //MARK: - Methods
     
     private func changePasswordTapped() {
-        auth.passwordReset(email: userStore.user.user.email) { result in
+        auth.passwordReset(email: userStore.user.email) { result in
             if result == true {
                 self.passwordResetAlertShown = true
             }
@@ -99,7 +99,7 @@ struct Account: View {
             if error == .failToSignOut {
                 self.failSignOutAlertShown = true
             }
-            userStore.user = UserModel(user: User(), favoriteLocations: [], reviews: [])
+            userStore.user = User()
         }
     }
     
