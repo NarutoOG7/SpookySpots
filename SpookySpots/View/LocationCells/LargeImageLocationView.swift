@@ -6,9 +6,14 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 
 struct LargeImageLocationView: View {
+    
     var location: LocationModel
+    
+    @State private var imageURL = URL(string: "")
+
     
     var body: some View {
         ZStack {
@@ -30,36 +35,15 @@ struct LargeImageLocationView: View {
             
         }.cornerRadius(25).frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
         
+            .onAppear {
+                loadImageFromFirebase()
+            }
+        
     }
-    
-//    var body: some View {
-//        VStack(alignment: .leading) {
-//            ZStack {
-//                image
-//                favoriteButton
-//            }
-//            HStack {
-//                VStack(alignment: .leading) {
-//                    title
-//                    address
-//                }
-//                Spacer()
-//                priceTag
-//            }
-//        }.cornerRadius(25).padding(.bottom).background(background)
-//            .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/2.7)
-//    }
-    
     
     //MARK: - SubViews
     private var image: some View {
-        let img: Image
-        if let image = location.location.imageName {
-            img = Image(image)
-        } else {
-            img = Image("bannack")
-        }
-        return img
+        WebImage(url: self.imageURL)
             .resizable()
             .aspectRatio(contentMode: .fill)
             .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
@@ -135,6 +119,14 @@ struct LargeImageLocationView: View {
     }
     
     //MARK: - Methods
+    
+    private func loadImageFromFirebase()  {
+        if let imageString = location.location.imageName {
+            FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
+                self.imageURL = url
+            }
+        }
+    }
 }
 
 

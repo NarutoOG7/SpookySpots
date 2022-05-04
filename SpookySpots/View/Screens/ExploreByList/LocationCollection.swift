@@ -9,8 +9,8 @@ import SwiftUI
 
 struct LocationCollection: View {
     
-    @State var userCurrentLocation = UserStore.instance.currentLocation
-    @State var searchedLocations = ExploreByListVM.instance.searchedLocations
+    @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var exploreByListVM = ExploreByListVM.instance
     
     @ObservedObject var locationStore = LocationStore.instance
     
@@ -53,13 +53,12 @@ struct LocationCollection: View {
     
     //MARK: - Search Locations
     private var searchLocations: some View {
-        List(searchedLocations, id: \.self.id) { location in
-//        List {
-        VStack {
-//            ForEach(exploreByListVM.searchedLocations) { location in
-            NavigationLink("\(location.location.name), \(location.location.address?.state ?? "")", destination: LD(location: .constant(location)) )
-                    .listRowSeparator(.hidden)
-//            LocationDetails(location: location)
+        
+        ForEach(exploreByListVM.searchedLocations) { location in
+            NavigationLink {
+                LD(location: location)
+            } label: {
+                MainLocCell(location: location)
             }
         }
     }
@@ -70,7 +69,7 @@ struct LocationCollection: View {
             VStack(alignment: .leading) {
                 NavigationLink {
 //                    LocationDetails(location: location)
-                    LD(location: .constant(location))
+                    LD(location: location)
                 } label: {
                     
                     
@@ -97,7 +96,7 @@ struct LocationCollection: View {
     //MARK: - Nearby Locations
     private var nearbyLocations: some View {
         let view: AnyView
-        if userCurrentLocation == nil {
+        if userStore.currentLocation == nil {
             view = AnyView(Text("Need Current Location").fontWeight(.light).padding())
         } else {
             view = AnyView(
@@ -105,7 +104,7 @@ struct LocationCollection: View {
 
                     VStack(alignment: .leading) {
                         NavigationLink {
-                            LD(location: .constant(location))
+                            LD(location: location)
                         } label: {
                             MainLocCell(location: location)
                                 .padding(isLastInNearbyList(location)

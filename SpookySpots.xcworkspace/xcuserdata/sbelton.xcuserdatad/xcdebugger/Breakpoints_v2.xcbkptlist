@@ -36,53 +36,5 @@
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "FFE26335-9D8D-4357-95C9-56C3013FE37F"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SpookySpots/View/Screens/LocationDetails/LD.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "222"
-            endingLineNumber = "222"
-            landmarkName = "addRemoveFromTrip"
-            landmarkType = "24">
-            <Locations>
-               <Location
-                  uuid = "FFE26335-9D8D-4357-95C9-56C3013FE37F - eff49bee0f176871"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "SpookySpots.LD.addRemoveFromTrip.getter : some"
-                  moduleName = "SpookySpots"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/sbelton/Library/Mobile%20Documents/com~apple~CloudDocs/iOS%20App%20Development/Courses/DevSlopes/Part%201/Week%2014/SpookySpots/SpookySpots/View/Screens/LocationDetails/LD.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "222"
-                  endingLineNumber = "222"
-                  offsetFromSymbolStart = "804">
-               </Location>
-               <Location
-                  uuid = "FFE26335-9D8D-4357-95C9-56C3013FE37F - be6ad03a924e712f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "implicit closure #2 () -&gt; () in implicit closure #1 (SpookySpots.LD) -&gt; () -&gt; () in SpookySpots.LD.addRemoveFromTrip.getter : some"
-                  moduleName = "SpookySpots"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/sbelton/Library/Mobile%20Documents/com~apple~CloudDocs/iOS%20App%20Development/Courses/DevSlopes/Part%201/Week%2014/SpookySpots/SpookySpots/View/Screens/LocationDetails/LD.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "222"
-                  endingLineNumber = "222"
-                  offsetFromSymbolStart = "32">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

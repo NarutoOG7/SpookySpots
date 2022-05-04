@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct LD: View {
     
-    @Binding var location: LocationModel
+    var location: LocationModel
     
     @State private var imageURL = URL(string: "")
     @State private var isSharing = false
@@ -59,8 +59,8 @@ struct LD: View {
                 
                 VStack {
                     HStack {
-                backButton
-                Spacer()
+                        backButton
+                        Spacer()
             }.padding(.horizontal)
                 .padding(.top, 60)
             Spacer()
@@ -311,7 +311,7 @@ struct LD: View {
 //MARK: - Previews
 struct LD_Previews: PreviewProvider {
     static var previews: some View {
-        LD(location: .constant(LocationModel.example))
+        LD(location: LocationModel.example)
             .environmentObject(FavoritesLogic())
     }
 }

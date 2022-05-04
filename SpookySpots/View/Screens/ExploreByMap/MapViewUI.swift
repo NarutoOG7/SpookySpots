@@ -54,6 +54,10 @@ struct MapViewUI: UIViewRepresentable {
             mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: false)
         }
     }
+    
+    func selectAnnotation(_ anno: MKAnnotation, animated: Bool) {
+        mapView.selectAnnotation(anno, animated: animated)
+    }
     //MARK: - Coordinator
     
     final class MapCoordinator: NSObject, MKMapViewDelegate {

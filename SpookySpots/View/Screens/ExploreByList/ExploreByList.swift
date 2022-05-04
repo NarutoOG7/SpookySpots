@@ -33,10 +33,6 @@ struct ExploreByList: View {
                             .background(Color.black)
                             .padding(.top, 12)
                         
-                        HStack {
-                            searchResults
-                            Spacer()
-                        }
                     } .padding()
                 }
                 Spacer()
@@ -71,7 +67,7 @@ struct ExploreByList: View {
             Spacer(minLength: 130)
             VStack {
                 ScrollView(.vertical, showsIndicators: false, content: {
-                    //                    VStack {
+                    
                     VStack(spacing: -14) {
                         LocationCollection(collectionType: .search)
                         LocationCollection(collectionType: .nearby)
@@ -82,36 +78,6 @@ struct ExploreByList: View {
                 
             }
         }
-    }
-    
-    private var searchLocations: some View {
-        VStack {
-            
-            List(exploreByListVM.searchedLocations) { location in
-                NavigationLink {
-                    LD(location: .constant(location))
-                } label: {
-                    Text("\(location.location.name), \(location.location.address?.state ?? "")")
-                }
-                
-            }
-            .listStyle(.plain)
-            .frame(width: 276, height: 300)
-            Spacer()
-        }.frame(maxHeight: 222)
-            .shadow(color: .black, radius: 2, x: 0, y: 0)
-        
-    }
-    
-    private var searchResults: some View {
-        let view: AnyView
-        if exploreByListVM.searchedLocations.isEmpty {
-            view = AnyView(EmptyView())
-        } else {
-            view = AnyView(searchLocations)
-        }
-        return view
-            .offset(x: 2, y: 4)
     }
     
     //MARK: - Buttons

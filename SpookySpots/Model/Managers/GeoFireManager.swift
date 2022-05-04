@@ -50,43 +50,15 @@ class GeoFireManager: ObservableObject {
     }
     
     
-    /// used by "search area" button..  want to get rid of.
-    func searchForLocations(region: MKCoordinateRegion) {
-        let geoLocRef = GeoFire(firebaseRef: locationRef)
-        
-        let regionCenter = region.center
-        let radius = region.distanceMax() / 2
-        let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
-        let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
-        circleQuery.observe(.keyEntered, with: { key, loc in
-            
-            self.firebaseManager.getSelectHotel(key) { locModel in
-                
-                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
-                
-                if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
-                    self.gfOnMapLocations.append(anno)
-                    
-                    if !self.locationStore.onMapLocations.contains(where: { "\($0.location.id)" == key }) {
-                        self.locationStore.onMapLocations.append(locModel)
-                    }
-                }
-            }
-        })
-    }
-    
-    
     //MARK: - Location Listener
-    /// need to try this out to get rid of the "search area" button.. haha lame ass button gtfo....
-    func startLocationListener() {
-        let region = exploreByMapVM.region
+    func startLocationListener(region: MKCoordinateRegion) {
         let geoLocRef = GeoFire(firebaseRef: locationRef)
         
         let regionCenter = region.center
         let radius = region.distanceMax() / 2
         let cllocation = CLLocation(latitude: regionCenter.latitude, longitude: regionCenter.longitude)
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
-        circleQuery.observe(.keyEntered, with: { key, loc in
+        locationHandle = circleQuery.observe(.keyEntered, with: { key, loc in
             
             self.firebaseManager.getSelectHotel(key) { locModel in
                 

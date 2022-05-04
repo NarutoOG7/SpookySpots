@@ -7,10 +7,15 @@
 
 import SwiftUI
 import CoreLocation
+import SwiftUITrackableScrollView
 
 struct ExploreByMap: View {
     
-    @State var onMapLocs = LocationStore.instance.onMapLocations
+    @State private var scrollViewContentOffset = CGFloat(0)
+    
+    @State private var visibleLocation: LocationModel?
+    
+    @ObservedObject var locationStore = LocationStore.instance
     
     @ObservedObject var exploreByListVM = ExploreByListVM.instance
     @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
@@ -23,30 +28,25 @@ struct ExploreByMap: View {
                 .ignoresSafeArea()
             VStack {
                 HStack {
-                    searchAreaButton
-                    Spacer()
-                    currentLocationButton
-                }
+                     SearchBar(type: .exploreByMap)
+                        .offset(y: -30)
+                    VStack {
+                        listButton
+                        currentLocationButton
+                    }
+                }.padding()
                 Spacer()
             }
-            .padding()
-            .offset(y: 60)
-            
-            VStack {
-                HStack {
-                    SearchBar(type: .exploreByMap)
-                    filterButton
-                    listButton
-                }
-                Spacer()
-            }
-            .padding()
-            
-            VStack{
-                Spacer()
-                locationList
-            }
+            locationList
+
         }
+        
+        .onAppear {
+            GeoFireManager.instance.startLocationListener(region: map.getRegion())
+        } .onDisappear {
+            GeoFireManager.instance.endLocationListener()
+        }
+        
         .navigationTitle("Map")
         .navigationBarHidden(true)
     }
@@ -58,29 +58,31 @@ extension ExploreByMap {
 
     private var locationsList: AnyView {
         AnyView(
-            ScrollViewReader{ scrollView in
-        ScrollView(.horizontal) {
-            HStack {
-                ForEach(onMapLocs) { location in
-//            LocationPreviewOnMap(location: location)
-                    LargeImageLocationView(location: location)
-                        .id(location.id)
+            TrackableScrollView(.horizontal, showIndicators: false, contentOffset: $scrollViewContentOffset) {
+                HStack {
+                    ForEach(locationStore.onMapLocations) { location in
+                        //            LocationPreviewOnMap(location: location)
+                        
+                        NavigationLink {
+                            LD(location: location)
+                        } label: {
+                            LargeImageLocationView(location: location)
+                        }
+                        .onAppear { self.visibleLocation = location }
+                        
+                        .onChange(of: visibleLocation) { newValue in
+                            if let anno = GeoFireManager.instance.gfOnMapLocations.first(where: { $0.id == "\(location.location.id)" }) {
+                                map.selectAnnotation(anno, animated: true)
+                            }
+                        }
+                    }
+                    
                 }
-            
-                .onChange(of: exploreByMapVM.highlightedLocationIndex) { _ in
-                    scrollView.scrollTo(exploreByMapVM.highlightedLocationIndex ?? 0)
-                }
-                
-                
-                
-//                onChange(of: exploreByMapVM.highlightedLocation, perform: { _ in
-//                    scrollView.scrollTo(exploreByMapVM.highlightedLocation?.id ?? 0)
-//                })
             }
-                        } .pagedScrollView()
-            }
+                .pagedScrollView()
         )
-                
+        
+        
     }
 
     private var locationList: some View {
@@ -100,8 +102,9 @@ extension ExploreByMap {
         VStack {
             
             List(exploreByMapVM.searchedLocations) { location in
+
                 NavigationLink {
-                    LD(location: .constant(location))
+                    LD(location: location)
                 } label: {
                     Text("\(location.location.name), \(location.location.address?.state ?? "")")
                 }
@@ -129,15 +132,6 @@ extension ExploreByMap {
     
     //MARK: - Buttons
     
-    private var filterButton: some View {
-        CircleButton(size: .small,
-                     image: Image(systemName: "slider.vertical.3"),
-                     outlineColor: .black,
-                     iconColor: .black,
-                     backgroundColor: .white,
-                     clicked: filterButtonPressed)
-    }
-    
     private var listButton: some View {
         CircleButton(size: .small,
                      image: Image(systemName: "list.bullet"),
@@ -145,19 +139,6 @@ extension ExploreByMap {
                      iconColor: .black,
                      backgroundColor: .white,
                      clicked: listButtonPressed)
-    }
-    
-    private var searchAreaButton: some View {
-        Button(action: searchThisArea) {
-            Text("Search This Area")
-                .background(
-                    Capsule()
-                        .fill(Color.white)
-                        .frame(width: 200, height: 39)
-                )
-                
-                .foregroundColor(.blue)
-        }.padding(.leading, 70)
     }
     
     private var currentLocationButton: some View {
@@ -171,33 +152,8 @@ extension ExploreByMap {
     
     //MARK: - Methods
     
-    func filterButtonPressed() {
-        
-    }
-    
     func listButtonPressed() {
         exploreByListVM.isShowingMap = false
-    }
-    
-    func searchThisArea() {
-        
-        GeoFireManager.instance.searchForLocations(region: map.getRegion())
-//        FirebaseManager.instance.getLocationDataFromKey(key: "1") { location in
-//            print(location.name)
-//        }
-//        FirebaseManager.instance.showSpotsOnMap(location: CLLocation(latitude: exploreByMapVM.region.center.latitude, longitude: exploreByMapVM.region.center.longitude))
-//        FirebaseManager.instance.showSpotsOnMap { locAnnoModel in
-//            
-//        }
-//        FirebaseManager.instance.getLocationsFromSpecificRadius { location in
-//            print(location + "_%%%%")
-//        }
-//        FirebaseManager.instance.getallDocs(
-//            center: UserLocationManager.instance.region.center,
-//            radius: UserLocationManager.instance.region.distanceMax()) { (location) -> (Void) in
-//            locationStore.onMapLocations.append(location)
-//            print(locationStore.onMapLocations.count)
-//        }
     }
     
     func currentLocationPressed() {
