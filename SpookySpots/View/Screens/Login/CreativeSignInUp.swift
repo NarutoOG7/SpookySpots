@@ -143,6 +143,8 @@ struct Login: View {
     
     @State var emailInput = ""
     @State var passwordInput = ""
+    
+    @State var isSecured = true
     @Binding var index: Int
     
     @State var emailOrPasswordInvalid = false
@@ -221,12 +223,21 @@ struct Login: View {
     private var password: some View {
         VStack {
             HStack(spacing: 15) {
-                Image(systemName: "eye.slash.fill")
-                    .foregroundColor(.white)
+                Button(action: showPasswordTapped) {
+                    Image(systemName: isSecured ? "eye.slash.fill" : "eye")
+                        .foregroundColor(.white)
+                }
                 
-                SecureField("Password", text: self.$passwordInput)
-                    .disableAutocorrection(true)
-                    .textInputAutocapitalization(.never)
+                if isSecured {
+                    SecureField("Password", text: self.$passwordInput)
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                } else {
+                    TextField("Password", text: self.$passwordInput)
+                        .disableAutocorrection(true)
+                        .textInputAutocapitalization(.never)
+                }
+                
             }
             Divider().background(Color.gray)
             
@@ -312,6 +323,10 @@ struct Login: View {
             default: break
             }
         }
+    }
+    
+    private func showPasswordTapped() {
+        self.isSecured.toggle()
     }
 }
 

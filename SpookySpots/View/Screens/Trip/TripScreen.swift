@@ -33,9 +33,17 @@ struct TripScreen: View {
                         }
                         .frame(height: 120)
                         .offset(y: -10)
+                        startAndStopHeader
                         locationsList
+                        HStack {
+                            Spacer()
+                            getRoutes
+                            
+                        }.padding(.horizontal)
+                            .padding(.bottom)
                         Spacer()
                         
+                     
                     }
                 }
             }
@@ -119,7 +127,11 @@ extension TripScreen {
     
     private var locationsList: some View {
         VStack(alignment: .leading) {
+            if let first = tripPageVM.trip.locations.first,
+               let last = tripPageVM.trip.locations.last {
+            
             ForEach(tripPageVM.trip.locations) { location in
+                if location != first || location != last {
                 HStack {
                     Text(location.name)
                         .font(.title2)
@@ -138,7 +150,8 @@ extension TripScreen {
                     return NSItemProvider(item: nil, typeIdentifier: location.name)
                 })
                 .onDrop(of: [UTType.text], delegate: MyDropDelegate(location: location, locations: $tripPageVM.trip.locations, draggedItem: $draggedItem))
-                
+                }
+            }
             }
         }
     }
@@ -149,10 +162,37 @@ extension TripScreen {
             .frame(width: 50, height: 300)
     }
     
+    private var startAndStopHeader: some View {
+        HStack {
+            Text("START:")
+            
+        }
+    }
+    
     //MARK: - Buttons
     
+    private var getRoutes: some View {
+        Button(action: routesTapped) {
+            Text("Get Routes")
+        }
+        .buttonStyle(.borderedProminent)
+    }
+    
+    private var startingLocationButton: some View {
+        Button(action: setStartLocationTapped) {
+            Text(tripPageVM.trip.locations.first?.name ?? "No Start")
+        }
+    }
     
     //MARK: - Methods
+    
+    private func routesTapped() {
+        tripPageVM.getRoutesInTrip()
+    }
+    
+    private func setStartLocationTapped() {
+        
+    }
 }
 
 

@@ -134,6 +134,8 @@ extension UserLocationManager: CLLocationManagerDelegate {
                 TripPageVM.instance.trip.setCurrentLocationTo(TripDetails.end)
             }
         
+        
+        
     }
     
     //MARK: - Handling user loction choice

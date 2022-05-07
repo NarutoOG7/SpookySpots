@@ -235,6 +235,28 @@ class FirebaseManager: ObservableObject {
         }
     }
     
+    //MARK: - Get Trips
+    
+    func getTripLocationsForUser(withCompletion completion: @escaping(TripTwo) -> Void) {
+        let db = Firestore.firestore()
+
+        db.collection("Trips")
+            .whereField("userID", isEqualTo: UserStore.instance.user.id)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else if let snapshot = snapshot {
+                    for doc in snapshot.documents {
+                        if let dict = doc.data() as? [String:AnyObject] {
+                        let trip = TripTwo(dict: dict)
+                        completion(trip)
+                        }
+                    }
+                }
+            }
+        
+    }
+    
     //MARK: - Search
     
     func searchForLocationInFullDatabase(text: String, withCompletion completion: @escaping(LocationModel) -> Void) {

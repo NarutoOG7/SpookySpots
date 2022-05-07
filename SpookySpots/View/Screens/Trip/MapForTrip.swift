@@ -48,6 +48,10 @@ struct MapForTrip: UIViewRepresentable {
         if let currentLocation = userStore.currentLocation {
             view.addAnnotation(
                 MKPlacemark(coordinate: currentLocation.coordinate))
+            let tripLoc = TripLocation(id: "\(TripDetails.startLocationID)", name: "Current Location", cLLocation: currentLocation, location: nil)
+            if !tripPageVM.trip.locations.contains(where: { $0 == tripLoc }) {
+                tripPageVM.trip.locations.insert(tripLoc, at: 0)
+            }
         }
     }
     

@@ -34,14 +34,15 @@ struct LD: View {
                     address
                     avgRatingDisplay
                     
-                    HStack {
+                    HStack(alignment: .top) {
                         Spacer()
                         directionsButton
                         shareButton
                         addRemoveFromTrip
                         favoriteButton
                         Spacer()
-                    }.padding(.vertical)
+                    }.padding(.top)
+                        .frame(height: 150)
                     
                     Divider()
                     description

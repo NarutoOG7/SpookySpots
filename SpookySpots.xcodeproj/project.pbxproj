@@ -74,6 +74,8 @@
 		C9DC7C17281828DC00E8E71C /* PagedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9DC7C16281828DC00E8E71C /* PagedImageView.swift */; };
 		C9EFD61E281F9B1200B3BFDC /* CDTrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD61C281F9B1200B3BFDC /* CDTrip.xcdatamodeld */; };
 		C9EFD62028204E5B00B3BFDC /* FavoritesLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD61F28204E5B00B3BFDC /* FavoritesLogic.swift */; };
+		C9EFD6252826B4B200B3BFDC /* TripPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD6242826B4B200B3BFDC /* TripPage.swift */; };
+		C9EFD6272826B98800B3BFDC /* TripLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD6262826B98800B3BFDC /* TripLogic.swift */; };
 		C9FC76D728149AA1005777AF /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76D628149AA1005777AF /* Constants.swift */; };
 		C9FC76D928149ECF005777AF /* DatabaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76D828149ECF005777AF /* DatabaseView.swift */; };
 		C9FC76DB2814EFE3005777AF /* TripLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76DA2814EFE3005777AF /* TripLocation.swift */; };
@@ -172,6 +174,8 @@
 		C9DC7C16281828DC00E8E71C /* PagedImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedImageView.swift; sourceTree = "<group>"; };
 		C9EFD61D281F9B1200B3BFDC /* CDTrip.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDTrip.xcdatamodel; sourceTree = "<group>"; };
 		C9EFD61F28204E5B00B3BFDC /* FavoritesLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesLogic.swift; sourceTree = "<group>"; };
+		C9EFD6242826B4B200B3BFDC /* TripPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripPage.swift; sourceTree = "<group>"; };
+		C9EFD6262826B98800B3BFDC /* TripLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLogic.swift; sourceTree = "<group>"; };
 		C9FC76D628149AA1005777AF /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C9FC76D828149ECF005777AF /* DatabaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseView.swift; sourceTree = "<group>"; };
 		C9FC76DA2814EFE3005777AF /* TripLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripLocation.swift; sourceTree = "<group>"; };
@@ -386,6 +390,7 @@
 				C96A50C027EE2EF600E44B9F /* LocationAnnotationModel.swift */,
 				C9A8CA3127ED78FA00116B61 /* Trip.swift */,
 				C9FC76DA2814EFE3005777AF /* TripLocation.swift */,
+				C9EFD6262826B98800B3BFDC /* TripLogic.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -420,6 +425,7 @@
 				C9A8CA5427ED7C1A00116B61 /* ChangeStartAndStop.swift */,
 				C9A8CA5227ED7BFF00116B61 /* MapForTrip.swift */,
 				C9A8CA5027ED7BE500116B61 /* TripScreen.swift */,
+				C9EFD6242826B4B200B3BFDC /* TripPage.swift */,
 			);
 			path = Trip;
 			sourceTree = "<group>";
@@ -786,6 +792,7 @@
 				C9A8CA3427ED791A00116B61 /* LocationStore.swift in Sources */,
 				C92C63A7280A81140035C793 /* ProfilePage.swift in Sources */,
 				C9A8CA5527ED7C1A00116B61 /* ChangeStartAndStop.swift in Sources */,
+				C9EFD6252826B4B200B3BFDC /* TripPage.swift in Sources */,
 				C9A8CA5127ED7BE500116B61 /* TripScreen.swift in Sources */,
 				C9A8CA6227ED7DDE00116B61 /* SlideOverCard.swift in Sources */,
 				C9A8CA2C27ED784500116B61 /* LocationData.swift in Sources */,
@@ -807,6 +814,7 @@
 				C94046E427F946A5006837D6 /* HotelPriceModel.swift in Sources */,
 				C9A8CA3F27ED7A1400116B61 /* LocationPreviewOnMap.swift in Sources */,
 				C96A50C127EE2EF600E44B9F /* LocationAnnotationModel.swift in Sources */,
+				C9EFD6272826B98800B3BFDC /* TripLogic.swift in Sources */,
 				C94046EE27F95E82006837D6 /* Review.swift in Sources */,
 				C9A8CA5327ED7BFF00116B61 /* MapForTrip.swift in Sources */,
 				C96A50C727F14CA600E44B9F /* AppDelegate.swift in Sources */,
