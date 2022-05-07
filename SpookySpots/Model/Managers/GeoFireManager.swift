@@ -13,9 +13,9 @@ class GeoFireManager: ObservableObject {
     static let instance = GeoFireManager()
     
     @ObservedObject var firebaseManager = FirebaseManager.instance
-    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     @ObservedObject var locationStore = LocationStore.instance
     
+    @EnvironmentObject var exploreVM: ExploreViewModel
 
     lazy var locationRef = Database.database().reference().child("Haunted Hotels")
     @Published var gfNearbyLocations: [LocationAnnotationModel] = []

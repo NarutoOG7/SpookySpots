@@ -10,7 +10,7 @@ import SwiftUI
 struct LocationCollection: View {
     
     @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
+    @ObservedObject var exploreVM = ExploreViewModel.instance
     
     @ObservedObject var locationStore = LocationStore.instance
     
@@ -54,7 +54,7 @@ struct LocationCollection: View {
     //MARK: - Search Locations
     private var searchLocations: some View {
         
-        ForEach(exploreByListVM.searchedLocations) { location in
+        ForEach(exploreVM.searchedLocations) { location in
             NavigationLink {
                 LD(location: location)
             } label: {

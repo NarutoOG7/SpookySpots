@@ -5,7 +5,7 @@
 //  Created by Spencer Belton on 3/24/22.
 //
 
-import Foundation
+import SwiftUI
 import CoreLocation
 import FirebaseAuth
 import MapKit
@@ -13,9 +13,8 @@ import MapKit
 
 class UserStore: ObservableObject {
     static let instance = UserStore()
-    
+        
     @Published var isSignedIn = UserDefaults.standard.bool(forKey: "signedIn")
-
     
 //    @Published var isSignedIn = false
     @Published var isGuest = false
@@ -25,7 +24,7 @@ class UserStore: ObservableObject {
             if let newValue = newValue {
             let region = MKCoordinateRegion(center: newValue.coordinate,
                                             span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
-            ExploreByMapVM.instance.region = region
+                ExploreViewModel.instance.searchRegion = region
 //                RegionWrapper.instance.region = region
         }
         }

@@ -58,8 +58,7 @@
 		C9A8CA6227ED7DDE00116B61 /* SlideOverCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6127ED7DDE00116B61 /* SlideOverCard.swift */; };
 		C9A8CA6427ED7DF900116B61 /* CustomScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6327ED7DF900116B61 /* CustomScrollView.swift */; };
 		C9A8CA6727ED7EA400116B61 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6627ED7EA400116B61 /* CircularButton.swift */; };
-		C9A8CA6927ED7F1000116B61 /* ExploreByListVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6827ED7F1000116B61 /* ExploreByListVM.swift */; };
-		C9A8CA6B27ED7F3900116B61 /* ExploreByMapVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6A27ED7F3900116B61 /* ExploreByMapVM.swift */; };
+		C9A8CA6927ED7F1000116B61 /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6827ED7F1000116B61 /* ExploreViewModel.swift */; };
 		C9A8CA6D27ED7F5300116B61 /* TripPageVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6C27ED7F5300116B61 /* TripPageVM.swift */; };
 		C9A8CA7027ED800900116B61 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C9A8CA6F27ED800900116B61 /* SDWebImageSwiftUI */; };
 		C9A8CA7227ED826500116B61 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C9A8CA7127ED826500116B61 /* GoogleService-Info.plist */; };
@@ -156,8 +155,7 @@
 		C9A8CA6127ED7DDE00116B61 /* SlideOverCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlideOverCard.swift; sourceTree = "<group>"; };
 		C9A8CA6327ED7DF900116B61 /* CustomScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomScrollView.swift; sourceTree = "<group>"; };
 		C9A8CA6627ED7EA400116B61 /* CircularButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularButton.swift; sourceTree = "<group>"; };
-		C9A8CA6827ED7F1000116B61 /* ExploreByListVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreByListVM.swift; sourceTree = "<group>"; };
-		C9A8CA6A27ED7F3900116B61 /* ExploreByMapVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreByMapVM.swift; sourceTree = "<group>"; };
+		C9A8CA6827ED7F1000116B61 /* ExploreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewModel.swift; sourceTree = "<group>"; };
 		C9A8CA6C27ED7F5300116B61 /* TripPageVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripPageVM.swift; sourceTree = "<group>"; };
 		C9A8CA7127ED826500116B61 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C9A9CEEA2819A08C00D4A1F9 /* LD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LD.swift; sourceTree = "<group>"; };
@@ -327,8 +325,7 @@
 		C9A8CA2527ED779E00116B61 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				C9A8CA6827ED7F1000116B61 /* ExploreByListVM.swift */,
-				C9A8CA6A27ED7F3900116B61 /* ExploreByMapVM.swift */,
+				C9A8CA6827ED7F1000116B61 /* ExploreViewModel.swift */,
 				C9A8CA6C27ED7F5300116B61 /* TripPageVM.swift */,
 			);
 			path = ViewModel;
@@ -796,10 +793,9 @@
 				C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */,
 				C9A8CA3627ED793300116B61 /* UserStore.swift in Sources */,
 				C9A8CA3C27ED79D100116B61 /* LocalSearchService.swift in Sources */,
-				C9A8CA6B27ED7F3900116B61 /* ExploreByMapVM.swift in Sources */,
 				C94046DE27F9210A006837D6 /* LargeImageLocationView.swift in Sources */,
 				C9A8CA6727ED7EA400116B61 /* CircularButton.swift in Sources */,
-				C9A8CA6927ED7F1000116B61 /* ExploreByListVM.swift in Sources */,
+				C9A8CA6927ED7F1000116B61 /* ExploreViewModel.swift in Sources */,
 				C9FC76D728149AA1005777AF /* Constants.swift in Sources */,
 				C9A8CA6027ED7DC300116B61 /* FiveStars.swift in Sources */,
 				C9A8CA3027ED78C800116B61 /* Address.swift in Sources */,

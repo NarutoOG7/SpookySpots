@@ -9,17 +9,17 @@ import SwiftUI
 import MapKit
 
 struct MapViewUI: UIViewRepresentable {
+
+    @ObservedObject var exploreVM = ExploreViewModel.instance
     
-    
-    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
     @ObservedObject var userStore = UserStore.instance
     
     @ObservedObject var geoFireManager = GeoFireManager.instance
     let mapView = MKMapView()
 
     func makeUIView(context: Context) -> MKMapView {
-        mapView.setRegion(exploreByMapVM.region, animated: true)
-        setCurrentLocationRegion()
+        mapView.setRegion(exploreVM.searchRegion, animated: true)
+//        setCurrentLocationRegion()
         mapView.mapType = .standard
         mapView.isRotateEnabled = false
         mapView.isPitchEnabled = false
@@ -30,6 +30,7 @@ struct MapViewUI: UIViewRepresentable {
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
         mapView.addAnnotations(geoFireManager.gfOnMapLocations)
+        mapView.region = exploreVM.searchRegion
         addCurrentLocation(to: mapView)
     }
     
@@ -52,17 +53,23 @@ struct MapViewUI: UIViewRepresentable {
         if UserLocationManager.instance.locationServEnabled,
             let currentLoc = UserStore.instance.currentLocation {
             mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: false)
+            exploreVM.searchRegion = mapView.region
         }
     }
     
     func selectAnnotation(_ anno: MKAnnotation, animated: Bool) {
         mapView.selectAnnotation(anno, animated: animated)
     }
+    
+    func deselectAnnotation(_ anno: MKAnnotation, animated: Bool) {
+        mapView.deselectAnnotation(anno, animated: animated)
+    }
+    
     //MARK: - Coordinator
     
     final class MapCoordinator: NSObject, MKMapViewDelegate {
         
-        @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+        @ObservedObject var exploreVM = ExploreViewModel.instance
         
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
             
@@ -97,15 +104,29 @@ struct MapViewUI: UIViewRepresentable {
                                 
             case let locAnnotation as LocationAnnotationModel:
                 
-                exploreByMapVM.locAnnoTapped = locAnnotation
+                exploreVM.showingLocationList = true
+                exploreVM.highlightedAnnotation = locAnnotation
+                
                 if let loc = LocationStore.instance.onMapLocations.first(where: { "\($0.location.id)"
                     == locAnnotation.id }) {
-                exploreByMapVM.highlightedLocation = loc
-                exploreByMapVM.showingLocationList = true
-
-                exploreByMapVM.highlightedLocationIndex = LocationStore.instance.onMapLocations.firstIndex(of: loc)
+                    exploreVM.displayedLocation = loc
                 }
             default: break
+            }
+        }
+        
+        func mapView(_ mapView: MKMapView, didAdd views: [MKAnnotationView]) {
+            for anno in mapView.annotations {
+                switch anno {
+                    
+                case let locAnno as LocationAnnotationModel:
+                    
+                    if locAnno == exploreVM.highlightedAnnotation {
+                        mapView.selectAnnotation(locAnno, animated: true)
+                    }
+                    
+                default: break
+                }
             }
         }
     }

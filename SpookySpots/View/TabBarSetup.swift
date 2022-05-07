@@ -11,7 +11,8 @@ struct TabBarSetup: View {
     
     @State private var selection = 0
     @StateObject var favoritesLogic = FavoritesLogic()
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
+    
+    @ObservedObject var exploreVM = ExploreViewModel.instance
     
     init() {
         TripPageVM.instance.initTrip()
@@ -33,8 +34,11 @@ struct TabBarSetup: View {
         NavigationView {
             
             exploreHelperView
+
                 .navigationTitle("Explore")
-        }.background(Color.clear)
+        }
+        .background(Color.clear)
+        
             .tabItem {
                 Text("Explore")
                 Image(systemName: "magnifyingglass")
@@ -42,6 +46,7 @@ struct TabBarSetup: View {
                     .frame(width: 25, height: 25)
             }
             .tag(0)
+        
     }
     
     private var favoritesTab: some View {
@@ -93,7 +98,7 @@ struct TabBarSetup: View {
     
     private var exploreHelperView: some View {
         let view: AnyView
-        if exploreByListVM.isShowingMap {
+        if exploreVM.isShowingMap {
             view = AnyView(ExploreByMap())
         } else {
             view = AnyView(ExploreByList())

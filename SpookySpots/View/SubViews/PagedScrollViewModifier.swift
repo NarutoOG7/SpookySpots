@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftUITrackableScrollView
 
 struct PagedScrollViewModifier: ViewModifier {
     
@@ -21,7 +20,7 @@ struct PagedScrollViewModifier: ViewModifier {
 }
 
 
-extension TrackableScrollView {
+extension ScrollView {
     func pagedScrollView() -> some View {
         modifier(PagedScrollViewModifier())
     }

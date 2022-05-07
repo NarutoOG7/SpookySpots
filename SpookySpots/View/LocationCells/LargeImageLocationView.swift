@@ -13,7 +13,8 @@ struct LargeImageLocationView: View {
     var location: LocationModel
     
     @State private var imageURL = URL(string: "")
-
+    
+    @EnvironmentObject var favoritesLogic: FavoritesLogic
     
     var body: some View {
         ZStack {
@@ -48,6 +49,7 @@ struct LargeImageLocationView: View {
             .aspectRatio(contentMode: .fill)
             .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
 //            .padding(.bottom)
+        
     }
     
     
@@ -106,14 +108,16 @@ struct LargeImageLocationView: View {
         HStack {
             Spacer()
             VStack {
-                Image(systemName: "heart")
-                    .renderingMode(.none)
-                    .resizable()
-                    .shadow(color: Color.black, radius: 1.5)
-                    .tint(Color.red)
-                    .aspectRatio(contentMode: .fill)
-            .frame(width: 35, height: 35)
-                Spacer()
+                Button(action: favoritesTapped) {
+                    Image(systemName: favoritesLogic.contains(location) ? "heart.fill" : "heart")
+                        .renderingMode(.none)
+                        .resizable()
+                        .shadow(color: Color.black, radius: 1.5)
+                        .tint(Color.red)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 35, height: 35)
+                }
+                    Spacer()
             }
         }.padding()
     }
@@ -125,6 +129,14 @@ struct LargeImageLocationView: View {
             FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
                 self.imageURL = url
             }
+        }
+    }
+    
+    private func favoritesTapped() {
+        if favoritesLogic.contains(location) {
+            favoritesLogic.removeHotel(location)
+        } else {
+            favoritesLogic.addHotel(location)
         }
     }
 }

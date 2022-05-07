@@ -20,6 +20,7 @@ enum MapDetails {
 class UserLocationManager: NSObject, ObservableObject {
     static let instance = UserLocationManager()
     
+    @StateObject var exploreVM = ExploreViewModel.instance
     var locationManager: CLLocationManager?
     @Published var displayedLocationRoute: MKRoute!
     @Published var locationServEnabled = false
@@ -60,7 +61,7 @@ class UserLocationManager: NSObject, ObservableObject {
                 userStore.currentLocation = currentLoc
 //                RegionWrapper.instance.region = MKCoordinateRegion(
 //                    center: curentLoc.coordinate, span: MapDetails.defaultSpan)
-                ExploreByListVM.instance.setCurrentLocRegion(currentLoc)
+               exploreVM.setCurrentLocRegion(currentLoc)
             }
         @unknown default:
             break
@@ -123,7 +124,7 @@ extension UserLocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         locations.last.map {
-            ExploreByMapVM.instance.region = MKCoordinateRegion(
+            exploreVM.searchRegion = MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude),
                 span: MKCoordinateSpan(latitudeDelta: 2, longitudeDelta: 2))
         }

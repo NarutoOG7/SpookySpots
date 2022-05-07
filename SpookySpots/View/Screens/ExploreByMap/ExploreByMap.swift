@@ -7,7 +7,6 @@
 
 import SwiftUI
 import CoreLocation
-import SwiftUITrackableScrollView
 
 struct ExploreByMap: View {
     
@@ -15,14 +14,20 @@ struct ExploreByMap: View {
     
     @State private var visibleLocation: LocationModel?
     
+    @State private var swipeDirection: ExploreViewModel.SwipeDirection?
+    
+    @State private var shouldNavigate = false
+    
+    @State private var navigateToLocation: LocationModel?
+    
     @ObservedObject var locationStore = LocationStore.instance
     
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
-    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    @ObservedObject var exploreVM = ExploreViewModel.instance
     
     let map = MapViewUI()
     
     var body: some View {
+        
         ZStack {
             map
                 .ignoresSafeArea()
@@ -49,46 +54,94 @@ struct ExploreByMap: View {
         
         .navigationTitle("Map")
         .navigationBarHidden(true)
+        
+        .fullScreenCover(isPresented: $shouldNavigate) {
+            LD(location: navigateToLocation ?? LocationModel.example)
+        }
     }
 }
 
 //MARK: - Subviews
 
 extension ExploreByMap {
-
-    private var locationsList: AnyView {
-        AnyView(
-            TrackableScrollView(.horizontal, showIndicators: false, contentOffset: $scrollViewContentOffset) {
-                HStack {
-                    ForEach(locationStore.onMapLocations) { location in
-                        //            LocationPreviewOnMap(location: location)
+    
+    private var locationsList: some View {
+        VStack {
+            Spacer()
+        ZStack {
+            ForEach(locationStore.onMapLocations) { location in
+                if exploreVM.displayedLocation == location {
+                    LargeImageLocationView(location: location)
                         
-                        NavigationLink {
-                            LD(location: location)
-                        } label: {
-                            LargeImageLocationView(location: location)
-                        }
-                        .onAppear { self.visibleLocation = location }
-                        
-                        .onChange(of: visibleLocation) { newValue in
-                            if let anno = GeoFireManager.instance.gfOnMapLocations.first(where: { $0.id == "\(location.location.id)" }) {
-                                map.selectAnnotation(anno, animated: true)
-                            }
-                        }
-                    }
+                        .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
+                            .onEnded({ value in
+                                switch (value.translation.width, value.translation.height) {
+                                case (...0, -200...200):
+                                    print("left swipe")
+                                    self.swipeDirection = .forward
+                                    if let anno = exploreVM.highlightedAnnotation {
+                                    map.deselectAnnotation(anno, animated: true)
+                                    exploreVM.showLocationOnSwipe(direction: .forward)
+                                        print(anno.id)
+                                        DispatchQueue.main.async {
+                                            map.selectAnnotation(anno, animated: true)
+                                        }
+                                    }
+                                case (0..., -200...200):
+                                    print("right swipe")
+                                    self.swipeDirection = .backward
+                                    exploreVM.showLocationOnSwipe(direction: .backward)
+                                default: print("no clue")
+                                    print(value.translation.height)
+                                }
+                            }))
+                        .transition(.asymmetric(
+                            insertion: swipeDirection == .forward ? .move(edge: .trailing) : .move(edge: .leading),
+                            removal: swipeDirection == .forward ? .move(edge: .leading) : .move(edge: .trailing)))
                     
+                        .onTapGesture {
+                            self.navigateToLocation = location
+                            self.shouldNavigate = true
+                        }
                 }
             }
-                .pagedScrollView()
-        )
-        
-        
+        }
+        }
     }
+
+//    private var locationsList: AnyView {
+//        AnyView(
+//            ScrollView {
+//                HStack {
+//                    ForEach(locationStore.onMapLocations) { location in
+//                        //            LocationPreviewOnMap(location: location)
+//
+//                        NavigationLink {
+//                            LD(location: location)
+//                        } label: {
+//                            LargeImageLocationView(location: location)
+//                        }
+//                        .onAppear { self.visibleLocation = location }
+//
+//                        .onChange(of: visibleLocation) { newValue in
+//                            if let anno = GeoFireManager.instance.gfOnMapLocations.first(where: { $0.id == "\(location.location.id)" }) {
+//                                map.selectAnnotation(anno, animated: true)
+//                            }
+//                        }
+//                    }
+//
+//                }
+//            }
+//                .pagedScrollView()
+//        )
+//
+//
+//    }
 
     private var locationList: some View {
         let view: AnyView
-        if exploreByMapVM.showingLocationList {
-            view = locationsList
+        if exploreVM.showingLocationList {
+            view = AnyView(locationsList)
         } else {
             view = AnyView(
                 Rectangle()
@@ -101,7 +154,7 @@ extension ExploreByMap {
     private var searchLocations: some View {
         VStack {
             
-            List(exploreByMapVM.searchedLocations) { location in
+            List(exploreVM.searchedLocations) { location in
 
                 NavigationLink {
                     LD(location: location)
@@ -120,7 +173,7 @@ extension ExploreByMap {
     
     private var searchResults: some View {
         let view: AnyView
-        if exploreByMapVM.searchedLocations.isEmpty {
+        if exploreVM.searchedLocations.isEmpty {
             view = AnyView(EmptyView())
         } else {
             view = AnyView(searchLocations)
@@ -153,7 +206,7 @@ extension ExploreByMap {
     //MARK: - Methods
     
     func listButtonPressed() {
-        exploreByListVM.isShowingMap = false
+        exploreVM.isShowingMap = false
     }
     
     func currentLocationPressed() {

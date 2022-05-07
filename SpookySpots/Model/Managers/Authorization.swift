@@ -25,6 +25,7 @@ class Authorization {
     static let instance = Authorization()
     
     @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var locationStore = LocationStore.instance
     
     let auth = Auth.auth()
     
@@ -154,6 +155,7 @@ class Authorization {
             try auth.signOut()
             self.userStore.isSignedIn = false
             self.userStore.user = User()
+            self.locationStore.favoriteLocations = []
             UserDefaults.standard.set(false, forKey: "signedIn")
             self.saveUserToUserDefaults(user: User()) { error in
                 if let error = error {

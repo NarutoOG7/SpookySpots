@@ -13,8 +13,8 @@ struct SearchBar: View {
 //    @State var searchText: String = ""
     var type: SearchFromType
     
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
-    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    @ObservedObject var exploreVM = ExploreViewModel.instance
+    
     @ObservedObject var locationStore = LocationStore.instance
     
     var body: some View {
@@ -40,9 +40,9 @@ struct SearchBar: View {
         TextField("Search",
                   text:
                     typeIsList() ?
-                    $exploreByListVM.searchText
+                    $exploreVM.searchText
                   :
-                    $exploreByMapVM.searchText)
+                    $exploreVM.searchText)
             .padding()
     }
     
@@ -61,9 +61,9 @@ struct SearchBar: View {
             Text("Cancel")
         }
         .opacity(typeIsList() ?
-                    (exploreByListVM.searchText.isEmpty ? 0 : 1)
+                    (exploreVM.searchText.isEmpty ? 0 : 1)
                  :
-                    (exploreByMapVM.searchText.isEmpty ? 0 : 1))
+                    (exploreVM.searchText.isEmpty ? 0 : 1))
             .padding()
     }
     
@@ -72,11 +72,11 @@ struct SearchBar: View {
     private func cancelSearchTapped() {
         switch type {
         case .exploreByMap:
-            exploreByMapVM.searchText = ""
-            exploreByMapVM.searchedLocations = []
+            exploreVM.searchText = ""
+            exploreVM.searchedLocations = []
         case .exploreByList:
-            exploreByListVM.searchText = ""
-            exploreByListVM.searchedLocations = []
+            exploreVM.searchText = ""
+            exploreVM.searchedLocations = []
             
         }
     }

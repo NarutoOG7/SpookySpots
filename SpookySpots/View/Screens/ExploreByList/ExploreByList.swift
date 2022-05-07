@@ -14,7 +14,7 @@ struct ExploreByList: View {
     @State var showingSearchResults = false
     @State var user = UserStore.instance.user
     
-    @ObservedObject var exploreByListVM = ExploreByListVM.instance
+    @ObservedObject private var exploreVM = ExploreViewModel.instance
         
     var body: some View {
         ZStack {
@@ -40,7 +40,7 @@ struct ExploreByList: View {
         }.padding(.top, 30)
             .navigationBarHidden(true)
             .onAppear {
-                ExploreByListVM.instance.supplyLocationLists()
+                exploreVM.supplyLocationLists()
             }
         
         //        }
@@ -50,7 +50,7 @@ struct ExploreByList: View {
     //MARK: - SubViews
     var greeting: some View {
         HStack(spacing: -7) {
-            Text("\(ExploreByListVM.instance.greetingLogic()),")
+            Text("\(exploreVM.greetingLogic()),")
                 .font(.title)
                 .fontWeight(.ultraLight)
                 .padding(.horizontal)
@@ -95,7 +95,7 @@ struct ExploreByList: View {
     }
     
     func isShowingMap() {
-        exploreByListVM.isShowingMap = true
+        exploreVM.isShowingMap = true
     }
 }
 
