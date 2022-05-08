@@ -21,7 +21,6 @@ struct LD: View {
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
     
-    @ObservedObject var tripPageVM = TripPageVM.instance
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -217,12 +216,19 @@ struct LD: View {
     
     private var addRemoveFromTrip: some View {
         BorderedCircularButton(
-            image: Image(systemName: tripPageVM.trip.listContainsLocation(location: location.location) ? "minus" : "plus"),
-            title: tripPageVM.trip.listContainsLocation(location: location.location) ? "Remove From Trip" : "Add To Trip",
+            image: Image(systemName: "plus"),
+            title: "Add To Trip",
             color: .green,
             tapped: addToTripTapped)
     }
     
+//    private var addRemoveFromTrip: some View {
+//        BorderedCircularButton(
+//            image: Image(systemName: tripPageVM.trip.listContainsLocation(location: location.location) ? "minus" : "plus"),
+//            title: tripPageVM.trip.listContainsLocation(location: location.location) ? "Remove From Trip" : "Add To Trip",
+//            color: .green,
+//            tapped: addToTripTapped)
+//    }
     private var favoriteButton: some View {
         BorderedCircularButton(
             image: favoritesLogic.contains(location) ?
@@ -279,7 +285,7 @@ struct LD: View {
     }
     
     private func addToTripTapped() {
-        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
+//        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
         
     }
     

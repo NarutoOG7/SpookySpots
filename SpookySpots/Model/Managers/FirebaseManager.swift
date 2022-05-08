@@ -237,7 +237,7 @@ class FirebaseManager: ObservableObject {
     
     //MARK: - Get Trips
     
-    func getTripLocationsForUser(withCompletion completion: @escaping(TripTwo) -> Void) {
+    func getTripLocationsForUser(withCompletion completion: @escaping(Trip) -> Void) {
         let db = Firestore.firestore()
 
         db.collection("Trips")
@@ -248,7 +248,7 @@ class FirebaseManager: ObservableObject {
                 } else if let snapshot = snapshot {
                     for doc in snapshot.documents {
                         if let dict = doc.data() as? [String:AnyObject] {
-                        let trip = TripTwo(dict: dict)
+                        let trip = Trip(dict: dict)
                         completion(trip)
                         }
                     }

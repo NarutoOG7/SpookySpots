@@ -13,7 +13,7 @@ struct LocationPreviewOnMap: View {
     
     let location: LocationModel
     
-    @ObservedObject var tripPageVM = TripPageVM.instance
+//    @ObservedObject var tripPageVM = TripPageVM.instance
 
     @State private var imageURL = URL(string: "")
     
@@ -135,11 +135,12 @@ struct LocationPreviewOnMap: View {
     }
     
     private func isInTrip() -> Bool {
-        tripPageVM.trip.listContainsLocation(location: location.location)
+        true
+//        tripPageVM.trip.listContainsLocation(location: location.location)
     }
     
     private func addOrSubtractFromTrip() {
-        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
+//        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
     }
     
     private func loadImageFromFirebase()  {
