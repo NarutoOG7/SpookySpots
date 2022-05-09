@@ -17,6 +17,7 @@ struct LD: View {
     @State private var imageIsAvailable = false
     
     @EnvironmentObject var favoritesLogic: FavoritesLogic
+    @EnvironmentObject var tripLogic: TripLogic
 
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
@@ -214,21 +215,21 @@ struct LD: View {
             tapped: shareTapped)
     }
     
-    private var addRemoveFromTrip: some View {
-        BorderedCircularButton(
-            image: Image(systemName: "plus"),
-            title: "Add To Trip",
-            color: .green,
-            tapped: addToTripTapped)
-    }
-    
 //    private var addRemoveFromTrip: some View {
 //        BorderedCircularButton(
-//            image: Image(systemName: tripPageVM.trip.listContainsLocation(location: location.location) ? "minus" : "plus"),
-//            title: tripPageVM.trip.listContainsLocation(location: location.location) ? "Remove From Trip" : "Add To Trip",
+//            image: Image(systemName: "plus"),
+//            title: "Add To Trip",
 //            color: .green,
 //            tapped: addToTripTapped)
 //    }
+//
+    private var addRemoveFromTrip: some View {
+        BorderedCircularButton(
+            image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
+            title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
+            color: .green,
+            tapped: addToTripTapped)
+    }
     private var favoriteButton: some View {
         BorderedCircularButton(
             image: favoritesLogic.contains(location) ?
@@ -253,14 +254,12 @@ struct LD: View {
     }
     
     private var backButton: some View {
-
-                Button(action: backButtonTapped) {
-                    Image(systemName: "chevron.left")
-                        .resizable()
-                        .frame(width: 25, height: 35)
-                        .tint(.pink)
-                }
-  
+        Button(action: backButtonTapped) {
+            Image(systemName: "chevron.left")
+                .resizable()
+                .frame(width: 25, height: 35)
+                .tint(.pink)
+        }
     }
     
     
@@ -285,8 +284,11 @@ struct LD: View {
     }
     
     private func addToTripTapped() {
-//        tripPageVM.trip.addOrSubtractFromTrip(location: location.location)
-        
+        if tripLogic.destinationsContains(location) {
+            tripLogic.removeDestination(location)
+        } else {
+            tripLogic.addDestination(location)
+        }        
     }
     
     private func moreReviewsTapped() {
@@ -320,6 +322,7 @@ struct LD_Previews: PreviewProvider {
     static var previews: some View {
         LD(location: LocationModel.example)
             .environmentObject(FavoritesLogic())
+            .environmentObject(TripLogic())
     }
 }
 

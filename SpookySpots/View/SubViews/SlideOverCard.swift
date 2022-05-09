@@ -11,6 +11,7 @@ struct SlideOverCard<Content: View> : View {
     @GestureState private var dragState = DragState.inactive
     @State var position = CardPosition.middle
     var color: Color
+    var handleColor: Color
     
     var content: () -> Content
     var body: some View {
@@ -23,7 +24,7 @@ struct SlideOverCard<Content: View> : View {
         
         return VStack {
 
-                Handle()
+            Handle(color: handleColor)
                     .padding(.bottom, 5)
             self.content()
                 Spacer()
@@ -71,7 +72,7 @@ struct SlideOverCard<Content: View> : View {
 
 struct SlideOverCard_Previews: PreviewProvider {
     static var previews: some View {
-        SlideOverCard(color: Color.black) {
+        SlideOverCard(color: Color.black, handleColor: .white) {
             VStack {
                 Text("Hello")
                     .foregroundColor(Color.white)
@@ -118,12 +119,15 @@ enum CardPosition: CGFloat {
 
 //MARK: - Handle
 struct Handle: View {
+    
+    var color: Color
+    
     private let handleThickness = CGFloat(5.0)
     
     var body: some View {
         RoundedRectangle(cornerRadius: handleThickness / 2.0)
             .frame(width: 40, height: handleThickness)
-            .foregroundColor(Color.white)
+            .foregroundColor(color)
             .padding(10)
     }
 }

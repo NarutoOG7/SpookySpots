@@ -10,11 +10,10 @@ import CoreLocation
 import CloudKit
 
 struct Trip: Equatable, Identifiable {
-
     
     var id: String
     var userID: String
-    var name: String
+    var isActive: Bool
     var destinations: [Destination]
     var startLocation: Destination
     var endLocation: Destination
@@ -23,15 +22,13 @@ struct Trip: Equatable, Identifiable {
     init(dict: [String:AnyObject]) {
         self.id = dict["id"] as? String ?? ""
         self.userID = dict["userID"] as? String ?? ""
-        self.name = dict["name"] as? String ?? ""
-        
+        self.isActive = dict["isActive"] as? Bool ?? false
         self.destinations = []
         
         if let destinations = dict["destinations"] as? [[String:AnyObject]] {
             for destination in destinations {
                 let dest = Destination(dict: destination)
                 self.destinations.append(dest)
-                
             }
         } else {
             self.destinations = []
@@ -52,6 +49,22 @@ struct Trip: Equatable, Identifiable {
         }
     }
     
+    //MARK: - Init from Code
+    init(id: String,
+         userID: String,
+         isActive: Bool,
+         destinations: [Destination],
+         startLocation: Destination,
+         endLocation: Destination) {
+        
+        self.id = id
+        self.userID = userID
+        self.isActive = isActive
+        self.destinations = destinations
+        self.startLocation = startLocation
+        self.endLocation = endLocation
+    }
+    
     //MARK: - Equatable
     static func == (lhs: Trip, rhs: Trip) -> Bool {
         lhs.id == rhs.id
@@ -60,20 +73,24 @@ struct Trip: Equatable, Identifiable {
 }
 
 //MARK: - Destination
-struct Destination: Equatable {
+struct Destination: Equatable, Identifiable {
+    var id: String
     var lat: Double
     var lon: Double
     var name: String
     
     init(dict: [String:AnyObject]) {
+        self.id = dict["id"] as? String ?? ""
         self.lat = dict["lat"] as? Double ?? 0
         self.lon = dict["lon"] as? Double ?? 0
         self.name = dict["name"] as? String ?? ""
     }
     //MARK: - Init From LocationModel
-    init(lat: Double,
+    init(id: String,
+         lat: Double,
          lon: Double,
          name: String) {
+        self.id = id
         self.lat = lat
         self.lon = lon
         self.name = name

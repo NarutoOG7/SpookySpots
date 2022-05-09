@@ -11,23 +11,20 @@ struct TabBarSetup: View {
     
     @State private var selection = 0
     @StateObject var favoritesLogic = FavoritesLogic()
-//    @StateObject var tripLogic = TripLogic.instance
+    @StateObject var tripLogic = TripLogic.instance
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
-    
-//    init() {
-//        TripPageVM.instance.initTrip()
-//    }
     
     var body: some View {
 //        NavigationView {
         TabView(selection: $selection) {
             exploreTab
             favoritesTab
-//            tripTab
+            tripTab
             settingsTab
         }
         .environmentObject(favoritesLogic)
+        .environmentObject(tripLogic)
 //        }
     }
     
@@ -37,6 +34,7 @@ struct TabBarSetup: View {
             exploreHelperView
 
                 .navigationTitle("Explore")
+                .navigationBarHidden(true)
         }
         .background(Color.clear)
         
@@ -65,22 +63,23 @@ struct TabBarSetup: View {
     }
     
     
-//    private var tripTab: some View {
-//        NavigationView {
-//            TripScreen()
-//                .navigationTitle("Trip")
-//        }
-//            .tabItem {
-//                VStack {
-//                    Image(systemName: "car.fill")
-//                        .resizable()
-//                        .frame(width: 25, height: 25)
-//                    Text("Trip")
-//                }
-//            }
-//            .tag(2)
-//    }
-//
+    private var tripTab: some View {
+        NavigationView {
+            TripPage()
+                .navigationTitle("Trip")
+                .navigationBarHidden(true)
+        }
+            .tabItem {
+                VStack {
+                    Image(systemName: "car.fill")
+                        .resizable()
+                        .frame(width: 25, height: 25)
+                    Text("Trip")
+                }
+            }
+            .tag(2)
+    }
+
 
     private var settingsTab: some View {
         NavigationView {
