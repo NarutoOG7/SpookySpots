@@ -32,7 +32,7 @@ struct TripPage: View {
                             distanceView
                         }
                         Spacer()
-                        goOrGetRoutesButton
+                        directionsButton
                             
                     }
                     
@@ -55,7 +55,7 @@ struct TripPage: View {
     
     private var distanceView: some View {
         HStack(spacing: 16) {
-            Text("_")
+            Text(tripLogic.distanceAsString)
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("miles")
@@ -67,14 +67,14 @@ struct TripPage: View {
     
     private var durationView: some View {
         HStack(spacing: 10) {
-            Text("_")
+            Text(tripLogic.durationHoursString)
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("hr")
                 .font(.avenirNextRegular(size: 15))
                 .fontWeight(.bold)
                 .foregroundColor(.secondary)
-            Text("_")
+            Text(tripLogic.durationMinutesString)
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("min")
@@ -125,13 +125,14 @@ struct TripPage: View {
     
     //MARK: - Buttons/Links
     
-    private var goOrGetRoutesButton: some View {
+    private var directionsButton: some View {
         Button(action: goOrGetTapped) {
-            Text("Get Routes")
+            Text(tripLogic.tripState.buttonTitleForState)
                 .padding(10)
         }
         .buttonStyle(.borderedProminent)
     }
+    
     
     private var startLink: some View {
         NavigationLink {
@@ -171,18 +172,24 @@ struct TripPage: View {
         switch tripLogic.tripState {
         case .creating:
             tripLogic.addRoutes()
+                tripLogic.tripState = .readyToDirect
+            
         case .readyToDirect:
             // Start Directions
             tripLogic.startDirections()
+            tripLogic.tripState = .directing
         case .directing:
             // Pause Directions
             tripLogic.pauseDirections()
+            tripLogic.tripState = .paused
         case .paused:
             // Resume Directions
             tripLogic.resumeDirections()
+            tripLogic.tripState = .directing
         case .finished:
             // End Directions
             tripLogic.endDirections()
+            tripLogic.tripState = .finished
         }
     }
     

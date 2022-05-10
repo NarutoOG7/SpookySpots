@@ -19,14 +19,5 @@ class LocationStore: ObservableObject {
     @Published var hauntedHotels: [LocationModel] = []
     @Published var trendingLocations: [LocationModel] = []
     @Published var activeTripLocations: [Destination] = []
-    @Published var selectedLocation: LocationModel? {
-        willSet {
-            if newValue != nil {
-                UserLocationManager.instance.getDistanceToLocation(location: newValue!) { distance in
-                    UserStore.instance.selectedLocationDistanceToUser = distance
-                }
-                print(newValue!.location.name)
-            }
-        }
-    }
+
 }

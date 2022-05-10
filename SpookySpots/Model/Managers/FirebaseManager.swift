@@ -50,6 +50,16 @@ class FirebaseManager: ObservableObject {
         }
     }
     
+    func addOrSaveTrip(_ trip: Trip) {
+        let db = Firestore.firestore()
+        
+        db.collection("Trips")
+            .document(trip.id)
+            .setData([
+                
+            ])
+    }
+    
     func getSelectHotel(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         
         let ref = Database.database().reference().child("Haunted Hotels/\(locID)")

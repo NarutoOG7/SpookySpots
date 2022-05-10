@@ -15,6 +15,21 @@ enum TripState {
     case directing
     case paused
     case finished
+    
+    var buttonTitleForState: String {
+        switch self {
+        case .creating:
+            return "Add Routes"
+        case .readyToDirect:
+            return "Get Directions"
+        case .directing:
+            return "Pause"
+        case .paused:
+            return "Resume"
+        case .finished:
+            return "End"
+        }
+    }
 }
 
 class TripLogic: ObservableObject {
@@ -24,8 +39,15 @@ class TripLogic: ObservableObject {
     
     @Published var trips: [Trip] = []
     @Published var currentTrip: Trip?
-    @Published var routes: [MKRoute] = []
+    @Published var availableRoutes: [MKRoute] = []
     @Published var tripState: TripState = .creating
+    private var distance: Double = 0
+    @Published var distanceAsString = "0"
+    private var duration: Double = 0
+    @Published var durationHoursString = "0"
+    @Published var durationMinutesString = "0"
+    
+    @Published var directingRoutes: [MKRoute] = []
     
     @Published var mapRegion: MKCoordinateRegion = MKCoordinateRegion()
     @Published var destAnnotations: [LocationAnnotationModel] = []
@@ -82,12 +104,22 @@ class TripLogic: ObservableObject {
         }
     }
     
+    //MARK: - Firebase
+    
     func loadFromFirebase() {
         firebaseManager.getTripLocationsForUser { trip in
             self.trips.append(trip)
         }
     }
+    
+    func saveToFirebase() {
+        if let currentTrip = currentTrip {
+            firebaseManager.addOrSaveTrip(currentTrip)
+        }
+    }
 
+    //MARK: - Destinations
+    
     func destinationsContains(_ location: LocationModel) -> Bool {
         self.destinations.contains(where:  { $0.name == location.location.name})
     }
@@ -105,25 +137,53 @@ class TripLogic: ObservableObject {
             self.currentTrip?.destinations.append(destination)
             self.destinations.append(destination)
             self.locationStore.activeTripLocations.append(destination)
+            self.tripState = .creating
         }
     }
 
     func removeDestination(_ location: LocationModel) {
         objectWillChange.send()
+        self.tripState = .creating
         self.currentTrip?.destinations.removeAll(where: { $0.name == location.location.name })
         self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
         self.destinations.removeAll(where: { $0.name == location.location.name })
     }
     
+    //MARK: - Distance
+    
+    func setDistance() {
+        if let route = self.availableRoutes.first {
+            self.distance = route.distance
+            self.distanceAsString = String(format: "%.0f", route.distance)
+        }
+    }
+    
+    
+    //MARK: - Duration
+    
+    func setDuration() {
+        if let route = self.availableRoutes.first {
+            self.duration = route.expectedTravelTime
+            self.durationHoursString = "\(secondsToHoursMinutes(route.expectedTravelTime).hours)"
+            self.durationMinutesString = "\(secondsToHoursMinutes(route.expectedTravelTime).minutes)"
+        }
+    }
+    
+    func secondsToHoursMinutes(_ seconds: Double) -> (hours: Int, minutes: Int) {
+        return (Int(seconds) / 3600, (Int(seconds) % 3600) / 60)
+    }
+    
     //MARK: -  Routes
     
     func addRoutes() {
-        getRoutes { route in
-            self.routes.append(route)
+        getRoutes { routes in
+            for route in routes {
+                self.availableRoutes.append(route)
+            }
         }
     }
 
-    private func getRoutes(withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
+    private func getRoutes(withCompletion completion: @escaping ((_ routes: [MKRoute]) -> (Void))) {
         if let trip = currentTrip {
             var last = trip.startLocation
             for location in trip.destinations {
@@ -132,8 +192,8 @@ class TripLogic: ObservableObject {
                     let lastPlacemark = MKPlacemark(coordinate: lastCLLocation.coordinate)
                     let destPlacemark = MKPlacemark(coordinate: CLLocation(latitude: location.lat, longitude: location.lon).coordinate)
                     
-                    getRouteFromPointsAB(a: lastPlacemark, b: destPlacemark) { (route) -> (Void) in
-                        completion(route)
+                    getRouteFromPointsAB(a: lastPlacemark, b: destPlacemark) { (routes) -> (Void) in
+                        completion(routes)
                     }
                     last = location
                 }
@@ -141,7 +201,7 @@ class TripLogic: ObservableObject {
         }
     }
 
-    private func getRouteFromPointsAB(a: MKPlacemark, b: MKPlacemark, withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
+    private func getRouteFromPointsAB(a: MKPlacemark, b: MKPlacemark, withCompletion completion: @escaping ((_ routes: [MKRoute]) -> (Void))) {
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: a)
         request.destination = MKMapItem(placemark: b)
@@ -152,9 +212,9 @@ class TripLogic: ObservableObject {
             if let error = error {
                 print(error.localizedDescription)
             }
-            guard let route = response?.routes.first else { return }
-            print(route)
-            completion(route)
+            guard let response = response else { return }
+            let routes = Array(response.routes.prefix(3))
+            completion(routes)
         }
     }
 

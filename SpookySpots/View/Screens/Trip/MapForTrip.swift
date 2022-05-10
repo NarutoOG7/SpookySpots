@@ -37,7 +37,7 @@ struct MapForTrip: UIViewRepresentable {
             view.removeOverlays(view.overlays)
         }
                     
-        for route in tripLogic.routes {
+        for route in tripLogic.availableRoutes {
             let polyline = route.polyline
             let mapRect = polyline.boundingMapRect
             view.setVisibleMapRect(mapRect, edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: true)
