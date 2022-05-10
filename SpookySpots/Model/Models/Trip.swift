@@ -13,18 +13,50 @@ struct Trip: Equatable, Identifiable {
     
     var id: String
     var userID: String
-    var isActive: Bool
+    var tripState: TripState
     var destinations: [Destination]
     var startLocation: Destination
     var endLocation: Destination
     
     //MARK: - Init from Firebase
     init(dict: [String:AnyObject]) {
-        self.id = dict["id"] as? String ?? ""
-        self.userID = dict["userID"] as? String ?? ""
-        self.isActive = dict["isActive"] as? Bool ?? false
-        self.destinations = []
         
+        self.id = dict["id"] as? String ?? ""
+        
+        self.userID = dict["userID"] as? String ?? ""
+        
+        self.tripState = .finished
+        let tripStateString = dict["tripState"] as? String ?? ""
+
+        self.destinations = []
+        self.startLocation = Destination(dict: [:])
+        self.endLocation = Destination(dict: [:])
+        
+        setTripState(tripStateString)
+        setDestinations(dict: dict)
+        setStartLoc(dict: dict)
+        setEndLoc(dict: dict)
+
+    }
+    
+    mutating func setTripState(_ tripStateString: String) {
+        switch tripStateString {
+        case "creating":
+            self.tripState = .creating
+        case "readyToDirect":
+            self.tripState = .readyToDirect
+        case "directing":
+            self.tripState = .directing
+        case "paused":
+            self.tripState = .paused
+        case "finished":
+            self.tripState = .finished
+        default:
+            self.tripState = .finished
+        }
+    }
+    
+    mutating func setDestinations(dict: [String:AnyObject]) {
         if let destinations = dict["destinations"] as? [[String:AnyObject]] {
             for destination in destinations {
                 let dest = Destination(dict: destination)
@@ -33,14 +65,18 @@ struct Trip: Equatable, Identifiable {
         } else {
             self.destinations = []
         }
-        
+    }
+    
+    mutating func setStartLoc(dict: [String:AnyObject]) {
         if let start = dict["startLocation"] as? [String:AnyObject] {
             let startLocation = Destination(dict: start)
             self.startLocation = startLocation
         } else {
             self.startLocation = Destination(dict: [:])
         }
-        
+    }
+    
+    mutating func setEndLoc(dict: [String:AnyObject]) {
         if let end = dict["endLocation"] as? [String:AnyObject] {
             let endLocation = Destination(dict: end)
             self.endLocation = endLocation
@@ -52,14 +88,14 @@ struct Trip: Equatable, Identifiable {
     //MARK: - Init from Code
     init(id: String,
          userID: String,
-         isActive: Bool,
+         tripState: TripState,
          destinations: [Destination],
          startLocation: Destination,
          endLocation: Destination) {
         
         self.id = id
         self.userID = userID
-        self.isActive = isActive
+        self.tripState = tripState
         self.destinations = destinations
         self.startLocation = startLocation
         self.endLocation = endLocation

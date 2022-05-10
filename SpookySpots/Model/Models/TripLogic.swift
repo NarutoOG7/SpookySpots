@@ -9,34 +9,44 @@
 import SwiftUI
 import MapKit
 
+enum TripState {
+    case creating
+    case readyToDirect
+    case directing
+    case paused
+    case finished
+}
+
 class TripLogic: ObservableObject {
     static let instance = TripLogic()
 
-    private var destinations: [Destination] = []
+    @Published var destinations: [Destination] = []
     
     @Published var trips: [Trip] = []
     @Published var currentTrip: Trip?
     @Published var routes: [MKRoute] = []
+    @Published var tripState: TripState = .creating
     
     @Published var mapRegion: MKCoordinateRegion = MKCoordinateRegion()
     @Published var destAnnotations: [LocationAnnotationModel] = []
 
     @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var firebaseManager = FirebaseManager.instance
 
     init() {
         
-        if userStore.isSignedIn {
+        if userStore.isSignedIn || userStore.isGuest {
             
-            // load from firebase
-            firebaseManager.getTripLocationsForUser { trip in
-                self.trips.append(trip)
-            }
+            loadFromFirebase()
             
             self.currentTrip = self.trips.last
-            self.destinations = self.currentTrip?.destinations ?? []
             
             if let trip = currentTrip {
+                
+                self.destinations = trip.destinations
+                locationStore.activeTripLocations = destinations
+                self.tripState = trip.tripState
                 
                 mapRegion = MKCoordinateRegion(center:
                                                 CLLocationCoordinate2D(
@@ -45,6 +55,7 @@ class TripLogic: ObservableObject {
                                                span: MapDetails.defaultSpan)
                 
             } else {
+                                
                 if let currentLoc = userStore.currentLocation {
                     
                     let startLoc = Destination(id: UUID().uuidString,
@@ -59,27 +70,26 @@ class TripLogic: ObservableObject {
                     
                 currentTrip = Trip(id: UUID().uuidString,
                                    userID: userStore.user.id,
-                                   isActive: true,
+                                   tripState: .creating,
                                    destinations: [],
                                    startLocation: startLoc,
                                    endLocation: endLoc)
-                    
+                    self.tripState = .creating
                     mapRegion = MapDetails.defaultRegion
             }
             }
             
-            getRoutes { route in
-                self.routes.append(route)
-            }
+        }
+    }
+    
+    func loadFromFirebase() {
+        firebaseManager.getTripLocationsForUser { trip in
+            self.trips.append(trip)
         }
     }
 
     func destinationsContains(_ location: LocationModel) -> Bool {
-        if let trip = currentTrip {
-           return trip.destinations.contains(where:  { $0.name == location.location.name})
-        } else {
-            return false
-        }
+        self.destinations.contains(where:  { $0.name == location.location.name})
     }
 
     func addDestination(_ location: LocationModel) {
@@ -93,15 +103,27 @@ class TripLogic: ObservableObject {
                 lon: cloc.coordinate.longitude,
                 name: location.location.name)
             self.currentTrip?.destinations.append(destination)
+            self.destinations.append(destination)
+            self.locationStore.activeTripLocations.append(destination)
         }
     }
 
     func removeDestination(_ location: LocationModel) {
         objectWillChange.send()
         self.currentTrip?.destinations.removeAll(where: { $0.name == location.location.name })
+        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
+        self.destinations.removeAll(where: { $0.name == location.location.name })
+    }
+    
+    //MARK: -  Routes
+    
+    func addRoutes() {
+        getRoutes { route in
+            self.routes.append(route)
+        }
     }
 
-    func getRoutes(withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
+    private func getRoutes(withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
         if let trip = currentTrip {
             var last = trip.startLocation
             for location in trip.destinations {
@@ -119,7 +141,7 @@ class TripLogic: ObservableObject {
         }
     }
 
-    func getRouteFromPointsAB(a: MKPlacemark, b: MKPlacemark, withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
+    private func getRouteFromPointsAB(a: MKPlacemark, b: MKPlacemark, withCompletion completion: @escaping ((_ route: MKRoute) -> (Void))) {
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: a)
         request.destination = MKMapItem(placemark: b)
@@ -136,4 +158,22 @@ class TripLogic: ObservableObject {
         }
     }
 
+    
+    //MARK: - Directions
+    
+    func startDirections() {
+        
+    }
+    
+    func pauseDirections() {
+        
+    }
+    
+    func resumeDirections() {
+        
+    }
+    
+    func endDirections() {
+        
+    }
 }

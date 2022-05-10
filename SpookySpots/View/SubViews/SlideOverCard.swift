@@ -10,6 +10,7 @@ import SwiftUI
 struct SlideOverCard<Content: View> : View {
     @GestureState private var dragState = DragState.inactive
     @State var position = CardPosition.middle
+    @Binding var canSlide: Bool
     var color: Color
     var handleColor: Color
     
@@ -36,7 +37,7 @@ struct SlideOverCard<Content: View> : View {
         .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.13), radius: 10)
         .offset(y: self.position.rawValue + self.dragState.translation.height)
         .animation(.interpolatingSpring(stiffness: 300, damping: 30), value: dragState.isDragging)
-        .gesture(drag)
+        .gesture(canSlide ? drag : nil)
     }
     
     private func onDragEnded(drag: DragGesture.Value) {
@@ -72,7 +73,7 @@ struct SlideOverCard<Content: View> : View {
 
 struct SlideOverCard_Previews: PreviewProvider {
     static var previews: some View {
-        SlideOverCard(color: Color.black, handleColor: .white) {
+        SlideOverCard(canSlide: .constant(true), color: Color.black, handleColor: .white) {
             VStack {
                 Text("Hello")
                     .foregroundColor(Color.white)

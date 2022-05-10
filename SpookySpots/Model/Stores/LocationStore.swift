@@ -18,11 +18,7 @@ class LocationStore: ObservableObject {
     @Published var nearbyLocations: [LocationModel] = []
     @Published var hauntedHotels: [LocationModel] = []
     @Published var trendingLocations: [LocationModel] = []
-    @Published var activeTripLocations: [Destination] = [
-        Destination(id: "12", lat: 12, lon: 12, name: "Bannack"),
-        Destination(id: "11", lat: 11, lon: 11, name: "Sacajawea Hotel"),
-        Destination(id: "10", lat: 10, lon: 10, name: "Stanley Hotel")
-    ]
+    @Published var activeTripLocations: [Destination] = []
     @Published var selectedLocation: LocationModel? {
         willSet {
             if newValue != nil {
