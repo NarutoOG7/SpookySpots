@@ -28,6 +28,8 @@
 		C96A50C127EE2EF600E44B9F /* LocationAnnotationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A50C027EE2EF600E44B9F /* LocationAnnotationModel.swift */; };
 		C96A50C727F14CA600E44B9F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A50C627F14CA600E44B9F /* AppDelegate.swift */; };
 		C96A50C927F16A3E00E44B9F /* GeoFireManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A50C827F16A3E00E44B9F /* GeoFireManager.swift */; };
+		C96BA74D282B2E3A00BEFD3D /* MapForNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */; };
+		C96BA74F282B30A100BEFD3D /* NavigationLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */; };
 		C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */; };
 		C9A8C9F127ED621000116B61 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9F027ED621000116B61 /* ContentView.swift */; };
 		C9A8C9F327ED621000116B61 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9A8C9F227ED621000116B61 /* Assets.xcassets */; };
@@ -124,6 +126,8 @@
 		C96A50C027EE2EF600E44B9F /* LocationAnnotationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationAnnotationModel.swift; sourceTree = "<group>"; };
 		C96A50C627F14CA600E44B9F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C96A50C827F16A3E00E44B9F /* GeoFireManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoFireManager.swift; sourceTree = "<group>"; };
+		C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapForNavigation.swift; sourceTree = "<group>"; };
+		C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationLogic.swift; sourceTree = "<group>"; };
 		C9A8C9EB27ED621000116B61 /* SpookySpots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpookySpots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsApp.swift; sourceTree = "<group>"; };
 		C9A8C9F027ED621000116B61 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -356,6 +360,7 @@
 				C9DC7C122817AC1100E8E71C /* LocationModel.swift */,
 				C9EFD61C281F9B1200B3BFDC /* CDTrip.xcdatamodeld */,
 				C9EFD61F28204E5B00B3BFDC /* FavoritesLogic.swift */,
+				C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -426,6 +431,7 @@
 				C9A8CA5027ED7BE500116B61 /* TripScreen.swift */,
 				C9EFD6242826B4B200B3BFDC /* TripPage.swift */,
 				C9F3F443282A9EEA00D794CE /* NavigationScreen.swift */,
+				C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */,
 			);
 			path = Trip;
 			sourceTree = "<group>";
@@ -781,10 +787,12 @@
 				C9087BE82809AC1D00372502 /* SettingsPage.swift in Sources */,
 				C9A9CEED281ADC8300D4A1F9 /* BorderedCircularButton.swift in Sources */,
 				C9689DD928084AA3001C8FB5 /* CreativeSignInUp.swift in Sources */,
+				C96BA74F282B30A100BEFD3D /* NavigationLogic.swift in Sources */,
 				C9A8CA5E27ED7DA500116B61 /* SearchBar.swift in Sources */,
 				C9A9CEEB2819A08C00D4A1F9 /* LD.swift in Sources */,
 				C9DC7C0D28174F9500E8E71C /* Sources.swift in Sources */,
 				C9689DD72807944A001C8FB5 /* Authorization.swift in Sources */,
+				C96BA74D282B2E3A00BEFD3D /* MapForNavigation.swift in Sources */,
 				C9A8C9F127ED621000116B61 /* ContentView.swift in Sources */,
 				C9DC7C17281828DC00E8E71C /* PagedImageView.swift in Sources */,
 				C9A8CA6D27ED7F5300116B61 /* TripPageVM.swift in Sources */,

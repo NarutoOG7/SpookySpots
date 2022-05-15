@@ -15,42 +15,61 @@ struct TripPage: View {
     @ObservedObject var locationStore = LocationStore.instance
     @EnvironmentObject var tripLogic: TripLogic
     
+    private let map = MapForTrip()
+    
     var body: some View {
         
         ZStack {
             
-            MapForTrip()
+            map
                 .ignoresSafeArea()
             
-            SlideOverCard(position: .bottom, canSlide: $slideCardCanMove, color: .white, handleColor: .black) {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading) {
-                    
-                    HStack {
-                        VStack(alignment: .leading, spacing: 16) {
-                            durationView
-                            distanceView
-                        }
-                        Spacer()
-                        directionsButton
-                            
-                    }
-                    
-                    startEnd
-                            .padding(.vertical)
-                }
-                 destinationList
-                }
-                .padding(.horizontal)
-//                .background(
-//                    RoundedRectangle(cornerRadius: 20)
-//                        .fill(.white)
-//                        .frame(width: UIScreen.main.bounds.width))
-            }
-//            .overlay(editMode == .active ? Color.gray : Color.clear)
-
+            
+            SlideOverCard(position: .bottom,
+                          canSlide: $slideCardCanMove,
+                          color: .white,
+                          handleColor: .black)
+                          { trip }
+                          
         }
+
         .environment(\.editMode, $editMode)
+    }
+    
+    private var trip: some View {
+        let view: AnyView
+        if locationStore.activeTripLocations.isEmpty {
+            view = AnyView(emptyTripView)
+        } else {
+            view = AnyView(tripView)
+        }
+        return view
+    }
+    
+    private var emptyTripView: some View {
+        Text("Add locations to your trip.")
+    }
+    
+    private var tripView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading) {
+            
+            HStack {
+                VStack(alignment: .leading, spacing: 16) {
+                    durationView
+                    distanceView
+                }
+                Spacer()
+                directionsButton
+                    
+            }
+            
+            startEnd
+                    .padding(.vertical)
+        }
+         destinationList
+        }
+        .padding(.horizontal)
     }
     
     private var distanceView: some View {
@@ -126,8 +145,8 @@ struct TripPage: View {
     //MARK: - Buttons/Links
     
     private var directionsButton: some View {
-        Button(action: goOrGetTapped) {
-            Text(tripLogic.tripState.buttonTitleForState)
+        Button(action: directionsTapped) {
+            Text("Get Directions")
                 .padding(10)
         }
         .buttonStyle(.borderedProminent)
@@ -168,29 +187,8 @@ struct TripPage: View {
     
     //MARK: - Methods
     
-    private func goOrGetTapped() {
-        switch tripLogic.tripState {
-        case .creating:
-            tripLogic.addRoutes()
-                tripLogic.tripState = .readyToDirect
-            
-        case .readyToDirect:
-            // Start Directions
-            tripLogic.startDirections()
-            tripLogic.tripState = .directing
-        case .directing:
-            // Pause Directions
-            tripLogic.pauseDirections()
-            tripLogic.tripState = .paused
-        case .paused:
-            // Resume Directions
-            tripLogic.resumeDirections()
-            tripLogic.tripState = .directing
-        case .finished:
-            // End Directions
-            tripLogic.endDirections()
-            tripLogic.tripState = .finished
-        }
+    private func directionsTapped() {
+        tripLogic.startDirections()
     }
     
     private func moveRow(_ source: IndexSet, _ destination: Int) {
@@ -228,6 +226,10 @@ struct TripPage: View {
             self.slideCardCanMove = true
         }
     }
+    
+   
+    
+    
 }
 
 struct TripPage_Previews: PreviewProvider {

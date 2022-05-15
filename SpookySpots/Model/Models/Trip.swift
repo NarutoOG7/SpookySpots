@@ -13,7 +13,7 @@ struct Trip: Equatable, Identifiable {
     
     var id: String
     var userID: String
-    var tripState: TripState
+    var isActive: Bool
     var destinations: [Destination]
     var startLocation: Destination
     var endLocation: Destination
@@ -25,35 +25,16 @@ struct Trip: Equatable, Identifiable {
         
         self.userID = dict["userID"] as? String ?? ""
         
-        self.tripState = .finished
-        let tripStateString = dict["tripState"] as? String ?? ""
+        self.isActive = dict["isActive"] as? Bool ?? false
 
         self.destinations = []
         self.startLocation = Destination(dict: [:])
         self.endLocation = Destination(dict: [:])
         
-        setTripState(tripStateString)
         setDestinations(dict: dict)
         setStartLoc(dict: dict)
         setEndLoc(dict: dict)
 
-    }
-    
-    mutating func setTripState(_ tripStateString: String) {
-        switch tripStateString {
-        case "creating":
-            self.tripState = .creating
-        case "readyToDirect":
-            self.tripState = .readyToDirect
-        case "directing":
-            self.tripState = .directing
-        case "paused":
-            self.tripState = .paused
-        case "finished":
-            self.tripState = .finished
-        default:
-            self.tripState = .finished
-        }
     }
     
     mutating func setDestinations(dict: [String:AnyObject]) {
@@ -88,14 +69,14 @@ struct Trip: Equatable, Identifiable {
     //MARK: - Init from Code
     init(id: String,
          userID: String,
-         tripState: TripState,
+         isActive: Bool,
          destinations: [Destination],
          startLocation: Destination,
          endLocation: Destination) {
         
         self.id = id
         self.userID = userID
-        self.tripState = tripState
+        self.isActive = isActive
         self.destinations = destinations
         self.startLocation = startLocation
         self.endLocation = endLocation
