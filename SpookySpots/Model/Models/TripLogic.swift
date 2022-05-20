@@ -28,8 +28,24 @@ class TripLogic: ObservableObject {
     @Published var trips: [Trip] = []
     @Published var currentTrip: Trip?
     
-    @Published var availableRoutes: [Route] = []
-    @Published var chosenRoutes: [Route] = []
+    @Published var availableRoutes: [Route] = [] {
+        willSet {
+            if let last = newValue.last {
+                let polyline = RoutePolyline(points: last.polyline.points(), count: last.polyline.pointCount)
+                polyline.parentCollectionID = last.collectionID
+                self.inactivePolylines.append(polyline)
+            }
+        }
+    }
+    @Published var chosenRoutes: [Route] = [] {
+        willSet {
+            if let last = newValue.last {
+                let polyline = RoutePolyline(points: last.polyline.points(), count: last.polyline.pointCount)
+                polyline.parentCollectionID = last.collectionID
+                self.activePolylines.append(polyline)
+            }
+        }
+    }
     
     private var distance: Double = 0
     @Published var distanceAsString = "0"
@@ -42,6 +58,9 @@ class TripLogic: ObservableObject {
     
     @Published var mapRegion = MKCoordinateRegion()
     @Published var destAnnotations: [LocationAnnotationModel] = []
+    
+    @Published var activePolylines: [RoutePolyline] = []
+    @Published var inactivePolylines: [RoutePolyline] = []
 
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var locationStore = LocationStore.instance
@@ -173,12 +192,13 @@ class TripLogic: ObservableObject {
                     let lastCLLocation = CLLocation(latitude: last.lat, longitude: last.lon)
                     let lastPlacemark = MKPlacemark(coordinate: lastCLLocation.coordinate)
                     let destPlacemark = MKPlacemark(coordinate: CLLocation(latitude: location.lat, longitude: location.lon).coordinate)
-                    
+
                     getRouteFromPointsAB(a: lastPlacemark, b: destPlacemark)
                     last = location
                 }
             }
         }
+
     }
 
     private func getRouteFromPointsAB(a: MKPlacemark, b: MKPlacemark) {

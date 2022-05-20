@@ -32,7 +32,14 @@ struct TripPage: View {
                           { trip }
                           
         }
-
+        
+        .onChange(of: locationStore.activeTripLocations, perform: { newValue in
+            if newValue == [] {
+                self.editMode = .inactive
+                self.slideCardCanMove = true
+            }
+        })
+        
         .environment(\.editMode, $editMode)
     }
     

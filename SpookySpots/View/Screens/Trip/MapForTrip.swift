@@ -14,9 +14,10 @@ struct MapForTrip: UIViewRepresentable {
     @ObservedObject var userStore = UserStore.instance
     
     @StateObject var tripLogic = TripLogic.instance
+        
+    let mapView = MKMapView()
     
     func makeUIView(context: Context) -> MKMapView {
-        let mapView = MKMapView()
         mapView.setRegion(tripLogic.mapRegion, animated: true)
         mapView.addAnnotations(tripLogic.destAnnotations)
         
@@ -50,22 +51,13 @@ struct MapForTrip: UIViewRepresentable {
             view.removeOverlays(view.overlays)
         }
         
-        for route in tripLogic.availableRoutes {
-            let polyline = RoutePolyline(points: route.rt.polyline.points(), count: route.rt.polyline.pointCount)
-            polyline.status = .inactive
-            polyline.parentCollectionID = route.collectionID
-            
+        for polyline in tripLogic.inactivePolylines {
             let mapRect = polyline.boundingMapRect
             view.setVisibleMapRect(mapRect, edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: true)
             view.addOverlay(polyline)
-            
         }
         
-        for route in tripLogic.chosenRoutes {
-            let polyline = RoutePolyline(points: route.rt.polyline.points(), count: route.rt.polyline.pointCount)
-            polyline.status = .active
-            polyline.parentCollectionID = route.collectionID
-            
+        for polyline in tripLogic.activePolylines {
             let mapRect = polyline.boundingMapRect
             view.setVisibleMapRect(mapRect, edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: true)
             view.addOverlay(polyline)
@@ -113,11 +105,14 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate 
         }
         
         let renderer = MKPolylineRenderer(overlay: overlay)
-        
-        renderer.strokeColor = overlay.status == .active ? UIColor.blue.withAlphaComponent(0.75) : UIColor.blue.withAlphaComponent(0.25)
-        renderer.lineWidth = 5
-        //        renderer.strokeColor = UIColor.red.withAlphaComponent(0.8)
+
+        renderer.strokeColor = polylineIsActive(overlay) ? UIColor.blue.withAlphaComponent(0.75) : UIColor.blue.withAlphaComponent(0.3)
+        renderer.lineWidth = 7
         return renderer
+    }
+    
+    func polylineIsActive(_ polyline: RoutePolyline) -> Bool {
+        tripLogic.activePolylines.contains(where: { $0 == polyline })
     }
     
     @objc func mapTapped(_ tap: TapGestureRecognizer) {
@@ -147,18 +142,27 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate 
                 
                 if Double(nearestDistance) <= maxMeters,
                    let nearestPoly = nearestPoly {
+                                        
                     // PolyLine Touched
                     print("PolyLine Touched")
-                    if nearestPoly.status == .inactive {
+                    
+                    if !polylineIsActive(nearestPoly) {
                         
-                        for route in tripLogic.chosenRoutes {
-                            if route.collectionID == nearestPoly.parentCollectionID {
-                                route.polyline.status = .inactive
+                        DispatchQueue.main.async {
+                            
+                
+                            let activePolys = self.tripLogic.activePolylines.filter({ $0.parentCollectionID == nearestPoly.parentCollectionID })
+                            for poly in activePolys {
+                                self.tripLogic.inactivePolylines.append(poly)
+                                self.tripLogic.activePolylines.removeAll(where: { $0.parentCollectionID == nearestPoly.parentCollectionID })
+                                self.tripLogic.activePolylines.append(nearestPoly)
                             }
+                            
+                            
+                        
+//                            self.parent.mapView.addOverlay(nearestPoly)
+                        
                         }
-                        
-                        nearestPoly.status = .active
-                        
                     }
                 }
             }
@@ -211,15 +215,10 @@ class MapViewDelegate: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate 
 }
 }
 
-class RoutePolyline: MKPolyline {
-    var status: RoutePolylineStatus?
-    var parentCollectionID: String?
-}
-
-enum RoutePolylineStatus {
-    case active, inactive
-}
-
 class TapGestureRecognizer: UITapGestureRecognizer {
     var map: MKMapView?
+}
+
+class RoutePolyline: MKPolyline {
+    var parentCollectionID: String?
 }
