@@ -89,7 +89,7 @@ struct MapViewUI: UIViewRepresentable {
                 annotationView.canShowCallout = false
                 annotationView.clusteringIdentifier = "cluster"
                 annotationView.markerTintColor = .purple
-                annotationView.titleVisibility = .visible
+                annotationView.titleVisibility = .hidden
                 annotationView.glyphText = "👻"
 
                 return annotationView

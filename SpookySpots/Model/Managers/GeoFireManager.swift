@@ -35,7 +35,7 @@ class GeoFireManager: ObservableObject {
             circleQuery.observe(.keyEntered, with: { key, loc in
                 
                 self.firebaseManager.getSelectHotel(key) { locModel in
-                    let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
+                    let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: "👻")
                     
                     if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
                         self.gfNearbyLocations.append(anno)
@@ -62,7 +62,7 @@ class GeoFireManager: ObservableObject {
             
             self.firebaseManager.getSelectHotel(key) { locModel in
                 
-                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key)
+                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: "👻")
                 
                 if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
                     self.gfOnMapLocations.append(anno)
@@ -70,7 +70,7 @@ class GeoFireManager: ObservableObject {
                     if !self.locationStore.onMapLocations.contains(where: { "\($0.location.id)" == key }) {
                         self.locationStore.onMapLocations.append(locModel)
                     }
-                }
+                }   
             }
         })
     }

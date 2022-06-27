@@ -15,6 +15,7 @@
 		C9187F3B280AFB520064627C /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F3A280AFB520064627C /* Account.swift */; };
 		C9187F3D280B07070064627C /* MainLocCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F3C280B07070064627C /* MainLocCell.swift */; };
 		C92C63A7280A81140035C793 /* ProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92C63A6280A81140035C793 /* ProfilePage.swift */; };
+		C936DC992863F51900D10C65 /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC982863F51900D10C65 /* Destination.swift */; };
 		C94046A127F56C97006837D6 /* PagedScrollViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */; };
 		C94046DE27F9210A006837D6 /* LargeImageLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046DD27F9210A006837D6 /* LargeImageLocationView.swift */; };
 		C94046E027F93867006837D6 /* HotelPriceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046DF27F93867006837D6 /* HotelPriceManager.swift */; };
@@ -113,6 +114,7 @@
 		C9187F3A280AFB520064627C /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		C9187F3C280B07070064627C /* MainLocCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLocCell.swift; sourceTree = "<group>"; };
 		C92C63A6280A81140035C793 /* ProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePage.swift; sourceTree = "<group>"; };
+		C936DC982863F51900D10C65 /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedScrollViewModifier.swift; sourceTree = "<group>"; };
 		C94046DD27F9210A006837D6 /* LargeImageLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeImageLocationView.swift; sourceTree = "<group>"; };
 		C94046DF27F93867006837D6 /* HotelPriceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotelPriceManager.swift; sourceTree = "<group>"; };
@@ -395,6 +397,7 @@
 				C96A50C027EE2EF600E44B9F /* LocationAnnotationModel.swift */,
 				C9FC76DA2814EFE3005777AF /* Trip.swift */,
 				C9EFD6262826B98800B3BFDC /* TripLogic.swift */,
+				C936DC982863F51900D10C65 /* Destination.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -803,6 +806,7 @@
 				C9A8CA5127ED7BE500116B61 /* TripScreen.swift in Sources */,
 				C9A8CA6227ED7DDE00116B61 /* SlideOverCard.swift in Sources */,
 				C9A8CA2C27ED784500116B61 /* LocationData.swift in Sources */,
+				C936DC992863F51900D10C65 /* Destination.swift in Sources */,
 				C9A8CA4B27ED7B2300116B61 /* LocationCollection.swift in Sources */,
 				C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */,
 				C9A8CA3627ED793300116B61 /* UserStore.swift in Sources */,

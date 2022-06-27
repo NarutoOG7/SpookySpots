@@ -12,7 +12,7 @@ import SwiftUI
 enum MapDetails {
     static let startingLocation = CLLocation(latitude: 45.677, longitude: -111.0429)
     static let startingLocationName = "Bozeman"
-    static let defaultSpan = MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+    static let defaultSpan = MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
     static let defaultRegion = MKCoordinateRegion(center: startingLocation.coordinate, span: defaultSpan)
 }
 

@@ -9,6 +9,19 @@ import SwiftUI
 import MapKit
 
 class LocationAnnotationModel: NSObject, Identifiable, MKAnnotation {
+
+    var coordinate = CLLocationCoordinate2D()
+    var id: String
+    var title: String?
+    
+    init(coordinate: CLLocationCoordinate2D, locationID: String, title: String) {
+        self.coordinate = coordinate
+        self.id = locationID
+        self.title = title
+    }
+}
+
+class StartAnnotation: NSObject, Identifiable, MKAnnotation {
     
     var coordinate = CLLocationCoordinate2D()
     var id: String
@@ -17,6 +30,19 @@ class LocationAnnotationModel: NSObject, Identifiable, MKAnnotation {
     init(coordinate: CLLocationCoordinate2D, locationID: String) {
         self.coordinate = coordinate
         self.id = locationID
-        self.title = ""
+        self.title = "START"
+    }
+}
+
+class EndAnnotation: NSObject, Identifiable, MKAnnotation {
+    
+    var coordinate = CLLocationCoordinate2D()
+    var id: String
+    var title: String?
+    
+    init(coordinate: CLLocationCoordinate2D, locationID: String) {
+        self.coordinate = coordinate
+        self.id = locationID
+        self.title = "END"
     }
 }
