@@ -5,15 +5,6 @@
 //  Created by Spencer Belton on 5/7/22.
 //
 
-
-/*
-    Selected polyline highlights and dehighlights the inactive ones.
-    Still need to figure out the logic on the get routes.
-    i think it gets routes from all points and redraws them?
-    Maybe there are just enough stacked that it is dark?
-    Try different colors.
- */
-
 import SwiftUI
 import MapKit
 
@@ -38,7 +29,13 @@ class TripLogic: ObservableObject {
     @Published var destinations: [Destination] = [] {
         didSet {
             self.tripRoutes = []
-            self.getRoutes()
+            self.getRoutes { success in
+                if success {
+                    self.getReturnHome { route in
+                        self.tripRoutes.append(route)
+                    }
+                }
+            }
         }
     }
     
@@ -384,15 +381,11 @@ class TripLogic: ObservableObject {
     }
             
 
-    func getRoutes() {
+    func getRoutes(withCompletion completion: @escaping(Bool) -> (Void)) {
         getRoutesForTrip { route in
             self.tripRoutes.append(route)
+            completion(true)
         }
-        self.getReturnHome { route in
-            self.tripRoutes.append(route)
-            print(self.tripRoutes.count)
-        }
-        
     }
             
     
