@@ -6,20 +6,30 @@
 //
 
 import SwiftUI
+import AVFoundation
+
+struct Time {
+    var hours: Int = 0
+    var minutes: Int = 0
+}
 
 struct TripPage: View {
     
     @State var slideCardCanMove = true
     @State private var editMode: EditMode = .inactive
     @State private var isShowingRoutHelper = false
-    @State var isNavigating = false
     @State var isShowingMoreSteps = false
+    
+    @State var totalTripTime: Time = Time()
+    @State var currentRouteTime: Time = Time()
     
     
     @ObservedObject var locationStore = LocationStore.instance
     @EnvironmentObject var tripLogic: TripLogic
     
     private let map = MapForTrip()
+   
+    private let speechSynthesizer = AVSpeechSynthesizer()
     
     var body: some View {
         
@@ -29,9 +39,9 @@ struct TripPage: View {
                 .ignoresSafeArea()
                 .environmentObject(TripLogic.instance)
             
-            if isNavigating {
+            if tripLogic.isNavigating {
                 currentLocationButton
-                navigationHelper
+                routeStepHelper
             } else if tripLogic.routeIsHighlighted {
                 RouteHelper()
             }
@@ -58,21 +68,24 @@ struct TripPage: View {
             .environment(\.editMode, $editMode)
     }
     
-    private var navigationHelper: some View {
-        VStack{
+    private var routeStepHelper: some View {
+        VStack {
             VStack {
                 currentStep
                 if isShowingMoreSteps {
                     allRemainingSteps
+                        .frame(maxHeight: 500)
                 }
+                
             }
-            .background(.thickMaterial)
+            .padding()
+            .background(.ultraThickMaterial)
             .cornerRadius(10)
             .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
             Spacer()
             
         }
-        .padding(.top, 75)
+//        .padding(.top, 75)
     }
     
     private var trip: some View {
@@ -94,9 +107,16 @@ struct TripPage: View {
             VStack(alignment: .leading) {
                 
                 HStack {
+                    if tripLogic.isNavigating {
+                        VStack(alignment: .leading, spacing: 16) {
+                            legDurationView
+                            legDistanceView
+                        }
+                    }
+//                    Divider()
                     VStack(alignment: .leading, spacing: 16) {
-                        durationView
-                        distanceView
+                        totalDurationView
+                        totalDistanceView
                     }
                     Spacer()
                     startTripButton
@@ -111,9 +131,9 @@ struct TripPage: View {
         .padding(.horizontal)
     }
     
-    private var distanceView: some View {
+    private var totalDistanceView: some View {
         HStack(spacing: 16) {
-            Text(tripLogic.distanceAsString)
+            Text(tripLogic.totalTripDistanceAsLocalUnitString)
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("miles")
@@ -123,16 +143,47 @@ struct TripPage: View {
         }
     }
     
-    private var durationView: some View {
+    private var legDistanceView: some View {
+        HStack(spacing: 16) {
+            Text(tripLogic.getSingleRouteDistanceAsString())
+                .font(.avenirNextRegular(size: 23))
+                .fontWeight(.medium)
+            Text("miles")
+                .font(.avenirNextRegular(size: 15))
+                .fontWeight(.bold)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    private var totalDurationView: some View {
         HStack(spacing: 10) {
-            Text(tripLogic.durationHoursString)
+            Text("\(tripLogic.totalTripDurationAsTime.hours)")
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("hr")
                 .font(.avenirNextRegular(size: 15))
                 .fontWeight(.bold)
                 .foregroundColor(.secondary)
-            Text(tripLogic.durationMinutesString)
+            Text("\(tripLogic.totalTripDurationAsTime.minutes)")
+                .font(.avenirNextRegular(size: 23))
+                .fontWeight(.medium)
+            Text("min")
+                .font(.avenirNextRegular(size: 15))
+                .fontWeight(.bold)
+                .foregroundColor(.secondary)
+        }
+    }
+    
+    private var legDurationView: some View {
+        HStack(spacing: 10) {
+            Text("\(tripLogic.currentRouteTravelTime?.hours ?? 0)")
+                .font(.avenirNextRegular(size: 23))
+                .fontWeight(.medium)
+            Text("hr")
+                .font(.avenirNextRegular(size: 15))
+                .fontWeight(.bold)
+                .foregroundColor(.secondary)
+            Text("\(tripLogic.currentRouteTravelTime?.minutes ?? 0)")
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("min")
@@ -189,36 +240,55 @@ struct TripPage: View {
         } label: {
             
             HStack {
-                Image("")
+//                Image("")
                 
-                if let first = tripLogic.tripRoutes.first?.rt.steps.first?.instructions {
-                    if first == "" {
-                        if ((tripLogic.tripRoutes.first?.rt.steps.indices.contains(1)) != nil) {
-                           let second = tripLogic.tripRoutes.first?.rt.steps[1]
-                            Text(second?.instructions ?? "bob")
-                                .frame(height: 50)
-                                .frame(maxWidth: UIScreen.main.bounds.width - 60)
-                                .padding()
-                                .overlay(alignment: .trailing) {
-                                    Image(systemName: isShowingMoreSteps ? "arrow.up" : "arrow.down")
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                        .padding()
-                                }
-                        }
-                    } else {
-                        Text(first)
-                            .frame(height: 50)
-                            .frame(maxWidth: UIScreen.main.bounds.width - 60)
+                let first = tripLogic.steps.first?.instructions
+                
+                Text(tripLogic.directionsLabel)
+                    .frame(height: 75, alignment: .bottom)
+                    .frame(maxWidth: UIScreen.main.bounds.width - 60)
+                    .padding()
+                    .overlay(alignment: .bottomTrailing) {
+                        Image(systemName: isShowingMoreSteps ? "arrow.up" : "arrow.down")
+                            .font(.headline)
+                            .foregroundColor(.primary)
                             .padding()
-                            .overlay(alignment: .trailing) {
-                                Image(systemName: isShowingMoreSteps ? "arrow.up" : "arrow.down")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                    .padding()
-                            }
                     }
-                }
+                
+                    .onAppear {
+                        let speechUtterance = AVSpeechUtterance(string: tripLogic.directionsLabel)
+                            speechSynthesizer.speak(speechUtterance)
+                    }
+    
+                
+//                if let first = tripLogic.tripRoutes.first?.rt.steps.first?.instructions {
+//                    if first == "" {
+//                        if ((tripLogic.tripRoutes.first?.rt.steps.indices.contains(1)) != nil) {
+//                           let second = tripLogic.tripRoutes.first?.rt.steps[1]
+//                            Text(second?.instructions ?? "bob")
+//                                .frame(height: 75, alignment: .bottom)
+//                                .frame(maxWidth: UIScreen.main.bounds.width - 60)
+//                                .padding()
+//                                .overlay(alignment: .bottomTrailing) {
+//                                    Image(systemName: isShowingMoreSteps ? "arrow.up" : "arrow.down")
+//                                        .font(.headline)
+//                                        .foregroundColor(.primary)
+//                                        .padding()
+//                                }
+//                        }
+//                    } else {
+//                        Text(first)
+//                            .frame(height: 75, alignment: .bottom)
+//                            .frame(maxWidth: UIScreen.main.bounds.width - 60)
+//                            .padding()
+//                            .overlay(alignment: .bottomTrailing) {
+//                                Image(systemName: isShowingMoreSteps ? "arrow.up" : "arrow.down")
+//                                    .font(.headline)
+//                                    .foregroundColor(.primary)
+//                                    .padding()
+//                            }
+//                    }
+//                }
 
             }
         }
@@ -232,10 +302,14 @@ struct TripPage: View {
     }
     
     private var allRemainingSteps: some View {
-        List(tripLogic.currentRoute?.rt.steps ?? [], id: \.self) { step in
-            Text(step.instructions)
+        List(tripLogic.steps, id: \.self) { step in
+//        ForEach(tripLogic.steps, id: \.self) { step in
+            if !tripLogic.completedSteps.contains(where: { $0 == step }) {
+                if step.instructions != "" {
+                    Text(step.instructions)
+                }                
+            }
         }
-        .listStyle(.sidebar)
     }
     
     
@@ -243,7 +317,7 @@ struct TripPage: View {
     
     private var startTripButton: some View {
         Button(action: startTripTapped) {
-            Text("Start Trip")
+            Text(tripLogic.isNavigating ? "END" : "Start Trip")
                 .padding(10)
         }
         .buttonStyle(.borderedProminent)
@@ -309,8 +383,12 @@ struct TripPage: View {
     //MARK: - Methods
     
     private func startTripTapped() {
-        isNavigating = true
-        tripLogic.startTrip()
+        if tripLogic.isNavigating {
+            tripLogic.endDirections()
+        } else {
+            tripLogic.startTrip()
+        }
+        tripLogic.isNavigating.toggle()
     }
     
     private func moveRow(_ source: IndexSet, _ destination: Int) {
@@ -355,6 +433,7 @@ struct TripPage: View {
     
     private func currentLocationPressed() {
         // map . set currentLocation Region
+        map.setCurrentLocationRegion()
     }
     
     
@@ -417,7 +496,7 @@ struct RouteHelper: View {
         HStack {
             Image(systemName: "car.fill")
                 .font(.caption)
-            Text(tripLogic.getSingleRouteDurationAsString() ?? "")
+            Text(tripLogic.getHighlightedRouteTravelTimeAsDigitalString() ?? "")
         }
         .padding(.bottom, 2)
     }

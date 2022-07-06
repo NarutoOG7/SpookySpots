@@ -7,12 +7,13 @@
 
 import MapKit
 import SwiftUI
+import AVFAudio
 
 
 enum MapDetails {
     static let startingLocation = CLLocation(latitude: 45.677, longitude: -111.0429)
     static let startingLocationName = "Bozeman"
-    static let defaultSpan = MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10)
+    static let defaultSpan = MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
     static let defaultRegion = MKCoordinateRegion(center: startingLocation.coordinate, span: defaultSpan)
 }
 
@@ -31,7 +32,7 @@ class UserLocationManager: NSObject, ObservableObject {
         if CLLocationManager.locationServicesEnabled() {
             let locManager = CLLocationManager()
             locManager.activityType = .automotiveNavigation
-            locManager.desiredAccuracy = kCLLocationAccuracyBest
+            locManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
             locManager.delegate = self
             self.locationManager = locManager
         } else {
@@ -106,6 +107,38 @@ extension UserLocationManager: CLLocationManagerDelegate {
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         checkLocationAuthorization()
+    }
+    
+    
+    //MARK: - For TurnByTurn Navigation, Geofencing Circle Region
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("ENTERED")
+
+        let tripLogic = TripLogic.instance
+
+//        tripLogic.stepsCounter += 1
+
+        let locale = Locale.current
+        let usesMetric = locale.usesMetricSystem
+        
+//        if tripLogic.stepsCounter < tripLogic.steps.count {
+        if tripLogic.completedSteps.count < tripLogic.steps.count {
+//            let currentStep = tripLogic.steps[tripLogic.stepsCounter]
+            let currentStep = tripLogic.steps[tripLogic.completedSteps.count]
+            
+            let distance = usesMetric ? currentStep.distance : currentStep.distance * 0.000621371
+            let unitSystem = usesMetric ? "meters" : "miles"
+            
+            let message = "In \(distance) \(unitSystem), \(currentStep.instructions)."
+            tripLogic.directionsLabel = message
+        } else {
+            let message = "You have arrived at your destination."
+            tripLogic.directionsLabel = message
+//            tripLogic.stepsCounter = 0
+            tripLogic.completedSteps = []
+
+            locationManager?.monitoredRegions.forEach({ locationManager?.stopMonitoring(for: $0) })
+        }
     }
     
 }

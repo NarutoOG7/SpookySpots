@@ -5,8 +5,45 @@
 //  Created by Spencer Belton on 5/7/22.
 //
 
+
+
+//
+//for i in 0..<first.rt.steps.count {
+//    let step = first.rt.steps[i]
+//    let region = CLCircularRegion(center: step.polyline.coordinate, radius: 20, identifier: "\(i)")
+//    let circle = MKCircle(center: region.center, radius: region.radius)
+//
+//    self.geoFencingCircles.append(circle)
+//
+//    let locale = Locale.current
+//    let usesMetric = locale.usesMetricSystem
+//    let units = usesMetric ? "meters" : "miles"
+//
+//    let firstDST = self.steps[0].distance
+//    let distanceONE = String(format: "%.2f", usesMetric ? firstDST : firstDST * 0.000621371)
+//
+//    let firstEmpty = self.steps[0].instructions == ""
+//
+//    let secondDST = self.steps[1].distance
+//    let distanceTWO = String(format: "%.2f", usesMetric ? secondDST : secondDST * 0.000621371)
+//
+//    let skippedEmptyFirstMessage = "In \(distanceTWO) \(units), \(self.steps[1].instructions)."
+//    let fullMessage = "In \(distanceONE) \(units), \(self.steps[0].instructions). Then, in \(distanceTWO) \(units), \(self.steps[1].instructions)."
+//
+//    let initialMessage = firstEmpty ? skippedEmptyFirstMessage : fullMessage
+//
+//    self.directionsLabel = initialMessage
+//    self.stepsCounter += 1
+//
+//    locManager.startMonitoring(for: region)
+//
+//}
+
+
 import SwiftUI
 import MapKit
+import CoreLocation
+import AVFoundation
 
 enum AlternateRouteState {
     case inactive, showingAll, selected
@@ -34,6 +71,24 @@ class TripLogic: ObservableObject {
                     self.getReturnHome { route in
                         self.tripRoutes.append(route)
                     }
+                    self.steps = self.tripRoutes.first?.rt.steps ?? []
+                    if let firstStep = self.steps.first {
+                        
+                        if firstStep.instructions == "" {
+                            if self.steps.indices.contains(1) {
+                                let secondStep = self.steps[1]
+                                self.directionsLabel = secondStep.instructions
+                                self.completedSteps.append(firstStep)
+                                self.completedSteps.append(secondStep)
+//                                self.stepDistanceString =
+                            }
+                        } else {
+                            self.directionsLabel = firstStep.instructions
+                            self.completedSteps.append(firstStep)
+                        }
+                        
+                    }
+//                    self.directionsLabel = ((firstStep == "") ? secondStep : firstStep) ?? ""
                 }
             }
         }
@@ -54,20 +109,69 @@ class TripLogic: ObservableObject {
                     center = arrayOfCoordinates.center()
                 }
                 self.mapRegion = MKCoordinateRegion(center: center, span: MapDetails.defaultSpan)
-            
             }
         }
         
             didSet {
-                setTotalTripDistance()
-                setTotalTripDuration()
+        setTotalDistance()
+        setTotalTripDuration()
             }
         
     }
     
-    @Published var isNavigating = false
-    @Published var currentRoute: Route?
     
+    @Published var isNavigating = false
+    @Published var currentRoute: Route? {
+        didSet {
+            setHighlightedRouteDistanceAsLocalString()
+            setHighlightedRouteTravelTimeAsTime()
+        }
+    }
+    @Published var currentRouteTravelTime: Time?
+    @Published var currentRouteDistanceString: String?
+    @Published var steps: [MKRoute.Step] = [] {
+        willSet {
+            guard let first = newValue.first else { return }
+            guard let locManager = self.userLocManager.locationManager else { return }
+            locManager.monitoredRegions.forEach({ locManager.stopMonitoring(for: $0) })
+            
+            let region = CLCircularRegion(center: first.polyline.coordinate, radius: 20, identifier: "\(newValue.firstIndex(where: { $0 == first }) )")
+                let circle = MKCircle(center: region.center, radius: region.radius)
+                
+                self.geoFencingCircles.append(circle)
+                
+//                let locale = Locale.current
+//                let usesMetric = locale.usesMetricSystem
+//                let units = usesMetric ? "meters" : "miles"
+//
+//                let firstDST = self.steps[0].distance
+//                let distanceONE = String(format: "%.2f", usesMetric ? firstDST : firstDST * 0.000621371)
+//
+//                let firstEmpty = self.steps[0].instructions == ""
+//
+//                let secondDST = self.steps[1].distance
+//                let distanceTWO = String(format: "%.2f", usesMetric ? secondDST : secondDST * 0.000621371)
+//
+//                let skippedEmptyFirstMessage = "In \(distanceTWO) \(units), \(self.steps[1].instructions)."
+//                let fullMessage = "In \(distanceONE) \(units), \(self.steps[0].instructions). Then, in \(distanceTWO) \(units), \(self.steps[1].instructions)."
+//
+//                let initialMessage = firstEmpty ? skippedEmptyFirstMessage : fullMessage
+//
+//                self.directionsLabel = initialMessage
+//                self.stepsCounter += 1
+//
+                locManager.startMonitoring(for: region)
+            
+        }
+    }
+    @Published var completedSteps: [MKRoute.Step] = []
+    @Published var geoFencingCircles: [MKCircle] = []
+    @Published var directionsLabel = ""
+    @Published var stepDistanceString = ""
+    
+    @Published var totalTripDurationAsTime = Time()
+    @Published var totalTripDistanceAsLocalUnitString = "" 
+        
     @Published var trips: [Trip] = []
     @Published var currentTrip: Trip?
     
@@ -101,6 +205,7 @@ class TripLogic: ObservableObject {
     
     
     @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var userLocManager = UserLocationManager.instance
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var firebaseManager = FirebaseManager.instance
 
@@ -249,6 +354,16 @@ class TripLogic: ObservableObject {
     
     //MARK: - Distance
     
+    func getDistanceAsString() -> String {
+        self.distance = 0
+        for route in self.tripRoutes {
+            let dst = route.rt.distance / 1609.344
+            self.distance += dst
+            return String(format: "%.0f", self.distance)
+        }
+        return ""
+    }
+    
     func getSingleRouteDistanceAsString() -> String {
         if var distance = self.highlightedPolyline?.route?.rt.distance {
             distance /=  1609.344
@@ -257,39 +372,72 @@ class TripLogic: ObservableObject {
         return ""
     }
     
-    func setTotalTripDistance() {
+    func setTotalDistance() {
+        let locale = Locale.current
+        let usesMetric = locale.usesMetricSystem
+        
         self.distance = 0
-        self.distanceAsString = ""
-        for route in self.tripRoutes {
-            let dst = route.rt.distance / 1609.344
-            self.distance += dst
-            self.distanceAsString = String(format: "%.0f", self.distance)
+        
+        for route in tripRoutes {
+            let meters = route.rt.distance
+            let miles = meters * 0.000621371
+            let distance = usesMetric ? meters : miles
+            self.distance += distance
+        }
+        self.totalTripDistanceAsLocalUnitString = String(format: "%.0f", distance)
+    }
+    
+    func setHighlightedRouteDistanceAsLocalString() {
+        let locale = Locale.current
+        let usesMetric = locale.usesMetricSystem
+        
+        if let meters = self.highlightedPolyline?.route?.rt.distance {
+            let miles = meters * 0.000621371
+            let distance = usesMetric ? meters : miles
+            self.currentRouteDistanceString = String(format: "%.0f", distance)
         }
     }
     
+//    func setTotalTripDistance() {
+//        self.distance = 0
+//        self.distanceAsString = ""
+//        for route in self.tripRoutes {
+//            let dst = route.rt.distance / 1609.344
+//            self.distance += dst
+//            self.distanceAsString = String(format: "%.0f", self.distance)
+//        }
+//    }
+//
     
     //MARK: - Duration
     
-    func getSingleRouteDurationAsString() -> String? {
-        if let time = highlightedPolyline?.route?.rt.expectedTravelTime {
-            return formatTime(time: time)
+    func getHighlightedRouteTravelTimeAsDigitalString() -> String? {
+        if let travelTime = highlightedPolyline?.route?.rt.expectedTravelTime {
+                return formatTime(time: travelTime)
         }
         return nil
     }
     
-    func setTotalTripDuration() {
-        self.duration = 0
-        self.durationHoursString = ""
-        for route in self.tripRoutes {
-            self.duration += route.rt.expectedTravelTime
-            let time = secondsToHoursMinutes(duration)
-            self.durationHoursString = "\(time.hours)"
-            self.durationMinutesString = "\(time.minutes)"
+    func setHighlightedRouteTravelTimeAsTime() {
+        if let travelTime = highlightedPolyline?.route?.rt.expectedTravelTime {
+            let time = secondsToHoursMinutes(travelTime)
+            self.currentRouteTravelTime = time
         }
     }
     
-    func secondsToHoursMinutes(_ seconds: Double) -> (hours: Int, minutes: Int) {
-        return (Int(seconds) / 3600, (Int(seconds) % 3600) / 60)
+    func setTotalTripDuration() {
+        self.duration = 0
+        for route in self.tripRoutes {
+            self.duration += route.rt.expectedTravelTime
+            let time = secondsToHoursMinutes(duration)
+            self.totalTripDurationAsTime = time
+        }
+    }
+    
+    func secondsToHoursMinutes(_ seconds: Double) -> Time {
+        let hours = Int(seconds) / 3600
+        let minutes = (Int(seconds) % 3600) / 60
+        return Time(hours: hours, minutes: minutes) 
     }
     
     func formatTime(time: Double) -> String? {
@@ -353,6 +501,7 @@ class TripLogic: ObservableObject {
                 
                 makeDirectionsRequest(start: first, end: destination) { routes in
                     if let first = routes.first {
+                                               
                         completion(first)
             
                     }
@@ -374,7 +523,9 @@ class TripLogic: ObservableObject {
             
             makeDirectionsRequest(start: start, end: end) { routes in
                 if let first = routes.first {
+        
                     completion(first)
+                    
                 }
             }
         }
@@ -393,18 +544,15 @@ class TripLogic: ObservableObject {
         tripRoutes.contains(where: { $0.id == route.id })
     }
     
-    //MARK: - Directions
+    //MARK: - Navigation
     
     func startTrip() {
-        
-        self.isNavigating = true
-        
-        self.currentRoute = tripRoutes.first
-        
+                        
         if let currentLoc = userStore.currentLocation {
             self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         }
 
+        self.currentRoute = self.tripRoutes.first
         self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
         
@@ -419,7 +567,8 @@ class TripLogic: ObservableObject {
     }
     
     func endDirections() {
-        
+        self.highlightedPolyline = nil
+        self.routeIsHighlighted = false
     }
     
 }

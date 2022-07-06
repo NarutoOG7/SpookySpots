@@ -13,7 +13,7 @@ struct MapForTrip: UIViewRepresentable {
     
     @ObservedObject var userStore = UserStore.instance
     
-    @EnvironmentObject var tripLogic: TripLogic                                               
+    @ObservedObject var tripLogic = TripLogic.instance
     
     let mapView = MKMapView()
     
@@ -41,6 +41,7 @@ struct MapForTrip: UIViewRepresentable {
         addPlacemarks(to: mapView)
         addCurrentLocation(to: mapView)
         addAlternateRoutes(to: mapView)
+        addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
     }
     
     func makeCoordinator() -> MapViewDelegate {
@@ -95,6 +96,19 @@ struct MapForTrip: UIViewRepresentable {
         }
     }
     
+    func setCurrentLocationRegion() {
+        if UserLocationManager.instance.locationServEnabled,
+            let currentLoc = UserStore.instance.currentLocation {
+//            mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: true)
+            tripLogic.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        }
+    }
+    
+    func addGeoFenceCirclesForTurnByTurnNavigation(to view: MKMapView) {
+        for circle in tripLogic.geoFencingCircles {
+            view.addOverlay(circle)
+        }
+    }
     
     //MARK: - MapViewDelegate
     
@@ -104,65 +118,71 @@ struct MapForTrip: UIViewRepresentable {
         
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             
-            guard let overlay = overlay as? RoutePolyline else {
-                return MKOverlayRenderer(overlay: overlay)
-            }
-            
-            let isHighlighted = tripLogic.routeIsHighlighted && tripLogic.highlightedPolyline == overlay
-            let noneHighlighted = !tripLogic.routeIsHighlighted
-            
-            let isShowingAlternates = tripLogic.alternatesAreOnBoard()
-            let isAlternate = tripLogic.alternates.contains(where: { $0.polyline == overlay })
-            let isFirstAlt = tripLogic.alternates.first?.polyline == overlay
-            let isSecondAlt = tripLogic.alternates.indices.contains(1) && tripLogic.alternates[1].polyline == overlay
-            let isThirdAlt = tripLogic.alternates.indices.contains(2) && tripLogic.alternates[2].polyline == overlay
-            
-            var color: UIColor = .white
-            var lineWidth: Int = 7
-            
-            if isShowingAlternates && !isAlternate {
-                // make gray
-                color = .gray.withAlphaComponent(0.33)
-            } else if isAlternate {
+            if overlay is RoutePolyline {
                 
-                if isFirstAlt {
-                    // make green
-                    color = .systemGreen
-                } else if isSecondAlt {
-                    // make blue
-                    color = .systemBlue
-                } else if isThirdAlt {
-                    // make yellow
-                    color = .systemYellow
+                guard let overlay = overlay as? RoutePolyline else {
+                    return MKOverlayRenderer(overlay: overlay)
                 }
                 
-//                if tripLogic.selecte
-            
-            } else if !noneHighlighted && !isHighlighted {
-                // make transparent orange
-                color = .systemOrange.withAlphaComponent(0.33)
-            } else if isHighlighted || noneHighlighted && !isShowingAlternates {
-                // make orange
-                color = .systemOrange
+                
+                let isHighlighted = tripLogic.routeIsHighlighted && tripLogic.highlightedPolyline == overlay
+                let noneHighlighted = !tripLogic.routeIsHighlighted
+                
+                let isShowingAlternates = tripLogic.alternatesAreOnBoard()
+                let isAlternate = tripLogic.alternates.contains(where: { $0.polyline == overlay })
+                let isFirstAlt = tripLogic.alternates.first?.polyline == overlay
+                let isSecondAlt = tripLogic.alternates.indices.contains(1) && tripLogic.alternates[1].polyline == overlay
+                let isThirdAlt = tripLogic.alternates.indices.contains(2) && tripLogic.alternates[2].polyline == overlay
+                
+                var color: UIColor = .white
+                var lineWidth: Int = 7
+                
+                if isShowingAlternates && !isAlternate {
+                    // make gray
+                    color = .gray.withAlphaComponent(0.33)
+                } else if isAlternate {
+                    
+                    if isFirstAlt {
+                        // make green
+                        color = .systemGreen
+                    } else if isSecondAlt {
+                        // make blue
+                        color = .systemBlue
+                    } else if isThirdAlt {
+                        // make yellow
+                        color = .systemYellow
+                    }
+                    
+                    //                if tripLogic.selecte
+                    
+                } else if !noneHighlighted && !isHighlighted {
+                    // make transparent orange
+                    color = .systemOrange.withAlphaComponent(0.33)
+                } else if isHighlighted || noneHighlighted && !isShowingAlternates {
+                    // make orange
+                    color = .systemOrange
+                }
+                
+                let renderer = MKPolylineRenderer(overlay: overlay)
+                renderer.lineWidth = 7
+                renderer.strokeColor = UIColor.systemOrange
+                renderer.strokeColor = color
+                
+                
+                
+                return renderer
+                
             }
             
-    
+            if overlay is MKCircle {
+                let renderer = MKCircleRenderer(overlay: overlay)
+                renderer.strokeColor = .red
+                renderer.fillColor = .red
+                renderer.alpha = 0.5
+                return renderer
+            }
             
- 
-            
-
-            
-            
-            
-            
-            let renderer = MKPolylineRenderer(overlay: overlay)
-            renderer.lineWidth = 7
-            renderer.strokeColor = UIColor.systemOrange
-            renderer.strokeColor = color
-            
-            
-            
-            return renderer
+            return MKOverlayRenderer()
         }
         
         
