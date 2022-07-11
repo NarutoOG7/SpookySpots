@@ -91,3 +91,12 @@
 //    //    }
 //    //
 //}
+
+
+import SwiftUI
+
+class TripPageVM: ObservableObject {
+    static let instance = TripPageVM()
+    
+    @Published var isShowingChangeOfStartAndStop = false
+}

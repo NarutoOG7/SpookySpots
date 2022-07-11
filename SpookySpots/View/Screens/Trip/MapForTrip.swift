@@ -39,7 +39,8 @@ struct MapForTrip: UIViewRepresentable {
         }
         addRoute(to: mapView)
         addPlacemarks(to: mapView)
-        addCurrentLocation(to: mapView)
+        addStartAndEndLocations(to: mapView)
+//        addCurrentLocation(to: mapView)
         addAlternateRoutes(to: mapView)
         addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
     }
@@ -64,6 +65,15 @@ struct MapForTrip: UIViewRepresentable {
         if let currentLocation = userStore.currentLocation {
             let startAnno = StartAnnotation(coordinate: currentLocation.coordinate, locationID: "START")
             let endAnno = EndAnnotation(coordinate: currentLocation.coordinate, locationID: "END")
+            view.addAnnotations([startAnno, endAnno])
+        }
+    }
+    
+    func addStartAndEndLocations(to view: MKMapView) {
+        if let start = tripLogic.currentTrip?.startLocation,
+           let end = tripLogic.currentTrip?.endLocation {
+            let startAnno = StartAnnotation(coordinate: CLLocationCoordinate2D(latitude: start.lat, longitude: start.lon), locationID: start.id)
+            let endAnno = EndAnnotation(coordinate: CLLocationCoordinate2D(latitude: end.lat, longitude: end.lon), locationID: end.id)
             view.addAnnotations([startAnno, endAnno])
         }
     }
@@ -125,7 +135,7 @@ struct MapForTrip: UIViewRepresentable {
                 }
                 
                 
-                let isHighlighted = tripLogic.routeIsHighlighted && tripLogic.highlightedPolyline == overlay
+                let isHighlighted = tripLogic.routeIsHighlighted && tripLogic.currentRoute?.polyline == overlay
                 let noneHighlighted = !tripLogic.routeIsHighlighted
                 
                 let isShowingAlternates = tripLogic.alternatesAreOnBoard()
@@ -253,14 +263,20 @@ struct MapForTrip: UIViewRepresentable {
                     
                     if Double(nearestDistance) <= maxMeters,
                        let nearestPoly = nearestPoly {
+                        
                         // PolyLine Touched
                         print("PolyLine Touched")
-                        tripLogic.highlightedPolyline = nearestPoly
-                        tripLogic.routeIsHighlighted = true
                         
                         if tripLogic.alternatesAreOnBoard() {
                             tripLogic.selectedAlternate = nearestPoly.route
+                            
                         }
+                        
+                        tripLogic.routeIsHighlighted = true
+                        tripLogic.currentRoute = nearestPoly.route
+//                        tripLogic.currentRoute = tripLogic.allRoutes.first(where: { $0 == nearestPoly.route })
+//                        tripLogic.currentRoute = tripLogic.tripRoutes.first(where: { $0.polyline == nearestPoly })
+                        
                        
 //                        withAnimation(.easeInOut) {
 //                        DispatchQueue.main.async {
@@ -270,7 +286,7 @@ struct MapForTrip: UIViewRepresentable {
 //                            map.setRegion(coordinateRegion, animated: true)
 //                        }
                     } else {
-                        tripLogic.highlightedPolyline = nil
+                        tripLogic.currentRoute = nil
                         tripLogic.routeIsHighlighted = false
                     }
                 }

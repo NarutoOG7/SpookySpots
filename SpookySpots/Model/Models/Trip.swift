@@ -89,5 +89,8 @@ struct Trip: Equatable, Identifiable {
     
 }
 
-
+enum TripDetails: String {
+    case startingLocationID = "StartID123"
+    case endLocationID = "EndID123"
+}
 

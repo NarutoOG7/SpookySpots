@@ -22,9 +22,9 @@ struct TripPage: View {
     
     @State var totalTripTime: Time = Time()
     @State var currentRouteTime: Time = Time()
-    
-    
+        
     @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var tripPageVM = TripPageVM.instance
     @EnvironmentObject var tripLogic: TripLogic
     
     private let map = MapForTrip()
@@ -32,6 +32,10 @@ struct TripPage: View {
     private let speechSynthesizer = AVSpeechSynthesizer()
     
     var body: some View {
+        
+        if tripPageVM.isShowingChangeOfStartAndStop {
+            ChangeStartAndStop(startInput: "", endInput: "")
+        } else {
         
         ZStack {
             
@@ -66,6 +70,7 @@ struct TripPage: View {
         
         
             .environment(\.editMode, $editMode)
+        }
     }
     
     private var routeStepHelper: some View {
@@ -176,14 +181,16 @@ struct TripPage: View {
     
     private var legDurationView: some View {
         HStack(spacing: 10) {
-            Text("\(tripLogic.currentRouteTravelTime?.hours ?? 0)")
+//            Text("\(tripLogic.currentRouteTravelTime?.hours ?? 0)")
+            Text("\(tripLogic.getHighlightedRouteTravelTimeAsTime()?.hours ?? 0)")
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("hr")
                 .font(.avenirNextRegular(size: 15))
                 .fontWeight(.bold)
                 .foregroundColor(.secondary)
-            Text("\(tripLogic.currentRouteTravelTime?.minutes ?? 0)")
+//            Text("\(tripLogic.currentRouteTravelTime?.minutes ?? 0)")
+            Text("\(tripLogic.getHighlightedRouteTravelTimeAsTime()?.minutes ?? 0)")
                 .font(.avenirNextRegular(size: 23))
                 .fontWeight(.medium)
             Text("min")
@@ -194,7 +201,7 @@ struct TripPage: View {
     }
     
     private var startEnd: some View {
-        VStack(alignment: .trailing) {
+        VStack(alignment: .leading) {
             
             HStack {
                 Text("START:")
@@ -325,26 +332,33 @@ struct TripPage: View {
     
     
     private var startLink: some View {
-        NavigationLink {
-            //            ChangeStartAndStop()
-            LD(location: LocationModel.example)
-        } label: {
-            Text(tripLogic.currentTrip?.startLocation.name ?? "Not Here")
+//        NavigationLink {
+//            ChangeStartAndStop(startInput: "", endInput: "")
+//        } label: {
+//            Text(tripLogic.currentTrip?.startLocation.name ?? "Not Here")
+//        }
+        Button(action: startOrEndLocationTapped) {
+            Text(tripLogic.currentTrip?.startLocation.name ?? "")
         }
     }
     
     private var endLink: some View {
-        NavigationLink {
-            //            ChangeStartAndStop()
-            LD(location: LocationModel.example)
-        } label: {
-            Text(tripLogic.currentTrip?.endLocation.name ?? "Not Here")
+//        NavigationLink {
+//                        ChangeStartAndStop(startInput: "", endInput: "")
+////            LD(location: LocationModel.example)
+//        } label: {
+//            Text(tripLogic.currentTrip?.endLocation.name ?? "Not Here")
+//        }
+        
+        Button(action: startOrEndLocationTapped) {
+            Text(tripLogic.currentTrip?.endLocation.name ?? "")
         }
     }
     
     private var editButton: some View {
         let view: AnyView
-        if locationStore.activeTripLocations == [] {
+        if tripLogic.isNavigating ||
+            locationStore.activeTripLocations == [] {
             view = AnyView(EmptyView())
         } else {
             view = AnyView(Button(action: editTapped) {
@@ -436,6 +450,9 @@ struct TripPage: View {
         map.setCurrentLocationRegion()
     }
     
+    private func startOrEndLocationTapped() {
+        tripPageVM.isShowingChangeOfStartAndStop = true
+    }
     
 }
 

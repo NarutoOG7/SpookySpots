@@ -53,7 +53,7 @@ struct Route: Identifiable, Equatable {
     let id: String
     let rt: MKRoute
     let collectionID: String
-    let polyline: RoutePolyline
+    var polyline: RoutePolyline
     let altPosition: Int
     var tripPosition: Int?
 }
@@ -110,6 +110,7 @@ class TripLogic: ObservableObject {
                 }
                 self.mapRegion = MKCoordinateRegion(center: center, span: MapDetails.defaultSpan)
             }
+            print(newValue.count)
         }
         
             didSet {
@@ -122,9 +123,9 @@ class TripLogic: ObservableObject {
     
     @Published var isNavigating = false
     @Published var currentRoute: Route? {
-        didSet {
+        willSet {
             setHighlightedRouteDistanceAsLocalString()
-            setHighlightedRouteTravelTimeAsTime()
+//            setHighlightedRouteTravelTimeAsTime()
         }
     }
     @Published var currentRouteTravelTime: Time?
@@ -188,7 +189,7 @@ class TripLogic: ObservableObject {
     @Published var destAnnotations: [LocationAnnotationModel] = []
     
     @Published var routeIsHighlighted = false
-    @Published var highlightedPolyline: RoutePolyline?
+//    @Published var highlightedPolyline: RoutePolyline?
     
     @Published var alternates: [Route] = []
     @Published var selectedAlternate: Route? {
@@ -202,6 +203,10 @@ class TripLogic: ObservableObject {
     @Published var altsHaveThird: Bool = false
     @Published var alternateRouteState: AlternateRouteState = .inactive
     
+    @Published var allRoutes: [Route] = []
+    
+    
+    @Published var isShowingSheetForStartOrStop = false
     
     
     @ObservedObject var userStore = UserStore.instance
@@ -259,10 +264,13 @@ class TripLogic: ObservableObject {
     //MARK: - Alternates
     
     func showAlternateRoutes() {
-            if let a = self.highlightedPolyline?.startLocation,
-               let b = self.highlightedPolyline?.endLocation {
+        if let a = self.currentRoute?.polyline.startLocation,
+           let b = self.currentRoute?.polyline.endLocation {
                 self.makeDirectionsRequest(start: a, end: b) { routes in
                     self.alternates = routes
+                    for route in routes {
+                        self.allRoutes.append(route)
+                    }
                 }
                     
             }
@@ -302,7 +310,7 @@ class TripLogic: ObservableObject {
     
     func selectAlternate(_ position: Int) {
         self.selectedAlternate = alternates.first(where: { $0.altPosition == position })
-        self.highlightedPolyline = self.selectedAlternate?.polyline
+        self.currentRoute = self.selectedAlternate
     }
     
     //MARK: - Firebase
@@ -365,7 +373,7 @@ class TripLogic: ObservableObject {
     }
     
     func getSingleRouteDistanceAsString() -> String {
-        if var distance = self.highlightedPolyline?.route?.rt.distance {
+        if var distance = self.currentRoute?.rt.distance {
             distance /=  1609.344
             return String(format: "%.0f", distance)
         }
@@ -391,7 +399,7 @@ class TripLogic: ObservableObject {
         let locale = Locale.current
         let usesMetric = locale.usesMetricSystem
         
-        if let meters = self.highlightedPolyline?.route?.rt.distance {
+        if let meters = self.currentRoute?.rt.distance {
             let miles = meters * 0.000621371
             let distance = usesMetric ? meters : miles
             self.currentRouteDistanceString = String(format: "%.0f", distance)
@@ -412,17 +420,19 @@ class TripLogic: ObservableObject {
     //MARK: - Duration
     
     func getHighlightedRouteTravelTimeAsDigitalString() -> String? {
-        if let travelTime = highlightedPolyline?.route?.rt.expectedTravelTime {
+        if let travelTime = currentRoute?.rt.expectedTravelTime {
                 return formatTime(time: travelTime)
         }
         return nil
     }
     
-    func setHighlightedRouteTravelTimeAsTime() {
-        if let travelTime = highlightedPolyline?.route?.rt.expectedTravelTime {
+    func getHighlightedRouteTravelTimeAsTime() -> Time? {
+        if let travelTime = currentRoute?.rt.expectedTravelTime {
             let time = secondsToHoursMinutes(travelTime)
-            self.currentRouteTravelTime = time
+//            self.currentRouteTravelTime = time
+            return time
         }
+        return nil
     }
     
     func setTotalTripDuration() {
@@ -477,6 +487,7 @@ class TripLogic: ObservableObject {
                             polyline.parentCollectionID = end.id
                             
                             var route = Route(id: UUID().uuidString, rt: rt, collectionID: end.id, polyline: polyline, altPosition: count)
+                            route.polyline = polyline
                             polyline.route = route
         
                             routesToReturn.append(route)
@@ -534,7 +545,10 @@ class TripLogic: ObservableObject {
 
     func getRoutes(withCompletion completion: @escaping(Bool) -> (Void)) {
         getRoutesForTrip { route in
-            self.tripRoutes.append(route)
+            var newRoute = route
+            newRoute.tripPosition = self.tripRoutes.count
+            self.tripRoutes.append(newRoute)
+            self.allRoutes.append(newRoute)
             completion(true)
         }
     }
@@ -552,8 +566,8 @@ class TripLogic: ObservableObject {
             self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         }
 
-        self.currentRoute = self.tripRoutes.first
-        self.highlightedPolyline = self.tripRoutes.first?.polyline
+        self.currentRoute = self.tripRoutes.first(where: { $0.tripPosition == 0 })
+//        self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
         
     }
@@ -567,7 +581,7 @@ class TripLogic: ObservableObject {
     }
     
     func endDirections() {
-        self.highlightedPolyline = nil
+        self.currentRoute = nil
         self.routeIsHighlighted = false
     }
     
