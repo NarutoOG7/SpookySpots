@@ -13,14 +13,16 @@ struct PagingView<Content>: View where Content: View {
 
     @Binding var index: Int
     let maxIndex: Int
+    let totalIndex: Int
     let content: () -> Content
 
     @State private var offset = CGFloat.zero
     @State private var dragging = false
 
-    init(index: Binding<Int>, maxIndex: Int, @ViewBuilder content: @escaping () -> Content) {
+    init(index: Binding<Int>, maxIndex: Int, totalIndex: Int, @ViewBuilder content: @escaping () -> Content) {
         self._index = index
         self.maxIndex = maxIndex
+        self.totalIndex = totalIndex
         self.content = content
     }
 
@@ -53,7 +55,7 @@ struct PagingView<Content>: View where Content: View {
             }
             .clipped()
 
-            PageControl(index: $index, maxIndex: maxIndex)
+            PageControl(index: index, maxIndex: maxIndex, totalIndex: totalIndex)
         }
     }
 
@@ -78,18 +80,40 @@ struct PagingView<Content>: View where Content: View {
 //MARK: - PageControl
 
 struct PageControl: View {
-    @Binding var index: Int
+     var index: Int
      let maxIndex: Int
-
+    let totalIndex: Int
+    
+    private var lowestIndex: Int = 0
+    private var highestIndex: Int = 1
+    
+    var previousIndices: [Int] = []
+    var nextIndices: [Int] = []
+    
+    
+    init(index: Int, maxIndex: Int, totalIndex: Int) {
+        self.index = index
+        self.maxIndex = maxIndex
+        self.totalIndex = totalIndex
+        
+        highestIndex = maxIndex
+    }
+    
      var body: some View {
          HStack {
              Spacer()
              
              HStack(spacing: 8) {
-                 ForEach(0...maxIndex, id: \.self) { index in
-                     Circle()
-                         .fill(index == self.index ? Color.white : Color.gray)
-                         .frame(width: 8, height: 8)
+                 ForEach(0...(totalIndex), id: \.self) { index in
+                     
+                     if Range(lowestIndex...highestIndex).contains(index) {
+                         let isEnd = index == lowestIndex || index == highestIndex
+                             Circle()
+                                 .fill(index == self.index ? Color.white : Color.gray)
+                                 .frame(width: isEnd ? 5 : 8, height: isEnd ? 5 : 8)
+                     }
+                     
+                    
                  }
              }
              .padding(15)
@@ -107,7 +131,7 @@ struct PagedImageView: View {
     var images = ["bannack", "apple", "bannack", "apple"]
 
     var body: some View {
-        PagingView(index: $index, maxIndex: images.count - 1) {
+        PagingView(index: $index, maxIndex: images.count - 1, totalIndex: 3) {
             ForEach(self.images, id: \.self) { imageName in
                 Image(imageName)
                     .resizable()

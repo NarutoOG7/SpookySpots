@@ -7,14 +7,16 @@
 
 import SwiftUI
 //import Firebase
-//import FirebaseFirestore
+import FirebaseFirestore
 //import FirebaseDatabase
 import CoreLocation
 import GeoFire
 import Firebase
+import MapKit
 
 
 class FirebaseManager: ObservableObject {
+    let constantToNeverTouch = FirebaseApp.configure()
     static let instance = FirebaseManager()
     
     //    @ObservedObject var userLocManager = UserLocationManager.instance
@@ -25,39 +27,167 @@ class FirebaseManager: ObservableObject {
     
     @Published var favoriteLocations: [FavoriteLocation] = []
     
+    var db: Firestore?
+    var newTripRef: DocumentReference?
+    
+    init() {
+        let docID = UUID().uuidString
+        db = Firestore.firestore()
+
+        guard let db = db else { return }
+
+        newTripRef = db.collection("Trips").document("LUKE")
+    }
+    
     func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
         
-        let db = Firestore.firestore()
-        
+        guard let db = db else { return }
+
         db.collection("Images")
         
             .whereField("locID", isEqualTo: locID)
         
             .getDocuments() { (querySnapshot, err) in
                 
-            if let err = err {
-                print("Error getting documents: \(err)")
+                if let err = err {
+                    print("Error getting documents: \(err)")
+                } else {
+                    
+                    if let snapshot = querySnapshot {
+                        for document in snapshot.documents {
+                            let dict = document.data()
+                            let image = FSImage(dict: dict)
+                            completion(image)
+                        }
+                    }
+                }
+            }
+    }
+    
+    //MARK: - Trip
+    
+    func saveTrip(_ trip: Trip, asActive: Bool, withCompletion completion: ((Bool) -> ())? = nil) {
+        
+        let userID = userStore.user.id
+        
+        guard let newTripRef = newTripRef else { return }
+
+        newTripRef.setData([
+            "id" : UUID().uuidString,
+            "usserID" : userID,
+            "isActive" : asActive
+        ])
+        
+        for dest in trip.destinations {
+            let tripDestinationsRef = newTripRef.collection("Destinations").document(dest.name)
+            tripDestinationsRef.setData([
+                "id" : dest.id,
+                "lat" : dest.lat,
+                "lon" : dest.lon,
+                "name" : dest.name
+            ])
+        }
+        
+        let tripEndPointsRef = newTripRef.collection("EndPoints")
+        let startRef = tripEndPointsRef.document("Start")
+        startRef.setData([
+            "id" : trip.startLocation.id,
+            "lat" : trip.startLocation.lat,
+            "lon" : trip.startLocation.lon,
+            "name" : trip.startLocation.name
+        ])
+        let endRef = tripEndPointsRef.document("End")
+        endRef.setData([
+            "id" : trip.endLocation.id,
+            "lat" : trip.endLocation.lat,
+            "lon" : trip.endLocation.lon,
+            "name" : trip.endLocation.name
+        ])
+        
+        
+        //        newTripReference.setData([
+        //
+        //            "id" : UUID().uuidString,
+        //            "userID" : userID,
+        //            "isActive" : asActive,
+        //            "destinations" : [
+        //
+        //            ]
+        ////            "startLocation" : startLocation,
+        ////            "endLocation" : endLocation
+        //        ]) { error in
+        //            if let error = error {
+        //                print(error.localizedDescription)
+        //                completion?(false)
+        //            } else {
+        //                completion?(true)
+        //            }
+        //        }
+        //        for dest in trip.destinations {
+        //        do {
+        //            try newTripReference.collection("destinations").document(dest.id).setData(from: dest)
+        //        } catch let error {
+        //            print("Error writing city to Firestore: \(error)")
+        //        }
+        //        }
+    }
+    
+    func saveRoutesToFirestoreFromTrip(_ trip: Trip) {
+        
+        guard let db = db else { return }
+        
+        let tripLogic = TripLogic.instance
+        let userID = userStore.user.id
+//        let newTripRef = db.collection("Trips").document(userID)
+        
+        guard let newTripRef = newTripRef else { return }
+
+        
+        for route in trip.routes {
+            let routesRef = newTripRef.collection("Routes").document("\(route.tripPosition)")
+            let rt = route.rt
+            print(rt.name)
+            
+            routesRef.setData([
+                "id" : route.id,
+                "tripPosition" : route.tripPosition ?? 0,
+                "collectionID" : route.collectionID,
+                "rtName" : rt.name
+            ])
+        }
+    }
+    
+    func getAllTrips() {
+        let tripLogic = TripLogic.instance
+        
+        guard let db = db else { return }
+
+        db.collection("Trips").getDocuments { querySnapshot, error in
+            if let error = error {
+                print("Error getting trip documents: \(error)")
             } else {
-                
                 if let snapshot = querySnapshot {
                     for document in snapshot.documents {
-                        let dict = document.data()
-                        let image = FSImage(dict: dict)
-                        completion(image)
+                        if let dict = document.data() as? [String:AnyObject] {
+                            let key = dict["userID"] as? String ?? ""
+                            
+                            let currentUserID = self.userStore.user.id
+                            
+                            if key == currentUserID {
+                                let trip = Trip(dict: dict)
+                                tripLogic.trips.append(trip)
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-    
-    func addOrSaveTrip(_ trip: Trip) {
-        let db = Firestore.firestore()
         
-//        db.collection("Trips")
-//            .document(trip.id)
-//            .setData([
-//
-//            ])
+        //        db.collection("Trips")
+        //            .document(trip.id)
+        //            .setData([
+        //
+        //            ])
     }
     
     func getSelectHotel(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
@@ -76,7 +206,7 @@ class FirebaseManager: ObservableObject {
                         imageURLS.append(url)
                     }
                 }
-                                
+                
                 let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
                 
                 completion(locModel)
@@ -103,9 +233,9 @@ class FirebaseManager: ObservableObject {
                                 }
                             }
                             
-  
-                                let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
-                                self.locationStore.hauntedHotels.append(locModel)
+                            
+                            let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
+                            self.locationStore.hauntedHotels.append(locModel)
                             
                         }
                     }
@@ -114,20 +244,20 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-//    func isLocationFavorited(_ locData: LocationData, withCompletion completion: @escaping(_ result: Bool) -> Void) {
-//        let db = Firestore.firestore()
-//        db.collection("Favorites")
-//            .whereField("locationID", isEqualTo: locData.id)
-//            .whereField("userID", isEqualTo: UserStore.instance.user.user.id)
-//
-//            .getDocuments { snapshot, error in
-//                if let error = error {
-//                    print(error.localizedDescription)
-//                } else {
-//                    completion(true)
-//                }
-//            }
-//    }
+    //    func isLocationFavorited(_ locData: LocationData, withCompletion completion: @escaping(_ result: Bool) -> Void) {
+    //        let db = Firestore.firestore()
+    //        db.collection("Favorites")
+    //            .whereField("locationID", isEqualTo: locData.id)
+    //            .whereField("userID", isEqualTo: UserStore.instance.user.user.id)
+    //
+    //            .getDocuments { snapshot, error in
+    //                if let error = error {
+    //                    print(error.localizedDescription)
+    //                } else {
+    //                    completion(true)
+    //                }
+    //            }
+    //    }
     
     func getImageURLFromFBPath(_ urlString: String, withCompletion completion: @escaping ((_ url: URL) -> (Void))) {
         
@@ -144,8 +274,8 @@ class FirebaseManager: ObservableObject {
     
     func getTrendingLocations() {
         
-        let db = Firestore.firestore()
-        
+        guard let db = db else { return }
+
         db.collection("Trending").getDocuments() { (querySnapshot, err) in
             if let err = err {
                 print("Error getting documents: \(err)")
@@ -168,7 +298,9 @@ class FirebaseManager: ObservableObject {
     }
     
     func getFavoritesAsIDsOnly(withCompletion completion: @escaping(FavoriteLocation) -> Void) {
-        let db = Firestore.firestore()
+        
+        guard let db = db else { return }
+
         db.collection("Favorites")
             .whereField("userID", isEqualTo: UserStore.instance.user.id)
             .getDocuments { snapshot, error in
@@ -186,13 +318,14 @@ class FirebaseManager: ObservableObject {
                     }
                 }
             }
-
+        
     }
     
     
     func getReviewsForUser(_ user: User, withCompletion completion: @escaping(_ review: ReviewModel) -> Void) {
-        let db = Firestore.firestore()
         
+        guard let db = db else { return }
+
         db.collection("Reviews")
         
             .whereField("userID", isEqualTo: user.id)
@@ -215,8 +348,9 @@ class FirebaseManager: ObservableObject {
     }
     
     func addLocToFavoritesBucket(_ favLoc: FavoriteLocation, withCompletion completion: ((Bool) -> ())? = nil) {
-        let db = Firestore.firestore()
         
+        guard let db = db else { return }
+
         db.collection("Favorites").document(favLoc.id).setData([
             "id" : favLoc.id,
             "locationID" : "\(favLoc.locationID)",
@@ -232,23 +366,24 @@ class FirebaseManager: ObservableObject {
     }
     
     func removeFavoriteFromBucket(_ favLoc: FavoriteLocation, withCompletion completion: ((Bool) -> ())? = nil) {
-        
-        let db = Firestore.firestore()
-        
+                
+        guard let db = db else { return }
+
         db.collection("Favorites").document(favLoc.id)
             .delete() { err in
-            if let err = err {
-                print("Error removing document: \(err)")
-            } else {
-                print("Document successfully removed!")
+                if let err = err {
+                    print("Error removing document: \(err)")
+                } else {
+                    print("Document successfully removed!")
+                }
             }
-        }
     }
     
     //MARK: - Get Trips
     
     func getTripLocationsForUser(withCompletion completion: @escaping(Trip) -> Void) {
-        let db = Firestore.firestore()
+        
+        guard let db = db else { return }
 
         db.collection("Trips")
             .whereField("userID", isEqualTo: UserStore.instance.user.id)
@@ -258,8 +393,8 @@ class FirebaseManager: ObservableObject {
                 } else if let snapshot = snapshot {
                     for doc in snapshot.documents {
                         if let dict = doc.data() as? [String:AnyObject] {
-                        let trip = Trip(dict: dict)
-                        completion(trip)
+                            let trip = Trip(dict: dict)
+                            completion(trip)
                         }
                     }
                 }
@@ -271,7 +406,7 @@ class FirebaseManager: ObservableObject {
     
     func searchForLocationInFullDatabase(text: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         let ref = Database.database().reference().child("Haunted Hotels")
-
+        
         ref.queryStarting(atValue: text)
         ref.queryEnding(atValue: text)
         ref.getData { error, snapshot in
@@ -286,7 +421,7 @@ class FirebaseManager: ObservableObject {
                         imageURLS.append(url)
                     }
                 }
-                                
+                
                 let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
                 
                 completion(locModel)
@@ -365,4 +500,68 @@ extension Image {
         return self
             .resizable()
     }
+}
+
+
+//MARK: Consecutive Sequence /// for allowing points to be able to be used in for loop
+public struct ConsecutiveSequence<T: IteratorProtocol>: IteratorProtocol, Sequence {
+    private var base: T
+    private var index: Int
+    private var previous: T.Element?
+    
+    init(_ base: T) {
+        self.base = base
+        self.index = 0
+    }
+    
+    public typealias Element = (T.Element, T.Element)
+    
+    public mutating func next() -> Element? {
+        guard let first = previous ?? base.next(), let second = base.next() else {
+            return nil
+        }
+        
+        previous = second
+        
+        return (first, second)
+    }
+}
+
+extension Sequence {
+    public func makeConsecutiveIterator() -> ConsecutiveSequence<Self.Iterator> {
+        return ConsecutiveSequence(self.makeIterator())
+    }
+}
+
+
+//MARK: - Decode Data
+
+struct Dict {
+    let key: String
+    let value: Any
+}
+func decodeDataToObject<Dict: Codable>(data : Data?) -> Dict? {
+    
+    if let dt = data {
+        do {
+            
+            return try JSONDecoder().decode(Dict.self, from: dt)
+            
+        }  catch let DecodingError.dataCorrupted(context) {
+            print(context)
+        } catch let DecodingError.keyNotFound(key, context) {
+            print("Key '\(key)' not found:", context.debugDescription)
+            print("codingPath:", context.codingPath)
+        } catch let DecodingError.valueNotFound(value, context) {
+            print("Value '\(value)' not found:", context.debugDescription)
+            print("codingPath:", context.codingPath)
+        } catch let DecodingError.typeMismatch(type, context)  {
+            print("Type '\(type)' mismatch:", context.debugDescription)
+            print("codingPath:", context.codingPath)
+        } catch {
+            print("error: ", error)
+        }
+    }
+    
+    return nil
 }

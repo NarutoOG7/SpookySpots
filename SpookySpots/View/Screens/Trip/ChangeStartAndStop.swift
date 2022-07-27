@@ -104,6 +104,10 @@ struct ChangeStartAndStop: View {
                     CustomTextInputViewWithTextLabel(labelText: "Start", textInput: $startInput, placeholderText: $startPlaceholder, searchForStart: $isEditingStart, searchForEnd: $isEditingEnd)
                     CustomTextInputViewWithTextLabel(labelText: "End", textInput: $endInput, placeholderText: $endPlaceholder, searchForStart: $isEditingStart, searchForEnd: $isEditingEnd)
 
+                    Button(action: currentLocationTapped) {
+                        Text("Current Location")
+                    }
+                    
                     List(localSearchService.locationsList) { location in
                         Button(action: {
                             if isEditingStart {
@@ -156,7 +160,6 @@ struct ChangeStartAndStop: View {
         tripPageVM.isShowingChangeOfStartAndStop = false
     }
 
-
     func addStartAndStopToTrip() {
         let trip = tripLogic.currentTrip
 
@@ -194,7 +197,7 @@ struct ChangeStartAndStop: View {
                 /// user won't know what the fuck is happening
             }
             
-            let newTrip = Trip(id: UUID().uuidString, userID: userStore.user.id, isActive: true, destinations: trip?.destinations ?? [], startLocation: startDest, endLocation: endDest)
+            let newTrip = Trip(id: UUID().uuidString, userID: userStore.user.id, isActive: true, destinations: trip?.destinations ?? [], startLocation: startDest, endLocation: endDest, routes: trip?.routes ?? [])
 //            newTrip.startLocation = newStartingLocation
 //            newTrip.endLocation = newEndingLocation
             tripLogic.currentTrip = newTrip
@@ -203,18 +206,26 @@ struct ChangeStartAndStop: View {
             let newStartAnno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: startDest.lat, longitude: startDest.lon), locationID: startDest.id, title: startDest.name)
             let newEndAnno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: endDest.lat, longitude: endDest.lon), locationID: endDest.id, title: endDest.name)
             
-            tripLogic.destAnnotations = []
-            tripLogic.destAnnotations.append(newStartAnno)
-            for dest in newTrip.destinations {
-                let anno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: dest.lat, longitude: dest.lon), locationID: dest.id, title: dest.name)
-                tripLogic.destAnnotations.append(anno)
-            }
-            tripLogic.destAnnotations.append(newEndAnno)
-            
+//            tripLogic.destAnnotations = []
+//            tripLogic.destAnnotations.append(newStartAnno)
+//            for dest in newTrip.destinations {
+//                let anno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: dest.lat, longitude: dest.lon), locationID: dest.id, title: dest.name)
+//                tripLogic.destAnnotations.append(anno)
+//            }
+//            tripLogic.destAnnotations.append(newEndAnno)
+//            
             tripLogic.isShowingSheetForStartOrStop = false
             tripPageVM.isShowingChangeOfStartAndStop = false
         } else {
             cancel()
+        }
+    }
+    
+    func currentLocationTapped() {
+        if isEditingStart {
+            startInput = "Current Location"
+        } else {
+            endInput = "Current Location"
         }
     }
     

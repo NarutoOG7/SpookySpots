@@ -116,29 +116,51 @@ extension UserLocationManager: CLLocationManagerDelegate {
 
         let tripLogic = TripLogic.instance
 
-//        tripLogic.stepsCounter += 1
+//      //  tripLogic.stepsCounter += 1
 
-        let locale = Locale.current
-        let usesMetric = locale.usesMetricSystem
+//        let locale = Locale.current
+//        let usesMetric = locale.usesMetricSystem
         
-//        if tripLogic.stepsCounter < tripLogic.steps.count {
+//    //    if tripLogic.stepsCounter < tripLogic.steps.count {
         if tripLogic.completedSteps.count < tripLogic.steps.count {
-//            let currentStep = tripLogic.steps[tripLogic.stepsCounter]
+//   //         let currentStep = tripLogic.steps[tripLogic.stepsCounter]
             let currentStep = tripLogic.steps[tripLogic.completedSteps.count]
             
-            let distance = usesMetric ? currentStep.distance : currentStep.distance * 0.000621371
-            let unitSystem = usesMetric ? "meters" : "miles"
-            
-            let message = "In \(distance) \(unitSystem), \(currentStep.instructions)."
-            tripLogic.directionsLabel = message
+            tripLogic.completedSteps.append(currentStep)
+//            let distance = usesMetric ? currentStep.distance : currentStep.distance * 0.000621371
+//            let unitSystem = usesMetric ? "meters" : "miles"
+//            
+//            let message = "In \(distance) \(unitSystem), \(currentStep.instructions)."
+   ////         tripLogic.instructions.append(message)
+////          tripLogic.directionsLabel = message
         } else {
             let message = "You have arrived at your destination."
-            tripLogic.directionsLabel = message
-//            tripLogic.stepsCounter = 0
+//            tripLogic.directionsLabel = message
+////            tripLogic.stepsCounter = 0
             tripLogic.completedSteps = []
 
             locationManager?.monitoredRegions.forEach({ locationManager?.stopMonitoring(for: $0) })
         }
+    }
+    
+    
+}
+
+extension MKRoute.Step {
+    
+    func getAsLocalStringAsTwoParts(_ currentStep: MKRoute.Step) -> (String,String) {
+        let locale = Locale.current
+        let usesMetric = locale.usesMetricSystem
+        
+        let distance = usesMetric ? currentStep.distance : currentStep.distance * 0.000621371
+        let unitSystem = usesMetric ? "meters" : "miles"
+        
+        let stringDistance = String(format: "%.2f", distance)
+        
+        let first = "In \(stringDistance) \(unitSystem),"
+        let second = currentStep.instructions + "."
+
+        return (first, second)
     }
     
 }

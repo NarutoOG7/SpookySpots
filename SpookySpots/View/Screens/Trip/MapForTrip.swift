@@ -15,9 +15,9 @@ struct MapForTrip: UIViewRepresentable {
     
     @ObservedObject var tripLogic = TripLogic.instance
     
-    let mapView = MKMapView()
     
     func makeUIView(context: Context) -> MKMapView {
+        let mapView = tripLogic.mapView
         if tripLogic.isNavigating {
             mapView.setRegion(tripLogic.mapRegion, animated: true)
         }
@@ -34,6 +34,7 @@ struct MapForTrip: UIViewRepresentable {
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
+        mapView.removeAnnotations(mapView.annotations)
         if tripLogic.isNavigating {
             mapView.setRegion(tripLogic.mapRegion, animated: true)
         }
@@ -79,6 +80,7 @@ struct MapForTrip: UIViewRepresentable {
     }
     
     func addPlacemarks(to view: MKMapView) {
+        print(tripLogic.currentTrip?.destinations)
         if let trip = tripLogic.currentTrip {
             for destination in trip.destinations {
                 if let index = trip.destinations.firstIndex(where: { $0.id == destination.id }) {
@@ -91,7 +93,7 @@ struct MapForTrip: UIViewRepresentable {
     }
     
     func addActivePolylines(to view: MKMapView) {
-        for route in tripLogic.tripRoutes {
+        for route in tripLogic.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 }) {
             let polyline = route.polyline            
 //            view.setVisibleMapRect(mapRect, edgePadding: UIEdgeInsets(top: ®10, left: 10, bottom: 10, right: 10), animated: true)
             view.addOverlay(polyline)
@@ -186,12 +188,12 @@ struct MapForTrip: UIViewRepresentable {
             
             if overlay is MKCircle {
                 let renderer = MKCircleRenderer(overlay: overlay)
-                renderer.strokeColor = .red
-                renderer.fillColor = .red
-                renderer.alpha = 0.5
+                renderer.strokeColor = .clear
+                renderer.fillColor = .clear
+//                renderer.alpha = 0.5
                 return renderer
             }
-            
+
             return MKOverlayRenderer()
         }
         

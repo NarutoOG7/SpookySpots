@@ -20,6 +20,8 @@ struct TripPage: View {
     @State private var isShowingRoutHelper = false
     @State var isShowingMoreSteps = false
     
+    @State var stepIndex = 0
+    
     @State var totalTripTime: Time = Time()
     @State var currentRouteTime: Time = Time()
         
@@ -29,7 +31,6 @@ struct TripPage: View {
     
     private let map = MapForTrip()
    
-    private let speechSynthesizer = AVSpeechSynthesizer()
     
     var body: some View {
         
@@ -45,7 +46,11 @@ struct TripPage: View {
             
             if tripLogic.isNavigating {
                 currentLocationButton
+//                    currentStep
                 routeStepHelper
+
+               
+                
             } else if tripLogic.routeIsHighlighted {
                 RouteHelper()
             }
@@ -84,7 +89,7 @@ struct TripPage: View {
                 
             }
             .padding()
-            .background(.ultraThickMaterial)
+            .background(.black)
             .cornerRadius(10)
             .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
             Spacer()
@@ -112,22 +117,30 @@ struct TripPage: View {
             VStack(alignment: .leading) {
                 
                 HStack {
-                    if tripLogic.isNavigating {
                         VStack(alignment: .leading, spacing: 16) {
-                            legDurationView
-                            legDistanceView
+                            if tripLogic.isNavigating {
+                            Text(tripLogic.currentRoute?.polyline.endLocation?.name ?? "")
+                                .font(.headline)
+                            HStack {
+                                legDurationView
+                                legDistanceView
+                            }
                         }
+                            VStack(alignment: .leading, spacing: 16) {
+                                totalDurationView
+                                totalDistanceView
+                            }
+                            
                     }
+                    
 //                    Divider()
-                    VStack(alignment: .leading, spacing: 16) {
-                        totalDurationView
-                        totalDistanceView
-                    }
+    
                     Spacer()
                     startTripButton
                     
                 }
                 
+
                 startEnd
                     .padding(.vertical)
             }
@@ -209,6 +222,7 @@ struct TripPage: View {
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 startLink
+                    .disabled(tripLogic.isNavigating)
             }
             
             HStack {
@@ -217,6 +231,7 @@ struct TripPage: View {
                     .fontWeight(.bold)
                     .foregroundColor(.secondary)
                 endLink
+                    .disabled(tripLogic.isNavigating)
             }
         }
     }
@@ -238,36 +253,68 @@ struct TripPage: View {
             
         }
     }
+//
+//    private var currentStep: some View {
+//
+//        VStack {
+//            ZStack {
+//                Rectangle().fill(.black)
+//
+//                let filteredSteps = tripLogic.steps.filter({ $0.instructions != "" })
+//
+//                PagingView(index: $stepIndex, maxIndex: 7, totalIndex: filteredSteps.count) {
+//                    ForEach(filteredSteps, id: \.self) { step in
+//
+//                        if step.instructions != "" {
+//                            HStack {
+////                                Spacer()
+//                            VStack(alignment: .leading) {
+//                                Text(step.getAsLocalStringAsTwoParts(step).0)
+//                                    .foregroundColor(.white)
+//                                    .font(.title)
+//
+//                                Text(step.getAsLocalStringAsTwoParts(step).1)
+//                                    .foregroundColor(.white)
+//                                    .font(.headline)
+//
+//                            }
+//                            .padding(.horizontal, 20)
+////                                Spacer()
+//                            }
+//                        }
+//                    }
+//                }.frame(height: 170)
+//
+//            }
+//            .frame(height: 185)
+//
+//            Spacer()
+//        }
+//    }
     
     private var currentStep: some View {
-        
+
         Button {
             self.isShowingMoreSteps.toggle()
-            
+
         } label: {
-            
+
             HStack {
 //                Image("")
-                
-                let first = tripLogic.steps.first?.instructions
-                
-                Text(tripLogic.directionsLabel)
-                    .frame(height: 75, alignment: .bottom)
-                    .frame(maxWidth: UIScreen.main.bounds.width - 60)
-                    .padding()
-                    .overlay(alignment: .bottomTrailing) {
-                        Image(systemName: isShowingMoreSteps ? "arrow.up" : "arrow.down")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                            .padding()
+
+                if let first = tripLogic.steps.first {
+                    if first.instructions == "" {
+                        if let second = tripLogic.steps[1] {
+                            DirectionsLabel(txt: second.instructions, isShowingMore: $isShowingMoreSteps)
+                        }
+                    } else {
+                        DirectionsLabel(txt: first.instructions , isShowingMore: $isShowingMoreSteps)
                     }
+                }
+
                 
-                    .onAppear {
-                        let speechUtterance = AVSpeechUtterance(string: tripLogic.directionsLabel)
-                            speechSynthesizer.speak(speechUtterance)
-                    }
-    
-                
+
+
 //                if let first = tripLogic.tripRoutes.first?.rt.steps.first?.instructions {
 //                    if first == "" {
 //                        if ((tripLogic.tripRoutes.first?.rt.steps.indices.contains(1)) != nil) {
@@ -310,13 +357,20 @@ struct TripPage: View {
     
     private var allRemainingSteps: some View {
         List(tripLogic.steps, id: \.self) { step in
+        
+
 //        ForEach(tripLogic.steps, id: \.self) { step in
+//            VStack(alignment: .leading) {
             if !tripLogic.completedSteps.contains(where: { $0 == step }) {
                 if step.instructions != "" {
                     Text(step.instructions)
-                }                
+                        .foregroundColor(.white)
+                        .listRowBackground(Color.clear)
+//                }
+            }
             }
         }
+            
     }
     
     
@@ -337,9 +391,13 @@ struct TripPage: View {
 //        } label: {
 //            Text(tripLogic.currentTrip?.startLocation.name ?? "Not Here")
 //        }
+        
         Button(action: startOrEndLocationTapped) {
             Text(tripLogic.currentTrip?.startLocation.name ?? "")
+                .disabled(tripLogic.isNavigating)
+
         }
+        
     }
     
     private var endLink: some View {
@@ -349,10 +407,10 @@ struct TripPage: View {
 //        } label: {
 //            Text(tripLogic.currentTrip?.endLocation.name ?? "Not Here")
 //        }
-        
         Button(action: startOrEndLocationTapped) {
             Text(tripLogic.currentTrip?.endLocation.name ?? "")
         }
+        
     }
     
     private var editButton: some View {
@@ -406,28 +464,38 @@ struct TripPage: View {
     }
     
     private func moveRow(_ source: IndexSet, _ destination: Int) {
-        if var trip = tripLogic.currentTrip {
-            if trip.destinations.indices.contains(destination) {
-                trip.destinations.move(fromOffsets: source, toOffset: destination)
-            }
-        }
         locationStore.activeTripLocations.move(fromOffsets: source, toOffset: destination)
+//        if var trip = tripLogic.currentTrip {
+////            if trip.destinations.indices.contains(source.) {
+//                trip.destinations.move(fromOffsets: source, toOffset: destination)
+//            print(trip.destinations)
+////            }
+//        }
+        var destinations = tripLogic.currentTrip?.destinations
+        destinations?.move(fromOffsets: source, toOffset: destination)
+        if let oldTrip = tripLogic.currentTrip {
+            let newTrip = Trip(id: oldTrip.id, userID: oldTrip.userID, isActive: oldTrip.isActive, destinations: destinations ?? [], startLocation: oldTrip.startLocation, endLocation: oldTrip.endLocation, routes: oldTrip.routes)
+            tripLogic.currentTrip = newTrip
+        }
         tripLogic.destinations.move(fromOffsets: source, toOffset: destination)
+
         
         editMode = .active
     }
     
     private func deleteRow(_ source: IndexSet) {
         if let row = source.last {
-            if var trip = tripLogic.currentTrip {
-                if trip.destinations.indices.contains(row) {
-                    trip.destinations.remove(at: row )
-                }
-            }
-            if tripLogic.destinations.indices.contains(row) {
-                tripLogic.destinations.remove(at: row)
-            }
-            locationStore.activeTripLocations.remove(at: row)
+//            if var trip = tripLogic.currentTrip {
+//                if trip.destinations.indices.contains(row) {
+//                    trip.destinations.remove(at: row )
+//                }
+//            }
+            tripLogic.removeDestination(atIndex: row)
+//            
+//            if tripLogic.destinations.indices.contains(row) {
+//                tripLogic.destinations.remove(at: row)
+//            }
+//            locationStore.activeTripLocations.remove(at: row)
         }
     }
     
@@ -596,3 +664,32 @@ struct ColorBar: View {
 }
 
 
+struct DirectionsLabel: View {
+    
+    let txt: String
+    
+    @Binding var isShowingMore: Bool
+    
+    private let speechSynthesizer = AVSpeechSynthesizer()
+    
+    var body: some View {
+        
+        Text(txt)
+            .foregroundColor(.white)
+            .frame(height: 75, alignment: .bottom)
+            .frame(maxWidth: UIScreen.main.bounds.width - 60)
+            .padding()
+            .overlay(alignment: .bottomTrailing) {
+                Image(systemName: isShowingMore ? "arrow.up" : "arrow.down")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding()
+            }
+        
+
+            .onAppear {
+                let speechUtterance = AVSpeechUtterance(string: txt)
+                    speechSynthesizer.speak(speechUtterance)
+            }
+    }
+}

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Destination: Equatable, Identifiable {
+struct Destination: Codable, Equatable, Identifiable {
     var id: String
     var lat: Double
     var lon: Double

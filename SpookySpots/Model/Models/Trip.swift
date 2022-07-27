@@ -17,6 +17,7 @@ struct Trip: Equatable, Identifiable {
     var destinations: [Destination]
     var startLocation: Destination
     var endLocation: Destination
+    var routes: [Route]
     
     //MARK: - Init from Firebase
     init(dict: [String:AnyObject]) {
@@ -30,11 +31,12 @@ struct Trip: Equatable, Identifiable {
         self.destinations = []
         self.startLocation = Destination(dict: [:])
         self.endLocation = Destination(dict: [:])
+        self.routes = []
         
         setDestinations(dict: dict)
         setStartLoc(dict: dict)
         setEndLoc(dict: dict)
-
+        setRoutes(dict: dict)
     }
     
     mutating func setDestinations(dict: [String:AnyObject]) {
@@ -66,13 +68,23 @@ struct Trip: Equatable, Identifiable {
         }
     }
     
+    mutating func setRoutes(dict: [String:AnyObject]) {
+        if let routes = dict["routes"] as? [[String:AnyObject]] {
+            for route in routes {
+                let rt = Route(dict: route)
+                self.routes.append(rt)
+            }
+        }
+    }
+    
     //MARK: - Init from Code
     init(id: String,
          userID: String,
          isActive: Bool,
          destinations: [Destination],
          startLocation: Destination,
-         endLocation: Destination) {
+         endLocation: Destination,
+         routes: [Route]) {
         
         self.id = id
         self.userID = userID
@@ -80,6 +92,7 @@ struct Trip: Equatable, Identifiable {
         self.destinations = destinations
         self.startLocation = startLocation
         self.endLocation = endLocation
+        self.routes = routes
     }
     
     //MARK: - Equatable

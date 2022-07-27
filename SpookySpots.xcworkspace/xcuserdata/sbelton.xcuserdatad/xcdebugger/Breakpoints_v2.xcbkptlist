@@ -30,8 +30,8 @@
             filePath = "SpookySpots/Model/Models/TripLogic.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "570"
-            endingLineNumber = "570"
+            startingLineNumber = "607"
+            endingLineNumber = "607"
             landmarkName = "startTrip()"
             landmarkType = "7">
          </BreakpointContent>

@@ -18,7 +18,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     @ObservedObject var userStore = UserStore.instance
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-            FirebaseApp.configure()
+//            FirebaseApp.configure()
         Database.database().isPersistenceEnabled = true
 
         locationManager.checkIfLocationServicesIsEnabled()

@@ -16,8 +16,19 @@ struct Favorites: View {
     }
     
     var locationsList: some View {
-        List(locationStore.favoriteLocations) { location in
-            LargeImageLocationView(location: location)
+        VStack {
+            ScrollView(showsIndicators: false) {
+                ForEach(locationStore.favoriteLocations) { location in
+                    NavigationLink {
+                        LD(location: location)
+                    } label: {
+                        LargeImageLocationView(location: location)
+                    }
+
+                }
+                
+            }
+            
         }
     }
 }
