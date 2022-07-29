@@ -17,7 +17,6 @@
 		C92C63A7280A81140035C793 /* ProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92C63A6280A81140035C793 /* ProfilePage.swift */; };
 		C936DC992863F51900D10C65 /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC982863F51900D10C65 /* Destination.swift */; };
 		C936DC9D288EF48C00D10C65 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC9C288EF48A00D10C65 /* Route.swift */; };
-		C936DCA02890A2AE00D10C65 /* LaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC9F2890A2AE00D10C65 /* LaunchScreen.swift */; };
 		C94046A127F56C97006837D6 /* PagedScrollViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */; };
 		C94046DE27F9210A006837D6 /* LargeImageLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046DD27F9210A006837D6 /* LargeImageLocationView.swift */; };
 		C94046E027F93867006837D6 /* HotelPriceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046DF27F93867006837D6 /* HotelPriceManager.swift */; };
@@ -33,6 +32,7 @@
 		C96A50C927F16A3E00E44B9F /* GeoFireManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A50C827F16A3E00E44B9F /* GeoFireManager.swift */; };
 		C96BA74D282B2E3A00BEFD3D /* MapForNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */; };
 		C96BA74F282B30A100BEFD3D /* NavigationLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */; };
+		C99EA13328917F6D00882A45 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C99EA13228917F6D00882A45 /* LaunchScreen.storyboard */; };
 		C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */; };
 		C9A8C9F127ED621000116B61 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9F027ED621000116B61 /* ContentView.swift */; };
 		C9A8C9F327ED621000116B61 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9A8C9F227ED621000116B61 /* Assets.xcassets */; };
@@ -76,7 +76,7 @@
 		C9DC7C0F2817A09100E8E71C /* FullImageDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9DC7C0E2817A09100E8E71C /* FullImageDisplay.swift */; };
 		C9DC7C132817AC1100E8E71C /* LocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9DC7C122817AC1100E8E71C /* LocationModel.swift */; };
 		C9DC7C17281828DC00E8E71C /* PagedImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9DC7C16281828DC00E8E71C /* PagedImageView.swift */; };
-		C9EFD61E281F9B1200B3BFDC /* CDTrip.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD61C281F9B1200B3BFDC /* CDTrip.xcdatamodeld */; };
+		C9EFD61E281F9B1200B3BFDC /* SSCoreData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD61C281F9B1200B3BFDC /* SSCoreData.xcdatamodeld */; };
 		C9EFD62028204E5B00B3BFDC /* FavoritesLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD61F28204E5B00B3BFDC /* FavoritesLogic.swift */; };
 		C9EFD6252826B4B200B3BFDC /* TripPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD6242826B4B200B3BFDC /* TripPage.swift */; };
 		C9EFD6272826B98800B3BFDC /* TripLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EFD6262826B98800B3BFDC /* TripLogic.swift */; };
@@ -118,7 +118,6 @@
 		C92C63A6280A81140035C793 /* ProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePage.swift; sourceTree = "<group>"; };
 		C936DC982863F51900D10C65 /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		C936DC9C288EF48A00D10C65 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
-		C936DC9F2890A2AE00D10C65 /* LaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreen.swift; sourceTree = "<group>"; };
 		C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedScrollViewModifier.swift; sourceTree = "<group>"; };
 		C94046DD27F9210A006837D6 /* LargeImageLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeImageLocationView.swift; sourceTree = "<group>"; };
 		C94046DF27F93867006837D6 /* HotelPriceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotelPriceManager.swift; sourceTree = "<group>"; };
@@ -134,6 +133,7 @@
 		C96A50C827F16A3E00E44B9F /* GeoFireManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoFireManager.swift; sourceTree = "<group>"; };
 		C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapForNavigation.swift; sourceTree = "<group>"; };
 		C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationLogic.swift; sourceTree = "<group>"; };
+		C99EA13228917F6D00882A45 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C9A8C9EB27ED621000116B61 /* SpookySpots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpookySpots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsApp.swift; sourceTree = "<group>"; };
 		C9A8C9F027ED621000116B61 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -250,7 +250,7 @@
 		C936DC9E2890A29300D10C65 /* Launch */ = {
 			isa = PBXGroup;
 			children = (
-				C936DC9F2890A2AE00D10C65 /* LaunchScreen.swift */,
+				C99EA13228917F6D00882A45 /* LaunchScreen.storyboard */,
 			);
 			path = Launch;
 			sourceTree = "<group>";
@@ -372,7 +372,7 @@
 				C9A8CA2A27ED782B00116B61 /* Models */,
 				C9A8CA2927ED782500116B61 /* Stores */,
 				C9DC7C122817AC1100E8E71C /* LocationModel.swift */,
-				C9EFD61C281F9B1200B3BFDC /* CDTrip.xcdatamodeld */,
+				C9EFD61C281F9B1200B3BFDC /* SSCoreData.xcdatamodeld */,
 				C9EFD61F28204E5B00B3BFDC /* FavoritesLogic.swift */,
 				C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */,
 			);
@@ -657,6 +657,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C9A8C9F627ED621000116B61 /* Preview Assets.xcassets in Resources */,
+				C99EA13328917F6D00882A45 /* LaunchScreen.storyboard in Resources */,
 				C9A8C9F327ED621000116B61 /* Assets.xcassets in Resources */,
 				C9A8CA7227ED826500116B61 /* GoogleService-Info.plist in Resources */,
 			);
@@ -789,7 +790,7 @@
 				C9A8CA4927ED7B0B00116B61 /* ExploreByList.swift in Sources */,
 				C9FC76DB2814EFE3005777AF /* Trip.swift in Sources */,
 				C9187F39280A8C550064627C /* Favorites.swift in Sources */,
-				C9EFD61E281F9B1200B3BFDC /* CDTrip.xcdatamodeld in Sources */,
+				C9EFD61E281F9B1200B3BFDC /* SSCoreData.xcdatamodeld in Sources */,
 				C94046E227F9469B006837D6 /* HotelPriceData.swift in Sources */,
 				C9DC7C132817AC1100E8E71C /* LocationModel.swift in Sources */,
 				C9A9CEF0281BA03800D4A1F9 /* Custom Fonts.swift in Sources */,
@@ -826,7 +827,6 @@
 				C9A8CA3627ED793300116B61 /* UserStore.swift in Sources */,
 				C9A8CA3C27ED79D100116B61 /* LocalSearchService.swift in Sources */,
 				C94046DE27F9210A006837D6 /* LargeImageLocationView.swift in Sources */,
-				C936DCA02890A2AE00D10C65 /* LaunchScreen.swift in Sources */,
 				C9A8CA6727ED7EA400116B61 /* CircularButton.swift in Sources */,
 				C9A8CA6927ED7F1000116B61 /* ExploreViewModel.swift in Sources */,
 				C9FC76D728149AA1005777AF /* Constants.swift in Sources */,
@@ -1018,7 +1018,6 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show you nearby spooky spots.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1052,7 +1051,6 @@
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show you nearby spooky spots.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1210,13 +1208,13 @@
 /* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
-		C9EFD61C281F9B1200B3BFDC /* CDTrip.xcdatamodeld */ = {
+		C9EFD61C281F9B1200B3BFDC /* SSCoreData.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
 				C9EFD61D281F9B1200B3BFDC /* CDTrip.xcdatamodel */,
 			);
 			currentVersion = C9EFD61D281F9B1200B3BFDC /* CDTrip.xcdatamodel */;
-			path = CDTrip.xcdatamodeld;
+			path = SSCoreData.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

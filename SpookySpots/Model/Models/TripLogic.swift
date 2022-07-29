@@ -66,25 +66,15 @@ class TripLogic: ObservableObject {
     
     @Published var tripRoutes: [Route] = [] {
         willSet {
-            if let last = newValue.last {
-                
-                var arrayOfCoordinates: [CLLocationCoordinate2D] = []
-                for dest in self.destinations {
-                    arrayOfCoordinates.append(CLLocationCoordinate2D(latitude: dest.lat, longitude: dest.lon))
-                }
-                var center = CLLocationCoordinate2D()
-                if arrayOfCoordinates.isEmpty {
-                    center = MapDetails.startingLocation.coordinate
-                } else {
-                    center = arrayOfCoordinates.center()
-                }
-                self.mapRegion = MKCoordinateRegion(center: center, span: MapDetails.defaultSpan)
-            }
-            print(newValue.count)
-            self.currentTrip?.routes = newValue
-            //            newValue.sort(by: { $0.tripPosition })
             
+       
+            self.setCenterOnRoute()
+            self.currentTrip?.routes = newValue
 
+            if let first = newValue.first(where:  { $0.tripPosition == 0 }) {
+                self.steps = []
+                self.steps = first.rt.steps
+            }
         }
         
         didSet {
@@ -94,10 +84,7 @@ class TripLogic: ObservableObject {
             //                    return aPos < bPos
             //                }
             
-            if let first = oldValue.first(where:  { $0.tripPosition == 0 }) {
-                self.steps = []
-                self.steps = first.rt.steps
-            }
+  
          
             setTotalDistance()
             setTotalTripDuration()
@@ -477,15 +464,34 @@ class TripLogic: ObservableObject {
         return dateFormatter.string(from: time)
     }
     
+    //MARK: - Map
+    
+    func setCenterOnRoute() {
+        var arrayOfCoordinates: [CLLocationCoordinate2D] = []
+        for dest in self.destinations {
+            arrayOfCoordinates.append(CLLocationCoordinate2D(latitude: dest.lat, longitude: dest.lon))
+        }
+        var center = CLLocationCoordinate2D()
+        if arrayOfCoordinates.isEmpty {
+            center = MapDetails.startingLocation.coordinate
+        } else {
+            center = arrayOfCoordinates.center()
+        }
+        self.mapRegion = MKCoordinateRegion(center: center, span: MapDetails.defaultSpan)
+    }
+    
     //MARK: -  Routes
     
     private func getRoutes() {
         self.tripRoutes = []
         self.routesForDestinations { success in
             if success {
-                self.getReturnHome { route in
-                    self.tripRoutes.append(route)
-                }
+                print("here")
+//                self.getReturnHome { route in
+//                    var newRoute = route
+//                        newRoute.tripPosition = self.tripRoutes.count
+//                    self.tripRoutes.append(newRoute)
+//                }
             }
         }
     }
@@ -511,7 +517,7 @@ class TripLogic: ObservableObject {
             var routesToReturn: [Route] = []
             
             var count = 0
-            let tripPosition = 0
+//            let tripPosition = 0
             
             for rt in response.routes.prefix(3) {
                 let polyline = RoutePolyline(points: rt.polyline.points(), count: rt.polyline.pointCount)
@@ -519,7 +525,7 @@ class TripLogic: ObservableObject {
                 polyline.endLocation = end
                 polyline.parentCollectionID = end.id
                 ///
-                var route = Route(id: UUID().uuidString, rt: rt, collectionID: end.id, polyline: polyline, altPosition: count, tripPosition:(count == 0) ? tripPosition : nil)
+                var route = Route(id: UUID().uuidString, rt: rt, collectionID: end.id, polyline: polyline, altPosition: count, tripPosition: nil)
                 polyline.route = route
                 route.polyline = polyline
                 
@@ -550,8 +556,12 @@ class TripLogic: ObservableObject {
                     if let first = routes.first {
                         
                         routesReturnable.append(first) ///
+                                                ///
                         
-                                    completion(first)
+                        var route = first
+                        route.tripPosition = self.tripRoutes.count
+                        
+                                    completion(route)
                     }
                 }
                 first = destination
@@ -571,6 +581,7 @@ class TripLogic: ObservableObject {
             
             makeDirectionsRequest(start: start, end: end) { routes in
                 if let first = routes.first {
+
                     
                     completion(first)
                     
@@ -582,6 +593,8 @@ class TripLogic: ObservableObject {
     
     func routesForDestinations(withCompletion completion: @escaping(Bool) -> (Void)) {
         getRoutesForTrip { routes in
+//            var newRoute = routes
+//            newRoute.tripPosition = self.tripRoutes.count
             self.tripRoutes.append(routes)
             self.allRoutes.append(routes)
         }
@@ -601,8 +614,8 @@ class TripLogic: ObservableObject {
             self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         }
         
-        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
-        let first = sortedTripRoutes.first
+//        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
+        if let first = self.tripRoutes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
         //        self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
@@ -610,7 +623,7 @@ class TripLogic: ObservableObject {
         guard let trip = currentTrip else { return }
         firebaseManager.saveRoutesToFirestoreFromTrip(trip)
         
-    }
+        }}
     
     func pauseDirections() {
         

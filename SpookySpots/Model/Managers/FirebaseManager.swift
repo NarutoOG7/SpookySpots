@@ -36,7 +36,7 @@ class FirebaseManager: ObservableObject {
 
         guard let db = db else { return }
 
-        newTripRef = db.collection("Trips").document("LUKE")
+        newTripRef = db.collection("Trips").document(docID)
     }
     
     func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
