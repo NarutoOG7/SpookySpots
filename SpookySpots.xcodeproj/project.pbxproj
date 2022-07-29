@@ -32,6 +32,7 @@
 		C96A50C927F16A3E00E44B9F /* GeoFireManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96A50C827F16A3E00E44B9F /* GeoFireManager.swift */; };
 		C96BA74D282B2E3A00BEFD3D /* MapForNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */; };
 		C96BA74F282B30A100BEFD3D /* NavigationLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */; };
+		C96BBCED289364540075A86C /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96BBCEC289364540075A86C /* CoreDataManager.swift */; };
 		C99EA13328917F6D00882A45 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C99EA13228917F6D00882A45 /* LaunchScreen.storyboard */; };
 		C9A8C9EF27ED621000116B61 /* SpookySpotsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */; };
 		C9A8C9F127ED621000116B61 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8C9F027ED621000116B61 /* ContentView.swift */; };
@@ -133,6 +134,7 @@
 		C96A50C827F16A3E00E44B9F /* GeoFireManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoFireManager.swift; sourceTree = "<group>"; };
 		C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapForNavigation.swift; sourceTree = "<group>"; };
 		C96BA74E282B30A100BEFD3D /* NavigationLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationLogic.swift; sourceTree = "<group>"; };
+		C96BBCEC289364540075A86C /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		C99EA13228917F6D00882A45 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C9A8C9EB27ED621000116B61 /* SpookySpots.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpookySpots.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9A8C9EE27ED621000116B61 /* SpookySpotsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpookySpotsApp.swift; sourceTree = "<group>"; };
@@ -388,6 +390,7 @@
 				C94046DF27F93867006837D6 /* HotelPriceManager.swift */,
 				C9A8CA3B27ED79D100116B61 /* LocalSearchService.swift */,
 				C9A8CA3727ED795600116B61 /* UserLocationManager.swift */,
+				C96BBCEC289364540075A86C /* CoreDataManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -833,6 +836,7 @@
 				C9A8CA6027ED7DC300116B61 /* FiveStars.swift in Sources */,
 				C9A8CA3027ED78C800116B61 /* Address.swift in Sources */,
 				C9EFD62028204E5B00B3BFDC /* FavoritesLogic.swift in Sources */,
+				C96BBCED289364540075A86C /* CoreDataManager.swift in Sources */,
 				C9A8CA3827ED795600116B61 /* UserLocationManager.swift in Sources */,
 				C9A8CA5727ED7C6100116B61 /* ExploreByMap.swift in Sources */,
 				C9DC7C0F2817A09100E8E71C /* FullImageDisplay.swift in Sources */,

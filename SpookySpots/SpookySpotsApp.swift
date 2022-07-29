@@ -10,12 +10,15 @@ import Firebase
 
 @main
 struct SpookySpotsApp: App {
-    
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    
+    @StateObject private var coreDataManager = CoreDataManager()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(\.managedObjectContext, coreDataManager.currentTripContainer.viewContext)
         }
     }
 }

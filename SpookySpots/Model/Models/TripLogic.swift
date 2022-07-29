@@ -201,13 +201,16 @@ class TripLogic: ObservableObject {
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var firebaseManager = FirebaseManager.instance
     
+    @FetchRequest(sortDescriptors: []) var cdTrip: FetchedResults<CDTrip>
+    
     init() {
         
         if userStore.isSignedIn || userStore.isGuest {
             
-            loadFromFirebase()
+//            loadFromFirebase()
             
-            self.currentTrip = self.trips.last
+//            self.currentTrip = self.trips.last
+            self.currentTrip = cdTrip
             
             if let trip = currentTrip {
                 
