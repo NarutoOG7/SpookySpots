@@ -15,6 +15,9 @@ struct ExploreByList: View {
     @State var user = UserStore.instance.user
     
     @ObservedObject private var exploreVM = ExploreViewModel.instance
+    @ObservedObject private var tripLogic = TripLogic.instance
+    
+    @Environment(\.managedObjectContext) var moc
         
     var body: some View {
         ZStack {
@@ -40,6 +43,7 @@ struct ExploreByList: View {
         }.padding(.top, 30)
             .onAppear {
                 exploreVM.supplyLocationLists()
+//                self.tripLogic.setUp(self.moc)
             }
         
         //        }

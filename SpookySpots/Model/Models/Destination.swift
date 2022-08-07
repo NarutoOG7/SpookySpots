@@ -20,10 +20,10 @@ struct Destination: Codable, Equatable, Identifiable {
         self.name = dict["name"] as? String ?? ""
     }
     //MARK: - Init From LocationModel
-    init(id: String,
-         lat: Double,
-         lon: Double,
-         name: String) {
+    init(id: String = "",
+         lat: Double = -105,
+         lon: Double = 39,
+         name: String = "") {
         self.id = id
         self.lat = lat
         self.lon = lon

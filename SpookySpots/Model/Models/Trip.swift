@@ -78,13 +78,13 @@ struct Trip: Equatable, Identifiable {
     }
     
     //MARK: - Init from Code
-    init(id: String,
-         userID: String,
-         isActive: Bool,
-         destinations: [Destination],
-         startLocation: Destination,
-         endLocation: Destination,
-         routes: [Route]) {
+    init(id: String = "",
+         userID: String = "",
+         isActive: Bool = true,
+         destinations: [Destination] = [],
+         startLocation: Destination = Destination(),
+         endLocation: Destination = Destination(),
+         routes: [Route] = []) {
         
         self.id = id
         self.userID = userID

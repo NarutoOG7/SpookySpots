@@ -31,7 +31,7 @@ struct SlideOverCard<Content: View> : View {
                 Spacer()
             
         }
-        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        .frame(width: UIScreen.main.bounds.width, height: 1000)
         .background(color)
         .cornerRadius(10)
         .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.13), radius: 10)
@@ -68,6 +68,13 @@ struct SlideOverCard<Content: View> : View {
         } else {
             self.position = closestPosition
         }
+    }
+    
+    //MARK: - Card Position
+    enum CardPosition: CGFloat {
+        case bottom = 750
+        case middle = 500
+        case top = 100
     }
 }
 
@@ -110,13 +117,7 @@ enum DragState {
 }
 
 
-//MARK: - Card Position
-enum CardPosition: CGFloat {
-    case bottom = 700
-    case middle = 500
-    case top = 70
-    
-}
+
 
 
 //MARK: - Handle

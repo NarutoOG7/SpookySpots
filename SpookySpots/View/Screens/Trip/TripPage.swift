@@ -15,6 +15,10 @@ struct Time {
 
 struct TripPage: View {
     
+    @Environment(\.managedObjectContext) var moc
+    
+    @FetchRequest(entity: CDTrip.entity(), sortDescriptors: []) var trips: FetchedResults<CDTrip>
+    
     @State var slideCardCanMove = true
     @State private var editMode: EditMode = .inactive
     @State private var isShowingRoutHelper = false
@@ -88,9 +92,10 @@ struct TripPage: View {
                 }
                 
             }
+//            .padding(.top, 100)
             .padding()
+            .padding(.top, 20)
             .background(.black)
-            .cornerRadius(10)
             .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
             Spacer()
             
@@ -109,7 +114,10 @@ struct TripPage: View {
     }
     
     private var emptyTripView: some View {
-        Text("Add locations to your trip.")
+        VStack {
+            Text("Add locations to your trip.")
+            seePastTripsButton
+        }
     }
     
     private var tripView: some View {
@@ -117,16 +125,21 @@ struct TripPage: View {
             VStack(alignment: .leading) {
                 
                 HStack {
+                    HStack {
                         VStack(alignment: .leading, spacing: 16) {
                             if tripLogic.isNavigating {
                             Text(tripLogic.currentRoute?.polyline.endLocation?.name ?? "")
                                 .font(.headline)
-                            HStack {
                                 legDurationView
                                 legDistanceView
                             }
-                        }
+                        }.padding(.trailing, tripLogic.isNavigating ? 30 : 0)
+                    
+                        
+                        
                             VStack(alignment: .leading, spacing: 16) {
+                                Text("TOTAL")
+                                    .font(.caption)
                                 totalDurationView
                                 totalDistanceView
                             }
@@ -145,8 +158,13 @@ struct TripPage: View {
                     .padding(.vertical)
             }
             destinationList
+            
+            seePastTripsButton
+                .padding(.top, 60)
         }
         .padding(.horizontal)
+        
+        
     }
     
     private var totalDistanceView: some View {
@@ -238,59 +256,24 @@ struct TripPage: View {
     
     private var destinationList: some View {
         VStack {
-            
-            editButton
+            HStack {
+                editButton
+                    .padding(.leading, 20)
+                Spacer()
+            }
+//
             List {
                 ForEach(locationStore.activeTripLocations) { destination in
                     Text(destination.name)
                 }
                 .onMove(perform: moveRow(_:_:))
                 .onDelete(perform: deleteRow(_:))
-            }.listStyle(.inset)
-                .disabled(editMode == .inactive
-                )
-            
-            
+                
+            }.listStyle(.plain)
+                .disabled(editMode == .inactive)
+                .frame(height: CGFloat(tripLogic.destinations.count) * 50)
         }
     }
-//
-//    private var currentStep: some View {
-//
-//        VStack {
-//            ZStack {
-//                Rectangle().fill(.black)
-//
-//                let filteredSteps = tripLogic.steps.filter({ $0.instructions != "" })
-//
-//                PagingView(index: $stepIndex, maxIndex: 7, totalIndex: filteredSteps.count) {
-//                    ForEach(filteredSteps, id: \.self) { step in
-//
-//                        if step.instructions != "" {
-//                            HStack {
-////                                Spacer()
-//                            VStack(alignment: .leading) {
-//                                Text(step.getAsLocalStringAsTwoParts(step).0)
-//                                    .foregroundColor(.white)
-//                                    .font(.title)
-//
-//                                Text(step.getAsLocalStringAsTwoParts(step).1)
-//                                    .foregroundColor(.white)
-//                                    .font(.headline)
-//
-//                            }
-//                            .padding(.horizontal, 20)
-////                                Spacer()
-//                            }
-//                        }
-//                    }
-//                }.frame(height: 170)
-//
-//            }
-//            .frame(height: 185)
-//
-//            Spacer()
-//        }
-//    }
     
     private var currentStep: some View {
 
@@ -451,6 +434,11 @@ struct TripPage: View {
         .padding(.top, 180)
     }
     
+    private var seePastTripsButton: some View {
+       NavigationLink("See Past Trips", destination: PastTrips())
+//            .environment(\.managedObjectContext, self.moc)
+    }
+    
     
     //MARK: - Methods
     
@@ -521,7 +509,6 @@ struct TripPage: View {
     private func startOrEndLocationTapped() {
         tripPageVM.isShowingChangeOfStartAndStop = true
     }
-    
 }
 
 struct TripPage_Previews: PreviewProvider {

@@ -5,12 +5,13 @@
 //  Created by Spencer Belton on 3/27/22.
 //
 
+import CoreData
 import Firebase
 import SwiftUI
 
 
-
 class AppDelegate: NSObject, UIApplicationDelegate {
+    
     
     private var signedInUser = UserDefaults.standard.data(forKey: "user")
     
@@ -24,7 +25,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         locationManager.checkIfLocationServicesIsEnabled()
 
         getUserIfSignedIn()
-        
+
         return true
     }
     

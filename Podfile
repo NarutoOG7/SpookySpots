@@ -7,10 +7,12 @@ target 'SpookySpots' do
 
   # Pods for SpookySpots
 
+
 pod 'GeoFire'
 pod 'FirebaseAuth'
 pod 'FirebaseFirestore'
 pod 'FirebaseStorage'
+
 
   target 'SpookySpotsTests' do
     inherit! :search_paths

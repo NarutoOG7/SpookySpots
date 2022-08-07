@@ -80,7 +80,6 @@ struct MapForTrip: UIViewRepresentable {
     }
     
     func addPlacemarks(to view: MKMapView) {
-        print(tripLogic.currentTrip?.destinations)
         if let trip = tripLogic.currentTrip {
             for destination in trip.destinations {
                 if let index = trip.destinations.firstIndex(where: { $0.id == destination.id }) {

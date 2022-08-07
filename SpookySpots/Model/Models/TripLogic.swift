@@ -41,6 +41,7 @@
 
 
 import SwiftUI
+import CoreData
 import MapKit
 import CoreLocation
 import AVFoundation
@@ -161,6 +162,11 @@ class TripLogic: ObservableObject {
     @Published var currentTrip: Trip? {
         willSet {
             saveToFirebase()
+            PersistenceController.shared.save { error in
+                if let error = error {
+                    print(error.localizedDescription)
+                }
+            }
         }
     }
     
@@ -195,25 +201,83 @@ class TripLogic: ObservableObject {
     
     @Published var isShowingSheetForStartOrStop = false
     
+    @Published var coreDataTrip: CDTrip?
+    
+//    @Published var moc: NSManagedObjectContext?
+    
     
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var userLocManager = UserLocationManager.instance
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var firebaseManager = FirebaseManager.instance
+//    @ObservedObject var coreDataManager = CoreDataManager.instance
     
-    @FetchRequest(sortDescriptors: []) var cdTrip: FetchedResults<CDTrip>
+//    @Environment(\.managedObjectContext) var moc
+    
+    
+//    @FetchRequest(sortDescriptors: []) var cdTripBucket: FetchedResults<CDTrip> {
+//        willSet {
+//            self.coreDataTrip = newValue.last
+//        }
+//    }
+    
+//
+    
+    @FetchRequest(entity: CDTrip.entity(), sortDescriptors: []) var cdTrips: FetchedResults<CDTrip>
     
     init() {
         
         if userStore.isSignedIn || userStore.isGuest {
             
-//            loadFromFirebase()
-            
-//            self.currentTrip = self.trips.last
-            self.currentTrip = cdTrip
+//  //          loadFromFirebase()
+            if let first = cdTrips.first {
+            self.coreDataTrip = first
+                self.currentTrip = PersistenceController.shared.cdTripToTrip(first)
+            }
+// //            self.currentTrip = self.trips.last
+//            if let cdTrip = coreDataTrip {
+//
+//                var destinations: [Destination] = []
+//
+//                var start = Destination(id: "", lat: 0, lon: 0, name: "")
+//                var end = Destination(id: "", lat: 0, lon: 0, name: "")
+//
+//                var routes: [Route] = []
+//
+//                if let cdDestinations = cdTrip.destinations?.allObjects as? [Destination] {
+//
+//                    destinations = cdDestinations
+//                }
+//
+//                if let endPoints = cdTrip.endPoints?.allObjects as? [Destination] {
+//                    if let cdStart = endPoints.first(where: { $0.id == "Start" }),
+//                        let cdEnd = endPoints.first(where: { $0.id == "End" }) {
+//                        start = cdStart
+//                        end = cdEnd
+//                    }
+//                }
+//
+//                if let cdRoutes = cdTrip.routes?.allObjects as? [Route] {
+//                    routes = cdRoutes
+//                }
+//
+//                let trip = Trip(
+//                    id: cdTrip.id ?? "",
+//                    userID: cdTrip.userID ?? "",
+//                    isActive: cdTrip.isActive,
+//                    destinations: destinations,
+//                    startLocation: start,
+//                    endLocation: end,
+//                    routes: routes)
+//
+//
+//                self.currentTrip = trip
+//            } else {
+//
+//            }
             
             if let trip = currentTrip {
-                
+                                
                 self.destinations = trip.destinations
                 locationStore.activeTripLocations = destinations
                 
@@ -224,6 +288,8 @@ class TripLogic: ObservableObject {
                                                     longitude: trip.startLocation.lon),
                                                span: MapDetails.defaultSpan)
                 
+//                self.coreDataTrip = coreDataManager.fetchCDTrip(trip)
+
             } else {
                 
                 if let currentLoc = userStore.currentLocation {
@@ -238,14 +304,23 @@ class TripLogic: ObservableObject {
                                              lon: currentLoc.coordinate.longitude,
                                              name: "Current Location")
                     
-                    currentTrip = Trip(id: UUID().uuidString,
-                                       userID: userStore.user.id,
-                                       isActive: true,
-                                       destinations: [],
-                                       startLocation: startLoc,
-                                       endLocation: endLoc,
-                                       routes: [])
+                    let trip = Trip(id: UUID().uuidString,
+                                    userID: userStore.user.id,
+                                    isActive: true,
+                                    destinations: [],
+                                    startLocation: startLoc,
+                                    endLocation: endLoc,
+                                    routes: [])
+                    
+                    
+                    self.currentTrip = trip
                     mapRegion = MapDetails.defaultRegion
+//                    if let moc = moc {
+//                        coreDataManager.saveTripAsCDTrip(trip: trip)
+//                    }
+                    
+                
+                    
                 }
             }
             
@@ -308,24 +383,37 @@ class TripLogic: ObservableObject {
         var trip = self.currentTrip
     }
     
-    //MARK: - Firebase
+    //MARK: - Core Data
+//    
+//    func setUp(_ moc: NSManagedObjectContext) {
+//        self.moc = moc
+//    }
     
-    func loadFromFirebase() {
-        firebaseManager.getTripLocationsForUser { trip in
-            self.trips.append(trip)
-        }
-    }
-    
-    func saveToFirebase() {
-        if let currentTrip = currentTrip {
-            firebaseManager.saveTrip(currentTrip, asActive: true) { failed in
-                if failed {
-                    // handle error at top of screen saying there was an error saving to database. give email for helpdesk saying to reach out if problem persists.
-                    print("Error saving trip to firebase")
-                }
-            }
-        }
-    }
+//
+//    func saveTripToCoreData() {
+//
+//        if let currentTrip = currentTrip {
+//
+//            let cdRoutes = NSSet(array: currentTrip.routes)
+//            let cdEndPoints = NSSet(array: [currentTrip.startLocation, currentTrip.endLocation])
+//            let cdDestinations = NSSet(array: currentTrip.destinations)
+//
+//
+//        let cdTrip = CDTrip(context: moc)
+//            cdTrip.id = currentTrip.id
+//            cdTrip.endPoints = cdEndPoints
+//            cdTrip.routes = cdRoutes
+//            cdTrip.destinations = cdDestinations
+//            cdTrip.isActive = currentTrip.isActive
+//
+//        do {
+//            try moc.save()
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//        }
+//    }
+
     
     //MARK: - Destinations
     
@@ -465,6 +553,26 @@ class TripLogic: ObservableObject {
         let dateFormatter = DateComponentsFormatter()
         dateFormatter.allowedUnits = [.hour, .minute]
         return dateFormatter.string(from: time)
+    }
+    
+    
+    //MARK: - Firebase
+    
+    func loadFromFirebase() {
+        firebaseManager.getTripLocationsForUser { trip in
+            self.trips.append(trip)
+        }
+    }
+    
+    func saveToFirebase() {
+        if let currentTrip = currentTrip {
+            firebaseManager.saveTrip(currentTrip, asActive: true) { failed in
+                if failed {
+                    // handle error at top of screen saying there was an error saving to database. give email for helpdesk saying to reach out if problem persists.
+                    print("Error saving trip to firebase")
+                }
+            }
+        }
     }
     
     //MARK: - Map
