@@ -36,6 +36,7 @@ class UserLocationManager: NSObject, ObservableObject {
             locManager.delegate = self
             self.locationManager = locManager
         } else {
+            checkLocationAuthorization()
             print("Show alert to let user know that location services is off.")
         }
     }

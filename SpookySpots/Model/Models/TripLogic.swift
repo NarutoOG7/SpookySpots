@@ -162,10 +162,8 @@ class TripLogic: ObservableObject {
     @Published var currentTrip: Trip? {
         willSet {
             saveToFirebase()
-            PersistenceController.shared.save { error in
-                if let error = error {
-                    print(error.localizedDescription)
-                }
+            if let newValue = newValue {
+                PersistenceController.shared.createOrUpdateTrip(newValue)
             }
         }
     }
@@ -198,6 +196,7 @@ class TripLogic: ObservableObject {
     
     @Published var allRoutes: [Route] = []
     
+    @Published var shouldShowAlertForClearingTrip = false
     
     @Published var isShowingSheetForStartOrStop = false
     
@@ -222,18 +221,18 @@ class TripLogic: ObservableObject {
 //    }
     
 //
-    
-    @FetchRequest(entity: CDTrip.entity(), sortDescriptors: []) var cdTrips: FetchedResults<CDTrip>
-    
+        
     init() {
         
         if userStore.isSignedIn || userStore.isGuest {
             
+            self.currentTrip = PersistenceController.shared.activeTrip()
+            
 //  //          loadFromFirebase()
-            if let first = cdTrips.first {
-            self.coreDataTrip = first
-                self.currentTrip = PersistenceController.shared.cdTripToTrip(first)
-            }
+//            if let first = cdTrips.first {
+//            self.coreDataTrip = first
+//                self.currentTrip = PersistenceController.shared.cdTripToTrip(first)
+//            }
 // //            self.currentTrip = self.trips.last
 //            if let cdTrip = coreDataTrip {
 //
@@ -291,39 +290,34 @@ class TripLogic: ObservableObject {
 //                self.coreDataTrip = coreDataManager.fetchCDTrip(trip)
 
             } else {
-                
-                if let currentLoc = userStore.currentLocation {
-                    
-                    let startLoc = Destination(id: UUID().uuidString,
-                                               lat: currentLoc.coordinate.latitude,
-                                               lon: currentLoc.coordinate.longitude,
-                                               name: "Current Location")
-                    
-                    let endLoc = Destination(id: UUID().uuidString,
-                                             lat: currentLoc.coordinate.latitude,
-                                             lon: currentLoc.coordinate.longitude,
-                                             name: "Current Location")
-                    
-                    let trip = Trip(id: UUID().uuidString,
-                                    userID: userStore.user.id,
-                                    isActive: true,
-                                    destinations: [],
-                                    startLocation: startLoc,
-                                    endLocation: endLoc,
-                                    routes: [])
-                    
-                    
-                    self.currentTrip = trip
-                    mapRegion = MapDetails.defaultRegion
-//                    if let moc = moc {
-//                        coreDataManager.saveTripAsCDTrip(trip: trip)
-//                    }
-                    
-                
-                    
-                }
+                resetTrip()
+                mapRegion = MapDetails.defaultRegion
             }
             
+        }
+    }
+    
+    func resetTrip() {
+        if let currentLoc = userStore.currentLocation {
+            
+            let startLoc = Destination(id: UUID().uuidString,
+                                       lat: currentLoc.coordinate.latitude,
+                                       lon: currentLoc.coordinate.longitude,
+                                       name: "Current Location")
+            
+            let endLoc = Destination(id: UUID().uuidString,
+                                     lat: currentLoc.coordinate.latitude,
+                                     lon: currentLoc.coordinate.longitude,
+                                     name: "Current Location")
+            
+            let trip = Trip(id: UUID().uuidString,
+                            userID: userStore.user.id,
+                            isActive: true,
+                            destinations: [],
+                            startLocation: startLoc,
+                            endLocation: endLoc,
+                            routes: [])
+            self.currentTrip = trip
         }
     }
     
@@ -747,6 +741,7 @@ class TripLogic: ObservableObject {
     func endDirections() {
         self.currentRoute = nil
         self.routeIsHighlighted = false
+        self.shouldShowAlertForClearingTrip = true
     }
     
 }

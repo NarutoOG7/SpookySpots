@@ -8,7 +8,7 @@
 import CoreData
 import MapKit
 
-class PersistenceController {
+struct PersistenceController {
     
     static let shared = PersistenceController()
     
@@ -116,7 +116,8 @@ class PersistenceController {
                 
             } else {
                 // update
-                let trips = try request.execute()
+//                let trips = try request.execute()
+                let trips = try context.fetch(request)
                 if let tripToUpdate = trips.first {
                     for route in trip.routes {
                         let routeContext = CDRoute(context: context)
@@ -183,53 +184,18 @@ class PersistenceController {
         }
     }
     
-    func cdTripToTrip(_ cdTrip: CDTrip) -> Trip {
-        var destinations: [Destination] = []
-        if let cdDests = cdTrip.destinations?.allObjects as? [CDDestination] {
-            for cdDest in cdDests {
-                let destination = Destination(id: cdDest.id ?? "",
-                                              lat: cdDest.lat,
-                                              lon: cdDest.lon,
-                                              name: cdDest.name ?? "")
-                destinations.append(destination)
+    
+    func activeTrip() -> Trip? {
+        do {
+            let context = container.viewContext
+            let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
+            let trips = try context.fetch(request)
+            if let cdTrip = trips.first(where: { $0.isActive }) {
+                return Trip(cdTrip)
             }
+        } catch {
+            print("Error fetching request: \(error)")
         }
-        
-        var routes: [Route] = []
-        if let cdRoutes = cdTrip.routes?.allObjects as? [CDRoute] {
-            for cdRoute in cdRoutes {
-                let route = Route(id: cdRoute.id ?? "",
-                                  rt: MKRoute(),
-                                  collectionID: cdRoute.collectionID ?? "",
-                                  polyline: RoutePolyline(),
-                                  altPosition: 0,
-                                  tripPosition: Int(cdRoute.tripPosition) )
-                routes.append(route)
-            }
-        }
-        
-        var start = Destination()
-        var end = Destination()
-        if let endPoints = cdTrip.endPoints?.allObjects as? [CDEndPoint] {
-            if let cdStart = endPoints.first(where: { $0.id == "Start" }),
-               let cdEnd = endPoints.first(where: { $0.id == "End" }) {
-                start = Destination(id: cdStart.destination?.id ?? "",
-                                    lat: cdStart.destination?.lat ?? 0,
-                                    lon: cdStart.destination?.lon ?? 0,
-                                    name: cdStart.destination?.name ?? "")
-                end = Destination(id: cdEnd.destination?.id ?? "",
-                                  lat: cdEnd.destination?.lat ?? 0,
-                                  lon: cdEnd.destination?.lon ?? 0,
-                                  name: cdEnd.destination?.name ?? "")
-            }
-        }
-        
-        return Trip(id: cdTrip.id ?? "",
-                    userID: cdTrip.userID ?? "",
-                    isActive: cdTrip.isActive,
-                    destinations: destinations,
-                    startLocation: start,
-                    endLocation: end,
-                    routes: routes)
+        return nil
     }
 }

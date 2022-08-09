@@ -14,7 +14,6 @@
 		C9187F39280A8C550064627C /* Favorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F38280A8C550064627C /* Favorites.swift */; };
 		C9187F3B280AFB520064627C /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F3A280AFB520064627C /* Account.swift */; };
 		C9187F3D280B07070064627C /* MainLocCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F3C280B07070064627C /* MainLocCell.swift */; };
-		C91BBB7528982E4A005D1968 /* PastTrips.swift in Sources */ = {isa = PBXBuildFile; fileRef = C91BBB7428982E4A005D1968 /* PastTrips.swift */; };
 		C91BBB782898C90A005D1968 /* TripCDModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C91BBB762898C90A005D1968 /* TripCDModel.xcdatamodeld */; };
 		C91BBB7B28A0138E005D1968 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C91BBB7A28A0138E005D1968 /* PersistenceController.swift */; };
 		C92C63A7280A81140035C793 /* ProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92C63A6280A81140035C793 /* ProfilePage.swift */; };
@@ -118,7 +117,6 @@
 		C9187F38280A8C550064627C /* Favorites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorites.swift; sourceTree = "<group>"; };
 		C9187F3A280AFB520064627C /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		C9187F3C280B07070064627C /* MainLocCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainLocCell.swift; sourceTree = "<group>"; };
-		C91BBB7428982E4A005D1968 /* PastTrips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PastTrips.swift; sourceTree = "<group>"; };
 		C91BBB772898C90A005D1968 /* TripCDModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TripCDModel.xcdatamodel; sourceTree = "<group>"; };
 		C91BBB7A28A0138E005D1968 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		C92C63A6280A81140035C793 /* ProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePage.swift; sourceTree = "<group>"; };
@@ -465,7 +463,6 @@
 				C9EFD6242826B4B200B3BFDC /* TripPage.swift */,
 				C9F3F443282A9EEA00D794CE /* NavigationScreen.swift */,
 				C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */,
-				C91BBB7428982E4A005D1968 /* PastTrips.swift */,
 			);
 			path = Trip;
 			sourceTree = "<group>";
@@ -863,7 +860,6 @@
 				C936DC9D288EF48C00D10C65 /* Route.swift in Sources */,
 				C94046EE27F95E82006837D6 /* Review.swift in Sources */,
 				C9A8CA5327ED7BFF00116B61 /* MapForTrip.swift in Sources */,
-				C91BBB7528982E4A005D1968 /* PastTrips.swift in Sources */,
 				C96A50C727F14CA600E44B9F /* AppDelegate.swift in Sources */,
 				C9F3F444282A9EEA00D794CE /* NavigationScreen.swift in Sources */,
 				C94046A127F56C97006837D6 /* PagedScrollViewModifier.swift in Sources */,

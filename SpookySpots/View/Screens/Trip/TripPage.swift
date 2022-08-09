@@ -79,6 +79,13 @@ struct TripPage: View {
         
         
             .environment(\.editMode, $editMode)
+            
+            .alert("Would you like to remove the destinations from the trip?", isPresented: $tripLogic.shouldShowAlertForClearingTrip) {
+                Button("NO", role: .cancel) {}
+                Button("YES", role: .destructive) {
+                    self.tripLogic.resetTrip()
+                }
+            }
         }
     }
     
@@ -114,10 +121,7 @@ struct TripPage: View {
     }
     
     private var emptyTripView: some View {
-        VStack {
-            Text("Add locations to your trip.")
-            seePastTripsButton
-        }
+        Text("Add locations to your trip.")
     }
     
     private var tripView: some View {
@@ -158,9 +162,7 @@ struct TripPage: View {
                     .padding(.vertical)
             }
             destinationList
-            
-            seePastTripsButton
-                .padding(.top, 60)
+
         }
         .padding(.horizontal)
         
@@ -432,11 +434,6 @@ struct TripPage: View {
         }
         .padding(. horizontal, 10)
         .padding(.top, 180)
-    }
-    
-    private var seePastTripsButton: some View {
-       NavigationLink("See Past Trips", destination: PastTrips())
-//            .environment(\.managedObjectContext, self.moc)
     }
     
     
