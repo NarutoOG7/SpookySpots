@@ -15,6 +15,12 @@ struct TabBarSetup: View {
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
+    init() {
+        let appearance =  UITabBar.appearance()
+       appearance.barTintColor = UIColor(K.Colors.WeenyWitch.brown)
+        appearance.unselectedItemTintColor = UIColor(K.Colors.WeenyWitch.light)
+      }
+    
     var body: some View {
 //        NavigationView {
         TabView(selection: $selection) {
@@ -23,8 +29,11 @@ struct TabBarSetup: View {
             tripTab
             settingsTab
         }
+        .accentColor(K.Colors.WeenyWitch.orange)
+        .tint(Color("WeenyWitch/ColorThree"))
         .environmentObject(favoritesLogic)
         .environmentObject(tripLogic)
+        
 //        }
     }
     

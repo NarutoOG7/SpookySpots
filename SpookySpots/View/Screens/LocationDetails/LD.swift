@@ -125,6 +125,7 @@ struct LD: View {
         Text(location.location.name)
             .font(.avenirNext(size: 34))
             .fontWeight(.medium)
+            .foregroundColor(K.Colors.WeenyWitch.brown)
     }
     
     
@@ -132,7 +133,7 @@ struct LD: View {
         Text(location.location.address?.fullAddress() ?? "")
             .font(.avenirNextRegular(size: 17))
             .lineLimit(nil)
-            .foregroundColor(Color(red: 73/255, green: 77/255, blue: 73/255))
+            .foregroundColor(K.Colors.WeenyWitch.brown)
     }
     
     private var avgRatingDisplay: some View {
@@ -140,7 +141,7 @@ struct LD: View {
             FiveStars(location: location.location)
             Text(location.getAvgRating())
                 .font(.avenirNext(size: 15))
-                .foregroundColor(Color(red: 120/255, green: 120/255, blue: 120/255))
+                .foregroundColor(K.Colors.WeenyWitch.orange)
                 .offset(y: 1)
         }
     }
@@ -150,12 +151,15 @@ struct LD: View {
             Text(location.location.description ?? "")
                 .font(.avenirNext(size: 17))
                 .lineLimit(nil)
+                .foregroundColor(K.Colors.WeenyWitch.brown)
             Text(location.location.description ?? "")
                 .font(.avenirNext(size: 17))
                 .lineLimit(nil)
+                .foregroundColor(K.Colors.WeenyWitch.brown)
             Text(location.location.description ?? "")
                 .font(.avenirNext(size: 17))
                 .lineLimit(nil)
+                .foregroundColor(K.Colors.WeenyWitch.brown)
         }
     }
     
@@ -189,6 +193,7 @@ struct LD: View {
                 Link(destination: url, label: {
                     Text("Get More Info")
                         .underline()
+                        .foregroundColor(K.Colors.WeenyWitch.orange)
                 })
             )
         } else {
@@ -203,7 +208,7 @@ struct LD: View {
         BorderedCircularButton(
             image: Image(systemName: "arrow.triangle.turn.up.right.diamond.fill"),
             title: "Directions",
-            color: .green,
+            color: K.Colors.WeenyWitch.brown,
             tapped: directionsTapped)
     }
     
@@ -211,7 +216,7 @@ struct LD: View {
         BorderedCircularButton(
             image: Image(systemName: "square.and.arrow.up"),
             title: "Share",
-            color: .green,
+            color: K.Colors.WeenyWitch.brown,
             tapped: shareTapped)
     }
     
@@ -227,7 +232,7 @@ struct LD: View {
         BorderedCircularButton(
             image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
             title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
-            color: .green,
+            color: K.Colors.WeenyWitch.brown,
             tapped: addToTripTapped)
     }
     private var favoriteButton: some View {
@@ -236,7 +241,7 @@ struct LD: View {
                 Image(systemName: "heart.fill") :
                 Image(systemName: "heart"),
             title: "Favorites",
-            color: .green,
+            color: K.Colors.WeenyWitch.brown,
             tapped: favoritesTapped)
         
 
@@ -258,7 +263,7 @@ struct LD: View {
             Image(systemName: "chevron.left")
                 .resizable()
                 .frame(width: 25, height: 35)
-                .tint(.pink)
+                .tint(K.Colors.WeenyWitch.orange)
         }
     }
     

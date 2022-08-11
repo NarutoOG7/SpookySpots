@@ -265,7 +265,7 @@ struct TripPage: View {
             }
 //
             List {
-                ForEach(locationStore.activeTripLocations) { destination in
+                ForEach(tripLogic.currentTrip?.destinations ?? []) { destination in
                     Text(destination.name)
                 }
                 .onMove(perform: moveRow(_:_:))

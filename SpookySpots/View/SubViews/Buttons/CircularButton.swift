@@ -44,7 +44,7 @@ struct CircleButton: View {
                                     .foregroundColor(backgroundColor))
                     .aspectRatio(contentMode: .fit)
                     .frame(width: size.rawValue)
-                    .shadow(color: Color(#colorLiteral(red: 0.06314038817, green: 0.4441809558, blue: 0.9376586294, alpha: 0.5)), radius: 2, x: 0, y: 1)
+                    .shadow(color: backgroundColor, radius: 2, x: 0, y: 1)
                 image
                     .resizable()
                     .accentColor(iconColor)

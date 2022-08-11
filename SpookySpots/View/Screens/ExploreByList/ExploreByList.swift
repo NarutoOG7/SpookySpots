@@ -18,6 +18,7 @@ struct ExploreByList: View {
     @ObservedObject private var tripLogic = TripLogic.instance
     
     @Environment(\.managedObjectContext) var moc
+    
         
     var body: some View {
         ZStack {
@@ -33,7 +34,7 @@ struct ExploreByList: View {
                         }
                         Divider()
                             .frame(height: 1.5)
-                            .background(Color.black)
+                            .background(K.Colors.WeenyWitch.brown)
                             .padding(.top, 12)
                         
                     } .padding()
@@ -47,6 +48,8 @@ struct ExploreByList: View {
             }
         
         //        }
+            .background(Image("PaperBackground").opacity(0.5))
+
     }
     
     
@@ -56,10 +59,13 @@ struct ExploreByList: View {
             Text("\(exploreVM.greetingLogic()),")
                 .font(.title)
                 .fontWeight(.ultraLight)
+//                .fontWeight(.light)
                 .padding(.horizontal)
+                .foregroundColor(K.Colors.WeenyWitch.brown)
             Text("\(user.name)")
                 .font(.title)
                 .fontWeight(.medium)
+                .foregroundColor(K.Colors.WeenyWitch.orange)
             Spacer()
         }
     }
@@ -84,12 +90,14 @@ struct ExploreByList: View {
     }
     
     //MARK: - Buttons
-    private var filterButton: some View {
-        CircleButton(size: .small, image: Image(systemName: "slider.vertical.3"), outlineColor: .black, iconColor: .black, backgroundColor: .white, clicked: filterButtonTapped)
-    }
     
     private var mapButton: some View {
-        CircleButton(size: .small, image: Image(systemName: "map"), outlineColor: .black, iconColor: .black, backgroundColor: .white, clicked: isShowingMap)
+        CircleButton(size: .small,
+                     image: Image(systemName: "map"),
+                     outlineColor: K.Colors.WeenyWitch.brown,
+                     iconColor: K.Colors.WeenyWitch.orange,
+                     backgroundColor: K.Colors.WeenyWitch.lightest,
+                     clicked: isShowingMap)
     }
     
     //MARK: - Methods

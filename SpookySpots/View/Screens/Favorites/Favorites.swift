@@ -22,7 +22,8 @@ struct Favorites: View {
                     NavigationLink {
                         LD(location: location)
                     } label: {
-                        LargeImageLocationView(location: location)
+//                        LargeImageLocationView(location: location)
+                        MainLocCell(location: location)
                     }
 
                 }

@@ -17,6 +17,7 @@
 		C91BBB782898C90A005D1968 /* TripCDModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C91BBB762898C90A005D1968 /* TripCDModel.xcdatamodeld */; };
 		C91BBB7B28A0138E005D1968 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C91BBB7A28A0138E005D1968 /* PersistenceController.swift */; };
 		C92C63A7280A81140035C793 /* ProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92C63A6280A81140035C793 /* ProfilePage.swift */; };
+		C92DB77928A48615009B7646 /* overlay.json in Resources */ = {isa = PBXBuildFile; fileRef = C92DB77828A48615009B7646 /* overlay.json */; };
 		C936DC992863F51900D10C65 /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC982863F51900D10C65 /* Destination.swift */; };
 		C936DC9D288EF48C00D10C65 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC9C288EF48A00D10C65 /* Route.swift */; };
 		C94046A127F56C97006837D6 /* PagedScrollViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */; };
@@ -120,6 +121,7 @@
 		C91BBB772898C90A005D1968 /* TripCDModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TripCDModel.xcdatamodel; sourceTree = "<group>"; };
 		C91BBB7A28A0138E005D1968 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
 		C92C63A6280A81140035C793 /* ProfilePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePage.swift; sourceTree = "<group>"; };
+		C92DB77828A48615009B7646 /* overlay.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = overlay.json; sourceTree = "<group>"; };
 		C936DC982863F51900D10C65 /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		C936DC9C288EF48A00D10C65 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
 		C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedScrollViewModifier.swift; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 		C9A8C9E227ED621000116B61 = {
 			isa = PBXGroup;
 			children = (
+				C92DB77828A48615009B7646 /* overlay.json */,
 				C9A8CA7127ED826500116B61 /* GoogleService-Info.plist */,
 				C9A8C9ED27ED621000116B61 /* SpookySpots */,
 				C9A8C9FE27ED621000116B61 /* SpookySpotsTests */,
@@ -670,6 +673,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C92DB77928A48615009B7646 /* overlay.json in Resources */,
 				C9A8C9F627ED621000116B61 /* Preview Assets.xcassets in Resources */,
 				C99EA13328917F6D00882A45 /* LaunchScreen.storyboard in Resources */,
 				C9A8C9F327ED621000116B61 /* Assets.xcassets in Resources */,

@@ -52,6 +52,7 @@ enum AlternateRouteState {
 
 
 class TripLogic: ObservableObject {
+
     static let instance = TripLogic()
     
     @ObservedObject var navigationLogic = NavigationLogic.instance
@@ -161,7 +162,6 @@ class TripLogic: ObservableObject {
     @Published var trips: [Trip] = []
     @Published var currentTrip: Trip? {
         willSet {
-            saveToFirebase()
             if let newValue = newValue {
                 PersistenceController.shared.createOrUpdateTrip(newValue)
             }
@@ -223,7 +223,7 @@ class TripLogic: ObservableObject {
 //
         
     init() {
-        
+                
         if userStore.isSignedIn || userStore.isGuest {
             
             self.currentTrip = PersistenceController.shared.activeTrip()
@@ -550,25 +550,6 @@ class TripLogic: ObservableObject {
     }
     
     
-    //MARK: - Firebase
-    
-    func loadFromFirebase() {
-        firebaseManager.getTripLocationsForUser { trip in
-            self.trips.append(trip)
-        }
-    }
-    
-    func saveToFirebase() {
-        if let currentTrip = currentTrip {
-            firebaseManager.saveTrip(currentTrip, asActive: true) { failed in
-                if failed {
-                    // handle error at top of screen saying there was an error saving to database. give email for helpdesk saying to reach out if problem persists.
-                    print("Error saving trip to firebase")
-                }
-            }
-        }
-    }
-    
     //MARK: - Map
     
     func setCenterOnRoute() {
@@ -725,10 +706,9 @@ class TripLogic: ObservableObject {
         //        self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
         
-        guard let trip = currentTrip else { return }
-        firebaseManager.saveRoutesToFirestoreFromTrip(trip)
+        }
         
-        }}
+    }
     
     func pauseDirections() {
         

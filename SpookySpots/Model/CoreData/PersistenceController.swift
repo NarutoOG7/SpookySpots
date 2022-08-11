@@ -119,6 +119,9 @@ struct PersistenceController {
 //                let trips = try request.execute()
                 let trips = try context.fetch(request)
                 if let tripToUpdate = trips.first {
+                    tripToUpdate.destinations = NSSet()
+                    tripToUpdate.routes = NSSet()
+                    tripToUpdate.endPoints = NSSet()
                     for route in trip.routes {
                         let routeContext = CDRoute(context: context)
                         routeContext.id = route.id

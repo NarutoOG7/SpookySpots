@@ -28,15 +28,9 @@ class FirebaseManager: ObservableObject {
     @Published var favoriteLocations: [FavoriteLocation] = []
     
     var db: Firestore?
-    var newTripRef: DocumentReference?
     
     init() {
-        let docID = UUID().uuidString
         db = Firestore.firestore()
-
-        guard let db = db else { return }
-
-        newTripRef = db.collection("Trips").document(docID)
     }
     
     func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
@@ -64,131 +58,6 @@ class FirebaseManager: ObservableObject {
             }
     }
     
-    //MARK: - Trip
-    
-    func saveTrip(_ trip: Trip, asActive: Bool, withCompletion completion: ((Bool) -> ())? = nil) {
-        
-        let userID = userStore.user.id
-        
-        guard let newTripRef = newTripRef else { return }
-
-        newTripRef.setData([
-            "id" : UUID().uuidString,
-            "usserID" : userID,
-            "isActive" : asActive
-        ])
-        
-        for dest in trip.destinations {
-            let tripDestinationsRef = newTripRef.collection("Destinations").document(dest.name)
-            tripDestinationsRef.setData([
-                "id" : dest.id,
-                "lat" : dest.lat,
-                "lon" : dest.lon,
-                "name" : dest.name
-            ])
-        }
-        
-        let tripEndPointsRef = newTripRef.collection("EndPoints")
-        let startRef = tripEndPointsRef.document("Start")
-        startRef.setData([
-            "id" : trip.startLocation.id,
-            "lat" : trip.startLocation.lat,
-            "lon" : trip.startLocation.lon,
-            "name" : trip.startLocation.name
-        ])
-        let endRef = tripEndPointsRef.document("End")
-        endRef.setData([
-            "id" : trip.endLocation.id,
-            "lat" : trip.endLocation.lat,
-            "lon" : trip.endLocation.lon,
-            "name" : trip.endLocation.name
-        ])
-        
-        
-        //        newTripReference.setData([
-        //
-        //            "id" : UUID().uuidString,
-        //            "userID" : userID,
-        //            "isActive" : asActive,
-        //            "destinations" : [
-        //
-        //            ]
-        ////            "startLocation" : startLocation,
-        ////            "endLocation" : endLocation
-        //        ]) { error in
-        //            if let error = error {
-        //                print(error.localizedDescription)
-        //                completion?(false)
-        //            } else {
-        //                completion?(true)
-        //            }
-        //        }
-        //        for dest in trip.destinations {
-        //        do {
-        //            try newTripReference.collection("destinations").document(dest.id).setData(from: dest)
-        //        } catch let error {
-        //            print("Error writing city to Firestore: \(error)")
-        //        }
-        //        }
-    }
-    
-    func saveRoutesToFirestoreFromTrip(_ trip: Trip) {
-        
-        guard let db = db else { return }
-        
-        let tripLogic = TripLogic.instance
-        let userID = userStore.user.id
-//        let newTripRef = db.collection("Trips").document(userID)
-        
-        guard let newTripRef = newTripRef else { return }
-
-        
-        for route in trip.routes {
-            let routesRef = newTripRef.collection("Routes").document("\(route.tripPosition)")
-            let rt = route.rt
-            print(rt.name)
-            
-            routesRef.setData([
-                "id" : route.id,
-                "tripPosition" : route.tripPosition ?? 0,
-                "collectionID" : route.collectionID,
-                "rtName" : rt.name
-            ])
-        }
-    }
-    
-    func getAllTrips() {
-        let tripLogic = TripLogic.instance
-        
-        guard let db = db else { return }
-
-        db.collection("Trips").getDocuments { querySnapshot, error in
-            if let error = error {
-                print("Error getting trip documents: \(error)")
-            } else {
-                if let snapshot = querySnapshot {
-                    for document in snapshot.documents {
-                        if let dict = document.data() as? [String:AnyObject] {
-                            let key = dict["userID"] as? String ?? ""
-                            
-                            let currentUserID = self.userStore.user.id
-                            
-                            if key == currentUserID {
-                                let trip = Trip(dict: dict)
-                                tripLogic.trips.append(trip)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        //        db.collection("Trips")
-        //            .document(trip.id)
-        //            .setData([
-        //
-        //            ])
-    }
     
     func getSelectHotel(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         
@@ -377,29 +246,6 @@ class FirebaseManager: ObservableObject {
                     print("Document successfully removed!")
                 }
             }
-    }
-    
-    //MARK: - Get Trips
-    
-    func getTripLocationsForUser(withCompletion completion: @escaping(Trip) -> Void) {
-        
-        guard let db = db else { return }
-
-        db.collection("Trips")
-            .whereField("userID", isEqualTo: UserStore.instance.user.id)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                } else if let snapshot = snapshot {
-                    for doc in snapshot.documents {
-                        if let dict = doc.data() as? [String:AnyObject] {
-                            let trip = Trip(dict: dict)
-                            completion(trip)
-                        }
-                    }
-                }
-            }
-        
     }
     
     //MARK: - Search

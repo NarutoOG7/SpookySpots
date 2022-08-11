@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject var userStore = UserStore.instance
+    
 
     var body: some View {
         if userStore.isSignedIn {
@@ -17,6 +18,7 @@ struct ContentView: View {
         } else {
             CreativeSignInUp()
         }
+            
     }
 }
 

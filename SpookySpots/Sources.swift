@@ -20,5 +20,20 @@
  
  
  
+ <a href='https://www.freepik.com/vectors/pastel-texture'>Pastel texture vector created by VecMes - www.freepik.com</a>
+ 
+ 
+ 
+ <a href='https://www.freepik.com/photos/old-paper'>Old paper photo created by kjpargeter - www.freepik.com</a>
+ 
+ 
+ 
+ <a href='https://www.freepik.com/photos/parchment'>Parchment photo created by aopsan - www.freepik.com</a>
+ 
+ 
+ 
+ 
+ 
+ 
  
  */

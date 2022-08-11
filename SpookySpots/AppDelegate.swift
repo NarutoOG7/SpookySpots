@@ -12,19 +12,19 @@ import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    
     private var signedInUser = UserDefaults.standard.data(forKey: "user")
     
     @ObservedObject var locationManager = UserLocationManager.instance
     @ObservedObject var userStore = UserStore.instance
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-//            FirebaseApp.configure()
+
         Database.database().isPersistenceEnabled = true
 
         locationManager.checkIfLocationServicesIsEnabled()
 
         getUserIfSignedIn()
+        
 
         return true
     }
@@ -44,4 +44,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             }
         }
     }
+    
+//    func applicationWillTerminate(_ application: UIApplication) {
+//        userStore.user
+//    }
 }

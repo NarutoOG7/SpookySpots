@@ -34,6 +34,7 @@ struct SearchBar: View {
     private var magGlass: some View {
         Image(systemName: "magnifyingglass")
             .padding()
+            .foregroundColor(K.Colors.WeenyWitch.orange)
     }
     
     private var searchField: some View {
@@ -44,15 +45,19 @@ struct SearchBar: View {
                   :
                     $exploreVM.searchText)
             .padding()
+            .foregroundColor(K.Colors.WeenyWitch.brown)
+            .accentColor(K.Colors.WeenyWitch.orange)
+            
+
     }
     
     private var background: some View {
         RoundedRectangle(cornerRadius: 20)
-            .fill(Color.red)
+            .fill(K.Colors.WeenyWitch.lightest)
             .padding(2)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(Color.black))
+                    .fill(K.Colors.WeenyWitch.brown))
     }
     
     //MARK: - Buttons
