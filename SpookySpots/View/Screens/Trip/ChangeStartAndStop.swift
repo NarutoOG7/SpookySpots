@@ -201,7 +201,7 @@ struct ChangeStartAndStop: View {
 //            newTrip.startLocation = newStartingLocation
 //            newTrip.endLocation = newEndingLocation
             tripLogic.currentTrip = newTrip
-            tripLogic.destinations = newTrip.destinations
+    
             
             let newStartAnno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: startDest.lat, longitude: startDest.lon), locationID: startDest.id, title: startDest.name)
             let newEndAnno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: endDest.lat, longitude: endDest.lon), locationID: endDest.id, title: endDest.name)

@@ -18,6 +18,6 @@ class LocationStore: ObservableObject {
     @Published var nearbyLocations: [LocationModel] = []
     @Published var hauntedHotels: [LocationModel] = []
     @Published var trendingLocations: [LocationModel] = []
-    @Published var activeTripLocations: [Destination] = []
+//    @Published var activeTripLocations: [Destination] = []
 
 }

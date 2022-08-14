@@ -30,6 +30,7 @@ struct LocationCollection: View {
             .font(.title2)
             .fontWeight(.bold)
             .offset(x: 15, y: 17)
+//            .foregroundColor(K.Colors.LetsHang.purple)
             .foregroundColor(K.Colors.WeenyWitch.brown)
     }
     

@@ -109,19 +109,6 @@ struct Trip: Equatable, Identifiable {
             }
         }
         
-        var routes: [Route] = []
-        if let cdRoutes = cdTrip.routes?.allObjects as? [CDRoute] {
-            for cdRoute in cdRoutes {
-                let route = Route(id: cdRoute.id ?? "",
-                                  rt: MKRoute(),
-                                  collectionID: cdRoute.collectionID ?? "",
-                                  polyline: RoutePolyline(),
-                                  altPosition: 0,
-                                  tripPosition: Int(cdRoute.tripPosition) )
-                routes.append(route)
-            }
-        }
-        
         var start = Destination()
         var end = Destination()
         if let endPoints = cdTrip.endPoints?.allObjects as? [CDEndPoint] {
@@ -137,6 +124,40 @@ struct Trip: Equatable, Identifiable {
                                   name: cdEnd.destination?.name ?? "")
             }
         }
+        
+        var routes: [Route] = []
+        if let cdRoutes = cdTrip.routes?.allObjects as? [CDRoute] {
+            for cdRoute in cdRoutes {
+                if let cdMKRoute = cdRoute.mkRoute {
+                    var mkRoute = MKRoute()
+                    
+                    switch cdRoute.tripPosition {
+                    case 0:
+                        if let end = destinations.first {
+                        getSpecificRouteMatching(name: cdMKRoute.name ?? "", distance: cdMKRoute.distance, duration: cdMKRoute.expectedTravelTime, start: start, end: end, withCompletion: { route in
+                            mkRoute = route
+                        })
+                        }
+                    default:
+                        let start = destinations[Int(cdRoute.tripPosition) - 1]
+                        let end = destinations[Int(cdRoute.tripPosition)]
+                        getSpecificRouteMatching(name: cdMKRoute.name ?? "", distance: cdMKRoute.distance, duration: cdMKRoute.expectedTravelTime, start: start, end: end) { route in
+                            mkRoute = route
+                        }
+                    }
+                    
+                    let route = Route(id: cdRoute.id ?? "",
+                                      rt: MKRoute(),
+                                      collectionID: cdRoute.collectionID ?? "",
+                                      polyline: RoutePolyline(),
+                                      altPosition: 0,
+                                      tripPosition: Int(cdRoute.tripPosition) )
+                    routes.append(route)
+                }
+            }
+        }
+        
+
         self.id = cdTrip.id ?? ""
         self.userID = cdTrip.userID ?? ""
         self.isActive = cdTrip.isActive
@@ -151,6 +172,7 @@ struct Trip: Equatable, Identifiable {
         lhs.id == rhs.id
     }
     
+  
 }
 
 enum TripDetails: String {
@@ -158,3 +180,34 @@ enum TripDetails: String {
     case endLocationID = "EndID123"
 }
 
+//MARK: - DirectionsRequest to get specific Route upon init
+private func getSpecificRouteMatching(name: String, distance: Double, duration: Double, start: Destination, end: Destination,
+                                   withCompletion completion: @escaping(MKRoute) -> (Void)) {
+    let request = MKDirections.Request()
+    request.transportType = .automobile
+    request.requestsAlternateRoutes = true
+    
+    let mapItemA = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: start.lat, longitude: start.lon))
+    let mapItemB = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: end.lat, longitude: end.lon))
+    
+    request.source = MKMapItem(placemark: mapItemA)
+    request.destination = MKMapItem(placemark: mapItemB)
+    
+    let directions = MKDirections(request: request)
+    directions.calculate { response, error in
+        if let error = error {
+            print(error.localizedDescription)
+        }
+        guard let response = response else { return }
+
+        for rt in response.routes.prefix(3) {
+            if rt.name == name &&
+                rt.distance == CLLocationDistance(distance) &&
+                rt.expectedTravelTime == TimeInterval(duration) {
+        
+                                        completion(rt)
+            }
+        }
+        
+    }
+}

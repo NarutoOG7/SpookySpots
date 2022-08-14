@@ -37,14 +37,14 @@ struct CreativeSignInUp: View {
                     HStack(spacing: 15) {
                         
                         Rectangle()
-                            .fill(Color.black)
+                            .fill(K.Colors.WeenyWitch.light)
                             .frame(height: 1)
                         
                         Text("OR")
-                            .foregroundColor(Color.black)
+                            .foregroundColor(K.Colors.WeenyWitch.lightest)
                         
                         Rectangle()
-                            .fill(Color.black)
+                            .fill(K.Colors.WeenyWitch.light)
                             .frame(height: 1)
                         
                     }
@@ -75,12 +75,14 @@ struct CreativeSignInUp: View {
 
         }
         .preferredColorScheme(.dark)
-        .background(Color.white.edgesIgnoringSafeArea(.all))
+        .background(K.Colors.WeenyWitch.black.edgesIgnoringSafeArea(.all))
     }
     
     var logo: some View {
-        Image("apple")
-            .logoStyle()
+        Image("SimpleLogo")
+            .resizable()
+            .aspectRatio(1, contentMode: .fill)
+            .frame(width: 50)
         
     }
     
@@ -105,7 +107,7 @@ struct CreativeSignInUp: View {
             .font(.title3)
             .fontWeight(.light)
             .italic()
-            .foregroundColor(.pink)
+            .foregroundColor(K.Colors.WeenyWitch.orange)
             .onTapGesture(perform: continueAsGuestTapped)
             .padding()
     }
@@ -153,6 +155,7 @@ struct Login: View {
     @State var showingAlertPasswordRest = false
     
     var auth = Authorization()
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             
@@ -167,10 +170,10 @@ struct Login: View {
             }
             .padding()
             .padding(.bottom, 65)
-            .background(Color.black)
+            .background(K.Colors.WeenyWitch.light)
             .clipShape(CurvedShapeLeft())
             .contentShape(CurvedShapeLeft())
-            .shadow(color: .white.opacity(0.3), radius: 5, x: 0, y: -5)
+            .shadow(color: K.Colors.WeenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
             .onTapGesture(perform: authTypeLoginTapped)
             .cornerRadius(45)
             .padding(.horizontal, 20)
@@ -187,12 +190,12 @@ struct Login: View {
         HStack {
             VStack(spacing: 50) {
                 Text("Login")
-                    .foregroundColor(self.index == 0 ? .white : .gray)
+                    .foregroundColor(self.index == 0 ? K.Colors.WeenyWitch.brown : K.Colors.WeenyWitch.lightest)
                     .font(.title)
                     .fontWeight(.bold)
                 
                 Capsule()
-                    .fill(self.index == 0 ? Color.pink : Color.clear)
+                    .fill(self.index == 0 ? K.Colors.WeenyWitch.brown : Color.clear)
                     .frame(width: 90, height: 4)
                     .offset(y: -35)
                 
@@ -206,16 +209,19 @@ struct Login: View {
         VStack {
             HStack(spacing: 15) {
                 Image(systemName: "envelope.fill")
-                    .foregroundColor(.white)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
                 
-                TextField("Email Address", text: self.$emailInput)
-                    .foregroundColor(.white)
+                TextField("", text: self.$emailInput)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
+                    .placeholder(when: self.emailInput.isEmpty) {
+                        Text("Email Address")
+                            .foregroundColor(K.Colors.WeenyWitch.lightest)
+                    }
             }
             
-            Divider().background(Color.gray)
-        }
+            Divider().background(K.Colors.WeenyWitch.orange)        }
         .padding(.horizontal)
         .padding(.top, 40)
     }
@@ -225,22 +231,32 @@ struct Login: View {
             HStack(spacing: 15) {
                 Button(action: showPasswordTapped) {
                     Image(systemName: isSecured ? "eye.slash.fill" : "eye")
-                        .foregroundColor(.white)
+                        .foregroundColor(K.Colors.WeenyWitch.brown)
                 }
                 
                 if isSecured {
-                    SecureField("Password", text: self.$passwordInput)
+                    SecureField("", text: self.$passwordInput)
                         .disableAutocorrection(true)
                         .textInputAutocapitalization(.never)
+                        .foregroundColor(K.Colors.WeenyWitch.brown)
+                        .placeholder(when: self.passwordInput.isEmpty) {
+                            Text("Password")
+                                .foregroundColor(K.Colors.WeenyWitch.lightest)
+                        }
+                        
                 } else {
-                    TextField("Password", text: self.$passwordInput)
+                    TextField("", text: self.$passwordInput)
                         .disableAutocorrection(true)
                         .textInputAutocapitalization(.never)
+                        .foregroundColor(K.Colors.WeenyWitch.brown)
+                        .placeholder(when: self.passwordInput.isEmpty) {
+                            Text("Password")
+                                .foregroundColor(K.Colors.WeenyWitch.lightest)
+                        }
                 }
                 
             }
-            Divider().background(Color.gray)
-            
+            Divider().background(K.Colors.WeenyWitch.orange)
             passwordError
         }
         .padding(.horizontal)
@@ -273,7 +289,7 @@ struct Login: View {
             
             Button(action: forgotPasswordTapped) {
                 Text("Forgot Password?")
-                    .foregroundColor(Color.white.opacity(0.6))
+                    .foregroundColor(K.Colors.WeenyWitch.lightest)
             }
         }
         .padding(.horizontal)
@@ -283,13 +299,13 @@ struct Login: View {
     private var loginButton: some View {
         Button(action: loginTapped) {
             Text("LOGIN")
-                .foregroundColor(.white)
+                .foregroundColor(K.Colors.WeenyWitch.brown)
                 .fontWeight(.bold)
                 .padding(.vertical)
                 .padding(.horizontal, 50)
-                .background(Color.pink)
+                .background(K.Colors.WeenyWitch.orange)
                 .clipShape(Capsule())
-                .shadow(color: Color.white.opacity(0.1), radius: 5, x: 0, y: 5)
+                .shadow(color: K.Colors.WeenyWitch.lightest.opacity(0.1), radius: 5, x: 0, y: 5)
         }
         .offset(y: 25)
         .opacity(self.index == 0 ? 1 : 0)
@@ -358,10 +374,10 @@ struct SignUP: View {
             }
             .padding()
             .padding(.bottom, 65)
-            .background(Color.black)
+            .background(K.Colors.WeenyWitch.light)
             .clipShape(CurvedShapeRight())
             .contentShape(CurvedShapeRight())
-            .shadow(color: .white.opacity(0.3), radius: 5, x: 0, y: -5)
+            .shadow(color: K.Colors.WeenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
             .onTapGesture(perform: authTypeSignUpTapped)
             .cornerRadius(45)
             .padding(.horizontal, 20)
@@ -375,12 +391,12 @@ struct SignUP: View {
             
             VStack(spacing: 50) {
                 Text("Sign Up")
-                    .foregroundColor(self.index == 1 ? .white : .gray)
+                    .foregroundColor(self.index == 1 ? K.Colors.WeenyWitch.brown : K.Colors.WeenyWitch.lightest)
                     .font(.title)
                     .fontWeight(.bold)
                 
                 Capsule()
-                    .fill(self.index == 1 ? Color.blue : Color.clear)
+                    .fill(self.index == 1 ? K.Colors.WeenyWitch.brown : Color.clear)
                     .frame(width: 90, height: 4)
                     .offset(y: -35)
                 
@@ -393,14 +409,19 @@ struct SignUP: View {
         VStack {
             HStack(spacing: 15) {
                 Image(systemName: "person.fill")
-                    .foregroundColor(.white)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
                 
-                TextField("Your Name", text: self.$usernameInput)
+                TextField("", text: self.$usernameInput)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
+                    .placeholder(when: usernameInput.isEmpty) {
+                        Text("Your Name")
+                            .foregroundColor(K.Colors.WeenyWitch.lightest)
+                    }
             }
             
-            Divider().background(Color.gray)
+            Divider().background(K.Colors.WeenyWitch.orange)
         }
         .padding(.horizontal)
         .padding(.top, 40)
@@ -410,14 +431,19 @@ struct SignUP: View {
         VStack {
             HStack(spacing: 15) {
                 Image(systemName: "envelope.fill")
-                    .foregroundColor(.white)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
                 
-                TextField("Email Address", text: self.$emailInput)
+                TextField("", text: self.$emailInput)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
+                    .placeholder(when: usernameInput.isEmpty) {
+                        Text("Email Address")
+                            .foregroundColor(K.Colors.WeenyWitch.lightest)
+                    }
             }
             
-            Divider().background(Color.gray)
+            Divider().background(K.Colors.WeenyWitch.orange)
             emailInUseErrorView
         }
         .padding(.horizontal)
@@ -428,14 +454,18 @@ struct SignUP: View {
         VStack {
             HStack(spacing: 15) {
                 Image(systemName: "eye.slash.fill")
-                    .foregroundColor(.white)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
                 
-                SecureField("Password", text: self.$passwordInput)
+                SecureField("", text: self.$passwordInput)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
+                    .placeholder(when: usernameInput.isEmpty) {
+                        Text("Password")
+                            .foregroundColor(K.Colors.WeenyWitch.lightest)
+                    }
             }
-            Divider().background(Color.gray)
-        }
+            Divider().background(K.Colors.WeenyWitch.orange)        }
         .padding(.horizontal)
         .padding(.top, 40)
     }
@@ -444,14 +474,18 @@ struct SignUP: View {
         VStack {
             HStack(spacing: 15) {
                 Image(systemName: "eye.slash.fill")
-                    .foregroundColor(.white)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
                 
-                SecureField("Confirm Password", text: self.$confirmPasswordInput)
+                SecureField("", text: self.$confirmPasswordInput)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
+                    .placeholder(when: usernameInput.isEmpty) {
+                        Text("Confirm Password")
+                            .foregroundColor(K.Colors.WeenyWitch.lightest)
+                    }
             }
-            Divider().background(Color.gray)
-            
+            Divider().background(K.Colors.WeenyWitch.orange)
             passwordErrorView
         }
         .padding(.horizontal)
@@ -486,13 +520,13 @@ struct SignUP: View {
     private var signUpButton: some View {
         Button(action: signUpTapped) {
             Text("SIGNUP")
-                .foregroundColor(self.index == 1 ? .white : .gray)
+                .foregroundColor(self.index == 1 ? K.Colors.WeenyWitch.brown : .gray)
                 .fontWeight(.bold)
                 .padding(.vertical)
                 .padding(.horizontal, 50)
-                .background(self.index == 1 ? Color.blue : Color.clear)
+                .background(self.index == 1 ? K.Colors.WeenyWitch.orange : Color.clear)
                 .clipShape(Capsule())
-                .shadow(color: Color.white.opacity(0.1), radius: 5, x: 0, y: 5)
+                .shadow(color: K.Colors.WeenyWitch.lightest.opacity(0.1), radius: 5, x: 0, y: 5)
         }
         .offset(y: 25)
         .opacity(self.index == 1 ? 1 : 0)
@@ -562,7 +596,23 @@ extension Image {
         return self
             .resizable()
             .renderingMode(.original)
-            .frame(width: 50, height: 50)
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 75, height: 75)
             .clipShape(Circle())
+    }
+}
+
+
+//MARK: - Placeholder
+extension View {
+    func placeholder<Content: View>(
+        when shouldShow: Bool,
+        alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content) -> some View {
+
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
+        }
     }
 }

@@ -188,18 +188,18 @@ extension ExploreByMap {
     private var listButton: some View {
         CircleButton(size: .small,
                      image: Image(systemName: "list.bullet"),
-                     outlineColor: .black,
-                     iconColor: .black,
-                     backgroundColor: .white,
+                     outlineColor: K.Colors.WeenyWitch.brown,
+                     iconColor: K.Colors.WeenyWitch.orange,
+                     backgroundColor: K.Colors.WeenyWitch.lightest,
                      clicked: listButtonPressed)
     }
     
     private var currentLocationButton: some View {
         CircleButton(size: .small,
                      image: Image(systemName: "location"),
-                     outlineColor: .black,
-                     iconColor: .black,
-                     backgroundColor: .white,
+                     outlineColor: K.Colors.WeenyWitch.brown,
+                     iconColor: K.Colors.WeenyWitch.orange,
+                     backgroundColor: K.Colors.WeenyWitch.lightest,
                      clicked: currentLocationPressed)
     }
     

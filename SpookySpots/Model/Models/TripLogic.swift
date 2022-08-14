@@ -277,9 +277,9 @@ class TripLogic: ObservableObject {
             
             if let trip = currentTrip {
                                 
-                self.destinations = trip.destinations
-                locationStore.activeTripLocations = destinations
-                
+//                self.destinations = trip.destinations
+//                locationStore.activeTripLocations = destinations
+//
                 
                 mapRegion = MKCoordinateRegion(center:
                                                 CLLocationCoordinate2D(
@@ -412,7 +412,7 @@ class TripLogic: ObservableObject {
     //MARK: - Destinations
     
     func destinationsContains(_ location: LocationModel) -> Bool {
-        self.destinations.contains(where:  { $0.name == location.location.name})
+        (self.currentTrip?.destinations ?? []).contains(where:  { $0.name == location.location.name})
     }
     
     func addDestination(_ location: LocationModel) {
@@ -430,14 +430,14 @@ class TripLogic: ObservableObject {
                 self.currentTrip?.destinations.append(destination)
             }
             self.destinations.append(destination)
-            self.locationStore.activeTripLocations.append(destination)
+//            self.locationStore.activeTripLocations.append(destination)
         }
     }
     
     func removeDestination(_ location: LocationModel) {
         objectWillChange.send()
         self.currentTrip?.destinations.removeAll(where: { $0.name == location.location.name })
-        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
+//        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
         self.destinations.removeAll(where: { $0.name == location.location.name })
         self.tripRoutes.removeAll(where: { $0.id == "\(location.location.id)" })
     }
@@ -446,7 +446,7 @@ class TripLogic: ObservableObject {
     func removeDestination(atIndex index: Int) {
         objectWillChange.send()
         self.currentTrip?.destinations.remove(at: index)
-        self.locationStore.activeTripLocations.remove(at: index)
+//        self.locationStore.activeTripLocations.remove(at: index)
         self.destinations.remove(at: index)
         if tripRoutes.indices.contains(index) {
             self.tripRoutes.remove(at: index)
@@ -486,6 +486,23 @@ class TripLogic: ObservableObject {
             self.distance += distance
         }
         self.totalTripDistanceAsLocalUnitString = String(format: "%.0f", distance)
+    }
+    
+    func getTotalDistanceAndUnit() -> (Double,String) {
+        let locale = Locale.current
+        let usesMetric = locale.usesMetricSystem
+        
+        self.distance = 0
+        var unitSystem = usesMetric ? "meters" : "miles"
+  
+        for route in tripRoutes {
+            let meters = route.rt.distance
+            let miles = meters * 0.000621371
+            let distance = usesMetric ? meters : miles
+            self.distance += distance
+        }
+        print(unitSystem)
+        return (distance, unitSystem)
     }
     
     func setHighlightedRouteDistanceAsLocalString() {
@@ -554,7 +571,8 @@ class TripLogic: ObservableObject {
     
     func setCenterOnRoute() {
         var arrayOfCoordinates: [CLLocationCoordinate2D] = []
-        for dest in self.destinations {
+        if let destinations = self.currentTrip?.destinations {
+        for dest in destinations {
             arrayOfCoordinates.append(CLLocationCoordinate2D(latitude: dest.lat, longitude: dest.lon))
         }
         var center = CLLocationCoordinate2D()
@@ -564,6 +582,7 @@ class TripLogic: ObservableObject {
             center = arrayOfCoordinates.center()
         }
         self.mapRegion = MKCoordinateRegion(center: center, span: MapDetails.defaultSpan)
+        }
     }
     
     //MARK: -  Routes
@@ -636,7 +655,7 @@ class TripLogic: ObservableObject {
             
             var routesReturnable: [Route] = []
             
-            for destination in destinations {
+            for destination in currentTrip.destinations {
                 
                 makeDirectionsRequest(start: first, end: destination) { routes in
                     if let first = routes.first {
@@ -662,7 +681,7 @@ class TripLogic: ObservableObject {
     }
     
     func getReturnHome(withCompletion completion: @escaping(Route) -> (Void)) {
-        if let start = self.destinations.last,
+        if let start = self.currentTrip?.destinations.last,
            let end = currentTrip?.endLocation {
             
             makeDirectionsRequest(start: start, end: end) { routes in

@@ -9,16 +9,28 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @ObservedObject var userStore = UserStore.instance
+    @State var showSplash = true
     
+    @ObservedObject var userStore = UserStore.instance
+
 
     var body: some View {
-        if userStore.isSignedIn {
-            TabBarSetup()
-        } else {
-            CreativeSignInUp()
+        ZStack {
+            if userStore.isSignedIn {
+                TabBarSetup()
+            } else {
+                CreativeSignInUp()
+            }
+            SplashScreen()
+              .opacity(showSplash ? 1 : 0)
+              .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                  withAnimation() {
+                    self.showSplash = false
+                  }
+                }
+            }
         }
-            
     }
 }
 

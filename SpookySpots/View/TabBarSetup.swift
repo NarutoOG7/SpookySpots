@@ -17,9 +17,12 @@ struct TabBarSetup: View {
     
     init() {
         let appearance =  UITabBar.appearance()
-       appearance.barTintColor = UIColor(K.Colors.WeenyWitch.brown)
+        //        appearance.barTintColor = UIColor(K.Colors.LetsHang.DarkPurple)
+        //        appearance.unselectedItemTintColor = UIColor(K.Colors.LetsHang.lightBrown)
+        appearance.barTintColor = UIColor(K.Colors.WeenyWitch.black)
         appearance.unselectedItemTintColor = UIColor(K.Colors.WeenyWitch.light)
-      }
+
+    }
     
     var body: some View {
 //        NavigationView {
@@ -33,6 +36,7 @@ struct TabBarSetup: View {
         .tint(Color("WeenyWitch/ColorThree"))
         .environmentObject(favoritesLogic)
         .environmentObject(tripLogic)
+
         
 //        }
     }

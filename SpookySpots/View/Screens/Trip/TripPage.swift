@@ -70,7 +70,7 @@ struct TripPage: View {
         
 
         }
-            .onChange(of: locationStore.activeTripLocations, perform: { newValue in
+        .onChange(of: tripLogic.currentTrip?.destinations, perform: { newValue in
                 if newValue == [] {
                     self.editMode = .inactive
                     self.slideCardCanMove = true
@@ -112,7 +112,7 @@ struct TripPage: View {
     
     private var trip: some View {
         let view: AnyView
-        if locationStore.activeTripLocations.isEmpty {
+        if (tripLogic.currentTrip?.destinations ?? []).isEmpty {
             view = AnyView(emptyTripView)
         } else {
             view = AnyView(tripView)
@@ -144,8 +144,7 @@ struct TripPage: View {
                             VStack(alignment: .leading, spacing: 16) {
                                 Text("TOTAL")
                                     .font(.caption)
-                                totalDurationView
-                                totalDistanceView
+                                totalTripInfo
                             }
                             
                     }
@@ -169,17 +168,21 @@ struct TripPage: View {
         
     }
     
-    private var totalDistanceView: some View {
-        HStack(spacing: 16) {
-            Text(tripLogic.totalTripDistanceAsLocalUnitString)
-                .font(.avenirNextRegular(size: 23))
-                .fontWeight(.medium)
-            Text("miles")
-                .font(.avenirNextRegular(size: 15))
-                .fontWeight(.bold)
-                .foregroundColor(.secondary)
-        }
+    private var totalTripInfo: some View {
+        DurationDistanceString(time: tripLogic.totalTripDurationAsTime, distanceAndUnit: tripLogic.getTotalDistanceAndUnit())
     }
+    
+//    private var totalDistanceView: some View {
+//        HStack(spacing: 16) {
+//            Text(tripLogic.totalTripDistanceAsLocalUnitString)
+//                .font(.avenirNextRegular(size: 23))
+//                .fontWeight(.medium)
+//            Text("miles")
+//                .font(.avenirNextRegular(size: 15))
+//                .fontWeight(.bold)
+//                .foregroundColor(.secondary)
+//        }
+//    }
     
     private var legDistanceView: some View {
         HStack(spacing: 16) {
@@ -192,25 +195,25 @@ struct TripPage: View {
                 .foregroundColor(.secondary)
         }
     }
-    
-    private var totalDurationView: some View {
-        HStack(spacing: 10) {
-            Text("\(tripLogic.totalTripDurationAsTime.hours)")
-                .font(.avenirNextRegular(size: 23))
-                .fontWeight(.medium)
-            Text("hr")
-                .font(.avenirNextRegular(size: 15))
-                .fontWeight(.bold)
-                .foregroundColor(.secondary)
-            Text("\(tripLogic.totalTripDurationAsTime.minutes)")
-                .font(.avenirNextRegular(size: 23))
-                .fontWeight(.medium)
-            Text("min")
-                .font(.avenirNextRegular(size: 15))
-                .fontWeight(.bold)
-                .foregroundColor(.secondary)
-        }
-    }
+//
+//    private var totalDurationView: some View {
+//        HStack(spacing: 10) {
+//            Text("\(tripLogic.totalTripDurationAsTime.hours)")
+//                .font(.avenirNextRegular(size: 23))
+//                .fontWeight(.medium)
+//            Text("hr")
+//                .font(.avenirNextRegular(size: 15))
+//                .fontWeight(.bold)
+//                .foregroundColor(.secondary)
+//            Text("\(tripLogic.totalTripDurationAsTime.minutes)")
+//                .font(.avenirNextRegular(size: 23))
+//                .fontWeight(.medium)
+//            Text("min")
+//                .font(.avenirNextRegular(size: 15))
+//                .fontWeight(.bold)
+//                .foregroundColor(.secondary)
+//        }
+//    }
     
     private var legDurationView: some View {
         HStack(spacing: 10) {
@@ -273,7 +276,7 @@ struct TripPage: View {
                 
             }.listStyle(.plain)
                 .disabled(editMode == .inactive)
-                .frame(height: CGFloat(tripLogic.destinations.count) * 50)
+                .frame(height: CGFloat((tripLogic.currentTrip?.destinations ?? []).count) * 50)
         }
     }
     
@@ -401,7 +404,7 @@ struct TripPage: View {
     private var editButton: some View {
         let view: AnyView
         if tripLogic.isNavigating ||
-            locationStore.activeTripLocations == [] {
+            tripLogic.currentTrip?.destinations == [] {
             view = AnyView(EmptyView())
         } else {
             view = AnyView(Button(action: editTapped) {
@@ -449,7 +452,7 @@ struct TripPage: View {
     }
     
     private func moveRow(_ source: IndexSet, _ destination: Int) {
-        locationStore.activeTripLocations.move(fromOffsets: source, toOffset: destination)
+        tripLogic.currentTrip?.destinations.move(fromOffsets: source, toOffset: destination)
 //        if var trip = tripLogic.currentTrip {
 ////            if trip.destinations.indices.contains(source.) {
 //                trip.destinations.move(fromOffsets: source, toOffset: destination)
@@ -462,7 +465,7 @@ struct TripPage: View {
             let newTrip = Trip(id: oldTrip.id, userID: oldTrip.userID, isActive: oldTrip.isActive, destinations: destinations ?? [], startLocation: oldTrip.startLocation, endLocation: oldTrip.endLocation, routes: oldTrip.routes)
             tripLogic.currentTrip = newTrip
         }
-        tripLogic.destinations.move(fromOffsets: source, toOffset: destination)
+        tripLogic.currentTrip?.destinations.move(fromOffsets: source, toOffset: destination)
 
         
         editMode = .active
@@ -675,5 +678,15 @@ struct DirectionsLabel: View {
                 let speechUtterance = AVSpeechUtterance(string: txt)
                     speechSynthesizer.speak(speechUtterance)
             }
+    }
+}
+
+//MARK: - Total Trip Details String
+
+struct DurationDistanceString: View {
+    let time: Time
+    let distanceAndUnit: (Double,String)
+    var body: some View {
+        Text("\(time.hours) hr \(time.minutes) min(\(Int(distanceAndUnit.0)) \(distanceAndUnit.1))")
     }
 }

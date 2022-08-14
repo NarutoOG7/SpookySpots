@@ -59,6 +59,11 @@ struct PersistenceController {
                     routeContext.collectionID = route.collectionID
                     routeContext.rtName = route.rt.name
                     routeContext.trip = newTrip
+                    let mkRouteContext = CDMKRoute(context: context)
+                    mkRouteContext.distance = route.rt.distance
+                    mkRouteContext.expectedTravelTime = route.rt.expectedTravelTime
+                    mkRouteContext.name = route.rt.name
+                    routeContext.mkRoute = mkRouteContext
                     newTrip.addToRoutes(routeContext)
                     
                     //            cdRoutes.append(routeContext)
@@ -118,18 +123,28 @@ struct PersistenceController {
                 // update
 //                let trips = try request.execute()
                 let trips = try context.fetch(request)
-                if let tripToUpdate = trips.first {
-                    tripToUpdate.destinations = NSSet()
-                    tripToUpdate.routes = NSSet()
-                    tripToUpdate.endPoints = NSSet()
+                if let tripToUpdate = trips.last {
+                    tripToUpdate.removeFromDestinations(tripToUpdate.destinations ?? [])
+                    tripToUpdate.removeFromRoutes(tripToUpdate.routes ?? [])
+                    tripToUpdate.removeFromEndPoints(tripToUpdate.endPoints ?? [])
+                    
+                    print(tripToUpdate)
+
                     for route in trip.routes {
                         let routeContext = CDRoute(context: context)
+   
                         routeContext.id = route.id
                         routeContext.tripPosition = Int16(route.tripPosition ?? 0)
                         routeContext.collectionID = route.collectionID
                         routeContext.rtName = route.rt.name
                         routeContext.trip = tripToUpdate
+                        let mkRouteContext = CDMKRoute(context: context)
+                        mkRouteContext.distance = route.rt.distance
+                        mkRouteContext.expectedTravelTime = route.rt.expectedTravelTime
+                        mkRouteContext.name = route.rt.name
+                        routeContext.mkRoute = mkRouteContext
                         tripToUpdate.addToRoutes(routeContext)
+                    
                         
                         //            cdRoutes.append(routeContext)
                     }
@@ -194,6 +209,7 @@ struct PersistenceController {
             let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
             let trips = try context.fetch(request)
             if let cdTrip = trips.first(where: { $0.isActive }) {
+                print(cdTrip)
                 return Trip(cdTrip)
             }
         } catch {

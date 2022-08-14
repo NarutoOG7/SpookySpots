@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import MapKitGoogleStyler
 
 struct MapViewUI: UIViewRepresentable {
 
@@ -25,6 +26,7 @@ struct MapViewUI: UIViewRepresentable {
         mapView.isPitchEnabled = false
         mapView.addAnnotations(geoFireManager.gfOnMapLocations)
         mapView.delegate = context.coordinator
+        configureTileOverlay()
         return mapView
     }
     
@@ -36,8 +38,8 @@ struct MapViewUI: UIViewRepresentable {
     
     func addCurrentLocation(to view: MKMapView) {
         if let currentLocation = userStore.currentLocation {
-            view.addAnnotation(
-                MKPlacemark(coordinate: currentLocation.coordinate))
+            let plc = StartAnnotation(coordinate: currentLocation.coordinate, locationID: "0")
+            view.addAnnotation(plc)
         }
     }
     
@@ -75,10 +77,19 @@ struct MapViewUI: UIViewRepresentable {
             
             switch annotation {
                 
+            case _ as StartAnnotation:
+                let annoView = mapView.dequeueReusableAnnotationView(withIdentifier: "START") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "Start")
+                annoView.canShowCallout = false
+                annoView.markerTintColor = .white
+                annoView.titleVisibility = .hidden
+                annoView.glyphText = "🕺"
+                
+                return annoView
+                
             case _ as MKClusterAnnotation:
                 
                 let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "cluster") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "cluster")
-                annotationView.markerTintColor = .black
+                annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.orange)
                 annotationView.titleVisibility = .hidden
                 annotationView.subtitleVisibility = .hidden
                 return annotationView
@@ -88,7 +99,7 @@ struct MapViewUI: UIViewRepresentable {
                 let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "SpookySpot") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "Spooky Spot")
                 annotationView.canShowCallout = false
                 annotationView.clusteringIdentifier = "cluster"
-                annotationView.markerTintColor = .purple
+                annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.black)
                 annotationView.titleVisibility = .hidden
                 annotationView.glyphText = "👻"
 
@@ -129,5 +140,43 @@ struct MapViewUI: UIViewRepresentable {
                 }
             }
         }
+        
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            switch overlay {
+            case let tileOverlay as MKTileOverlay:
+                return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+            default:
+                return MKOverlayRenderer(overlay: overlay)
+            }
+        }
+        
+//        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+//                // This is the final step. This code can be copied and pasted into your project
+//                // without thinking on it so much. It simply instantiates a MKTileOverlayRenderer
+//                // for displaying the tile overlay.
+//                if let tileOverlay = overlay as? MKTileOverlay {
+//                    return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+//                } else {
+//                    return MKOverlayRenderer(overlay: overlay)
+//                }
+//        }
     }
+//MARK: - MapKit Style
+    
+    private func configureTileOverlay() {
+            // We first need to have the path of the overlay configuration JSON
+            guard let overlayFileURLString = Bundle.main.path(forResource: "overlay", ofType: "json") else {
+                    return
+            }
+            let overlayFileURL = URL(fileURLWithPath: overlayFileURLString)
+            
+            // After that, you can create the tile overlay using MapKitGoogleStyler
+            guard let tileOverlay = try? MapKitGoogleStyler.buildOverlay(with: overlayFileURL) else {
+                return
+            }
+            
+            // And finally add it to your MKMapView
+            mapView.addOverlay(tileOverlay)
+    }
+
 }
