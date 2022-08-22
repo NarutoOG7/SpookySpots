@@ -30,8 +30,10 @@ struct LargeImageLocationView: View {
                         address
                     }
                     Spacer()
-                    priceTag
+//                    }
+//                    priceTag
                 }.padding(10).background(background)
+
             }
             
         }.cornerRadius(25).frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
@@ -70,33 +72,33 @@ struct LargeImageLocationView: View {
             .padding(.horizontal)
     }
     
-    private var price: some View {
-        let txt: Text
-        if let price = location.location.price {
-           if price != 0 {
-               txt = Text(String(format: "$%.0f", price))
-           } else {
-               txt = Text("")
-           }
-        } else {
-            txt = Text("")
-        }
-        return txt
-            .font(.title2)
-            .foregroundColor(Color(red: 18/255, green: 203/255, blue: 196/255))
-            .multilineTextAlignment(.trailing)
-    }
+//    private var price: some View {
+//        let txt: Text
+//        if let price = location.location.price {
+//           if price != 0 {
+//               txt = Text(String(format: "$%.0f", price))
+//           } else {
+//               txt = Text("")
+//           }
+//        } else {
+//            txt = Text("")
+//        }
+//        return txt
+//            .font(.title2)
+//            .foregroundColor(Color(red: 18/255, green: 203/255, blue: 196/255))
+//            .multilineTextAlignment(.trailing)
+//    }
     
-    private var priceTag: some View {
-        VStack(alignment: .trailing, spacing: -5) {
-            price
-            Text("/night")
-                .font(.footnote)
-                .fontWeight(.light)
-                .foregroundColor(Color(red: 18/255, green: 203/255, blue: 196/255))
-        }
-        .padding(.trailing)
-    }
+//    private var priceTag: some View {
+//        VStack(alignment: .trailing, spacing: -5) {
+//            price
+//            Text("/night")
+//                .font(.footnote)
+//                .fontWeight(.light)
+//                .foregroundColor(Color(red: 18/255, green: 203/255, blue: 196/255))
+//        }
+//        .padding(.trailing)
+//    }
     
     private var background: some View {
         Rectangle()

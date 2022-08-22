@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct LD: View {
     
-    var location: LocationModel
+    @State var location: LocationModel
     
     @State private var imageURL = URL(string: "")
     @State private var isSharing = false
@@ -25,35 +25,97 @@ struct LD: View {
     
     @Environment(\.presentationMode) var presentationMode
     
+//    var body: some View {
+//        ScrollView {
+//
+//        VStack {
+//            GeometryReader { geo in
+//                WebImage(url: self.imageURL)
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fill)
+//                    .blur(radius: self.getBlurRadiusForImage(geo))
+//                    .shadow(radius: self.calculateShadow(geo))
+//                    .overlay(header
+//                        .opacity(self.getBlurRadiusForImage(geo) - 0.35))
+//                    .frame(width: geo.size.width, height: self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
+//                    .offset(y: geo.frame(in: .global).origin.y < 0
+//                            ? abs(geo.frame(in: .global).origin.y)
+//                            : -geo.frame(in: .global).origin.y)
+////
+//                card
+//            }
+//            }
+////            .overlay(card)
+//        }
+//        
+//        .onAppear {
+//            loadImageFromFirebase()
+//        }
+//        .sheet(isPresented: $isSharing) {
+//            ShareActivitySheet(itemsToShare: [location.location.name])
+//        }
+//
+//        .background(Image(K.Images.paperBackground).opacity(0.5))
+////    .edgesIgnoringSafeArea(.vertical)
+//    .navigationBarHidden(true)
+//}
+    
+    var card: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            title
+            address
+            avgRatingDisplay
+            buttons
+            Divider()
+            description
+            Spacer()
+            moreInfoLink
+            Spacer()
+            reviewHelper
+        }
+        .padding()
+        .padding(.vertical, 100)
+        .onAppear {
+            if LocationStore.instance.reviewBucket.contains(where: { $0.locationID == "\(location.location.id)" }) {
+                var newLocation = location
+            for review in LocationStore.instance.reviewBucket.filter({ $0.locationID == "\(location.location.id)" }) {
+                newLocation.reviews.append(review)
+            }
+                self.location = newLocation
+            }
+        }
+    }
+    
+    var buttons: some View {
+        HStack(alignment: .top) {
+            Spacer()
+            directionsButton
+            shareButton
+            addRemoveFromTrip
+            favoriteButton
+            Spacer()
+        }.padding(.top)
+            .frame(height: 150)
+    }
+    
     var body: some View {
-        ScrollView {
+        ScrollView(showsIndicators: false) {
             ZStack {
                 VStack(alignment: .leading, spacing: 7) {
-                    
                     title
                     address
                     avgRatingDisplay
-                    
-                    HStack(alignment: .top) {
-                        Spacer()
-                        directionsButton
-                        shareButton
-                        addRemoveFromTrip
-                        favoriteButton
-                        Spacer()
-                    }.padding(.top)
-                        .frame(height: 150)
-                    
+                    buttons
                     Divider()
                     description
                     Spacer()
                     moreInfoLink
                     Spacer()
-                    mainReview
+                    reviewHelper
                 }
                 .clipped()
                 .padding(.horizontal)
-                .padding(.vertical, imageMaxHeight + 16.0)
+                .padding(.vertical, imageMaxHeight + 36.0)
                 
                 
                 image
@@ -75,6 +137,7 @@ struct LD: View {
                         ShareActivitySheet(itemsToShare: [location.location.name])
                     }
             }
+            .background(Image(K.Images.paperBackground).opacity(0.5))
         }
         .edgesIgnoringSafeArea(.vertical)
         .navigationBarHidden(true)
@@ -107,7 +170,7 @@ struct LD: View {
         GeometryReader { geo in
             WebImage(url: self.imageURL)
                 .resizable()
-                .aspectRatio(contentMode: .fill)
+                .aspectRatio(1.75, contentMode: .fill)
                 .blur(radius: self.getBlurRadiusForImage(geo))
                 .shadow(radius: self.calculateShadow(geo))
                 .overlay(header
@@ -117,7 +180,6 @@ struct LD: View {
                         ? abs(geo.frame(in: .global).origin.y)
                         : -geo.frame(in: .global).origin.y)
             
-                
         }
     }
     
@@ -137,64 +199,49 @@ struct LD: View {
     }
     
     private var avgRatingDisplay: some View {
-        HStack {
-            FiveStars(location: location.location)
-            Text(location.getAvgRating())
-                .font(.avenirNext(size: 15))
-                .foregroundColor(K.Colors.WeenyWitch.orange)
-                .offset(y: 1)
-        }
+            FiveStars(
+                rating: .constant(location.getAvgRatingIntAndString().number),
+                color: K.Colors.WeenyWitch.orange)
     }
     
     private var description: some View {
-        VStack {
             Text(location.location.description ?? "")
                 .font(.avenirNext(size: 17))
                 .lineLimit(nil)
                 .foregroundColor(K.Colors.WeenyWitch.brown)
-            Text(location.location.description ?? "")
-                .font(.avenirNext(size: 17))
-                .lineLimit(nil)
-                .foregroundColor(K.Colors.WeenyWitch.brown)
-            Text(location.location.description ?? "")
-                .font(.avenirNext(size: 17))
-                .lineLimit(nil)
-                .foregroundColor(K.Colors.WeenyWitch.brown)
-        }
     }
     
-    private var mainReview: some View {
-        let view: AnyView
-        if location.location.review?.lastReview != "" {
-            view = AnyView(VStack(alignment: .leading) {
+    private var reviewHelper: some View {
+        VStack(alignment: .leading) {
+//            if location.location.review?.lastReview == "" {
+            if location.reviews.isEmpty {
                 Divider()
-                HStack {
-                    Text(location.location.review!.lastReviewTitle)
-                        .font(.avenirNext(size: 17))
-                    Spacer()
-                    FiveStars(location: location.location)
+                Text("No Reviews")
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
+            } else {
+                if let random = location.reviews.randomElement() {
+                    
+                    ReviewCard(review: random)
                 }
-                
-                Text(location.location.review!.lastReview)
-                    .font(.avenirNextRegular(size: 15))
-                    .padding(.vertical, 1)
-                moreReviewsButton
-            })
-        } else {
-            view = AnyView(Rectangle().fill(.clear).frame(width: 10, height: 200))
+            }
+            leaveAReviewView
+                .padding(.vertical)
+            Spacer(minLength: 200)
         }
-        return view
     }
     
     private var moreInfoLink: some View {
         let view: AnyView
         if let url = URL(string: location.location.moreInfoLink ?? "") {
             view = AnyView(
+                HStack {
+                    Spacer()
                 Link(destination: url, label: {
                     Text("Get More Info")
                         .underline()
                         .foregroundColor(K.Colors.WeenyWitch.orange)
                 })
+                }
             )
         } else {
             view = AnyView(EmptyView())
@@ -202,23 +249,53 @@ struct LD: View {
         return view
     }
     
+    private var leaveAReviewView: some View {
+        VStack(alignment: .leading) {
+            Text("Been here before?")
+                .italic()
+                .foregroundColor(K.Colors.WeenyWitch.brown)
+            NavigationLink(destination: LocationReviewView(location: $location)) {
+                Text("Leave A Review")
+                    .underline()
+                    .foregroundColor(K.Colors.WeenyWitch.orange)
+            }
+        }
+    }
+    
     //MARK: - Buttons
     
     private var directionsButton: some View {
-        BorderedCircularButton(
-            image: Image(systemName: "arrow.triangle.turn.up.right.diamond.fill"),
+//        BorderedCircularButton(
+//            image: Image(systemName: ),
+//            title: "Directions",
+//            color: K.Colors.WeenyWitch.brown,
+//            tapped: directionsTapped)
+        CircleButton(
+            size: .medium,
+            image: Image(systemName: K.Images.directions),
+            mainColor: K.Colors.WeenyWitch.brown,
+            accentColor: K.Colors.WeenyWitch.lightest,
             title: "Directions",
-            color: K.Colors.WeenyWitch.brown,
-            tapped: directionsTapped)
+            clicked: directionsTapped)
     }
     
     private var shareButton: some View {
-        BorderedCircularButton(
-            image: Image(systemName: "square.and.arrow.up"),
+//        BorderedCircularButton(
+//            image: Image(systemName: K.Images.share),
+//            title: "Share",
+//            color: K.Colors.WeenyWitch.brown,
+//            tapped: shareTapped)
+//
+        CircleButton(
+            size: .medium,
+            image: Image(systemName: K.Images.share),
+            mainColor: K.Colors.WeenyWitch.brown,
+            accentColor: K.Colors.WeenyWitch.lightest,
             title: "Share",
-            color: K.Colors.WeenyWitch.brown,
-            tapped: shareTapped)
+            clicked: shareTapped)
     }
+    
+    
     
 //    private var addRemoveFromTrip: some View {
 //        BorderedCircularButton(
@@ -229,20 +306,38 @@ struct LD: View {
 //    }
 //
     private var addRemoveFromTrip: some View {
-        BorderedCircularButton(
+//        BorderedCircularButton(
+//            image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
+//            title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
+//            color: K.Colors.WeenyWitch.brown,
+//            tapped: addToTripTapped)
+//
+        CircleButton(
+            size: .medium,
             image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
+            mainColor: K.Colors.WeenyWitch.brown,
+            accentColor: K.Colors.WeenyWitch.lightest,
             title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
-            color: K.Colors.WeenyWitch.brown,
-            tapped: addToTripTapped)
+            clicked: addToTripTapped)
     }
     private var favoriteButton: some View {
-        BorderedCircularButton(
+//        BorderedCircularButton(
+//            image: favoritesLogic.contains(location) ?
+//                Image(systemName: "heart.fill") :
+//                Image(systemName: "heart"),
+//            title: "Favorites",
+//            color: K.Colors.WeenyWitch.brown,
+//            tapped: favoritesTapped)
+//
+        CircleButton(
+            size: .medium,
             image: favoritesLogic.contains(location) ?
-                Image(systemName: "heart.fill") :
-                Image(systemName: "heart"),
+            Image(systemName: "heart.fill") :
+            Image(systemName: "heart"),
+            mainColor: K.Colors.WeenyWitch.brown,
+            accentColor: K.Colors.WeenyWitch.lightest,
             title: "Favorites",
-            color: K.Colors.WeenyWitch.brown,
-            tapped: favoritesTapped)
+            clicked: favoritesTapped)
         
 
     }
@@ -386,3 +481,47 @@ struct ShareActivitySheet: UIViewControllerRepresentable {
 }
 
 
+struct ReviewCard: View {
+    let review: ReviewModel
+    
+    var body: some View {
+        VStack(alignment: .leading,spacing: 7) {
+            title
+            stars
+                .padding(.bottom, 6)
+            description
+            name
+                .padding(.trailing, 15)
+        }
+        .padding()
+        .overlay(RoundedRectangle(cornerRadius: 14)
+            .strokeBorder(K.Colors.WeenyWitch.brown, lineWidth: 3))
+//            .stroke(K.Colors.WeenyWitch.brown, lineWidth: 4))
+    }
+    
+    var title: some View {
+        Text(review.lastReviewTitle)
+            .fontWeight(.medium)
+            .foregroundColor(K.Colors.WeenyWitch.brown)
+    }
+    
+    var stars: some View {
+        FiveStars(rating: .constant(review.lastRating), color: K.Colors.WeenyWitch.orange)
+    }
+    
+    var description: some View {
+        Text(review.lastReview)
+            .fontWeight(.light)
+            .foregroundColor(K.Colors.WeenyWitch.brown)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+    
+    var name: some View {
+        HStack {
+            Spacer()
+            Text("-\(review.userName)")
+                .fontWeight(.medium)
+                .foregroundColor(K.Colors.WeenyWitch.brown)
+        }
+    }
+}

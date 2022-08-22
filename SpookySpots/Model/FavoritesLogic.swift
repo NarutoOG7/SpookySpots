@@ -19,10 +19,16 @@ class FavoritesLogic: ObservableObject {
     init() {
         // load from firebse
         if userStore.isSignedIn {
-        firebaseManager.getFavoritesAsIDsOnly { favLoc in
+        firebaseManager.getFavorites { favLoc in
             self.hotels.append(favLoc)
             
-            self.firebaseManager.getSelectHotel(favLoc.locationID) { locModel in
+            
+            
+//            self.firebaseManager.getSelectHotel(favLoc.locationID) { locModel in
+//                self.locationStore.favoriteLocations.append(locModel)
+//            }
+            /// REPLACED BY
+            self.firebaseManager.getHotelWithReviews(favLoc.locationID) { locModel in
                 self.locationStore.favoriteLocations.append(locModel)
             }
         }

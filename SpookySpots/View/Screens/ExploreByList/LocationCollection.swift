@@ -45,8 +45,8 @@ struct LocationCollection: View {
                         nearbyLocations
                     case .trending:
                         trendingLocations
-                    case .topRated:
-                        topRated
+                    case .featured:
+                        featured
                     }
                 }
             })
@@ -88,12 +88,28 @@ struct LocationCollection: View {
         location.location.id == locationStore.trendingLocations.last?.location.id ?? UUID().hashValue
     }
     
-    //MARK: - TopRated
+    //MARK: - Featured
     
-    private var topRated: some View {
-        Text("Top Rated")
+    private var featured: some View {     ForEach(locationStore.featuredLocations) { location in
+        VStack(alignment: .leading) {
+            NavigationLink {
+//                    LocationDetails(location: location)
+                LD(location: location)
+            } label: {
+                
+                
+                MainLocCell(location: location)
+                    .padding(isLastInFeatued(location)
+                             ? .horizontal : .leading)
+                    .padding(.vertical)
+            }
+        }
     }
-    
+}
+
+private func isLastInFeatued(_ location: LocationModel) -> Bool {
+    location.location.id == locationStore.featuredLocations.last?.location.id ?? UUID().hashValue
+}
     
     //MARK: - Nearby Locations
     private var nearbyLocations: some View {
@@ -137,6 +153,6 @@ enum LocationCollectionTypes: String {
     case search = ""
     case nearby = "Nearby Spooks"
     case trending = "Trending"
-    case topRated = "Top Rated"
+    case featured = "Featured"
 }
 

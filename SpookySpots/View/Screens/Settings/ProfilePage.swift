@@ -38,6 +38,8 @@ struct ProfilePage: View {
             }
             Button("CANCEL", role: .cancel) { }
         }
+        
+        .navigationTitle("Profile")
     }
     
     private var displayName: some View {

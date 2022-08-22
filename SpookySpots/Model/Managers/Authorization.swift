@@ -52,7 +52,7 @@ class Authorization {
                 let user = User(id: result.user.uid, name: result.user.displayName ?? "", email: result.user.email ?? "")
                 
                 var favorites: [FavoriteLocation] = []
-                FirebaseManager.instance.getFavoritesAsIDsOnly { favLoc in
+                FirebaseManager.instance.getFavorites { favLoc in
                     favorites.append(favLoc)
                 }
                 

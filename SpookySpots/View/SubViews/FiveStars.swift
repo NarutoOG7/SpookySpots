@@ -8,30 +8,34 @@
 import SwiftUI
 
 struct FiveStars: View {
-    var location: LocationData
-    
+    @Binding var rating: Int
+    var isEditable = false
+    let color: Color
     var body: some View {
-         HStack(alignment: .top) {
-            StarIcon(filled: location.review?.avgRating ?? 0 > 0)
-            StarIcon(filled: location.review?.avgRating ?? 0 > 1)
-            StarIcon(filled: location.review?.avgRating ?? 0 > 2)
-            StarIcon(filled: location.review?.avgRating ?? 0 > 3)
-            StarIcon(filled: location.review?.avgRating ?? 0 > 4)
+         HStack {
+             ForEach(1...5, id: \.self) { index in
+                 Image(systemName: self.starImageNameFromRating(index))
+                     .foregroundColor(color)
+                     .onTapGesture {
+                         if isEditable {
+                             self.rating = index
+                         }
+                     }
+             }
         }
     }
-}
-
-struct StarIcon: View {
-    var filled: Bool = true
-    var body: some View {
-        Image(systemName: filled ? "star.fill" : "star")
-            .foregroundColor(filled ? Color.yellow : Color.black.opacity(0.6))
+    
+    private func starImageNameFromRating(_ index: Int) -> String {
+            return index <= rating ? "star.fill" : "star"
     }
 }
 
 
 struct FiveStars_Previews: PreviewProvider {
     static var previews: some View {
-        FiveStars(location: LocationData.example)
+        FiveStars(
+            rating: .constant(3),
+            isEditable: true,
+            color: K.Colors.WeenyWitch.orange)
     }
 }

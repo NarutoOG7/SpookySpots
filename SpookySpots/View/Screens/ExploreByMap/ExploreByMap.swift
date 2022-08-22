@@ -43,6 +43,7 @@ struct ExploreByMap: View {
                 Spacer()
             }
             locationList
+                .padding()
 
         }
         
@@ -72,7 +73,10 @@ extension ExploreByMap {
             ForEach(locationStore.onMapLocations) { location in
                 if exploreVM.displayedLocation == location {
                     LargeImageLocationView(location: location)
-                        
+                        .onTapGesture {
+                            self.navigateToLocation = location
+                            self.shouldNavigate = true
+                        }
                         .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
                             .onEnded({ value in
                                 switch (value.translation.width, value.translation.height) {
@@ -91,6 +95,13 @@ extension ExploreByMap {
                                     print("right swipe")
                                     self.swipeDirection = .backward
                                     exploreVM.showLocationOnSwipe(direction: .backward)
+                                case (-100...100, 0...):
+                                    print("Up?")
+                                    if let anno = exploreVM.highlightedAnnotation {
+                                    exploreVM.displayedLocation = nil
+                                        exploreVM.highlightedAnnotation = nil
+                                        map.deselectAnnotation(anno, animated: true)
+                                    }
                                 default: print("no clue")
                                     print(value.translation.height)
                                 }
@@ -99,10 +110,7 @@ extension ExploreByMap {
                             insertion: swipeDirection == .forward ? .move(edge: .trailing) : .move(edge: .leading),
                             removal: swipeDirection == .forward ? .move(edge: .leading) : .move(edge: .trailing)))
                     
-                        .onTapGesture {
-                            self.navigateToLocation = location
-                            self.shouldNavigate = true
-                        }
+                     
                 }
             }
         }
@@ -188,18 +196,16 @@ extension ExploreByMap {
     private var listButton: some View {
         CircleButton(size: .small,
                      image: Image(systemName: "list.bullet"),
-                     outlineColor: K.Colors.WeenyWitch.brown,
-                     iconColor: K.Colors.WeenyWitch.orange,
-                     backgroundColor: K.Colors.WeenyWitch.lightest,
+                     mainColor: K.Colors.WeenyWitch.brown,
+                     accentColor: K.Colors.WeenyWitch.lightest,
                      clicked: listButtonPressed)
     }
     
     private var currentLocationButton: some View {
         CircleButton(size: .small,
                      image: Image(systemName: "location"),
-                     outlineColor: K.Colors.WeenyWitch.brown,
-                     iconColor: K.Colors.WeenyWitch.orange,
-                     backgroundColor: K.Colors.WeenyWitch.lightest,
+                     mainColor: K.Colors.WeenyWitch.brown,
+                     accentColor: K.Colors.WeenyWitch.lightest,
                      clicked: currentLocationPressed)
     }
     
@@ -212,7 +218,7 @@ extension ExploreByMap {
     func currentLocationPressed() {
         map.setCurrentLocationRegion()
     }
-    
+
 }
 
 

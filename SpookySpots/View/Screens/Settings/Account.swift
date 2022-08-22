@@ -22,14 +22,22 @@ struct Account: View {
         VStack {
             SettingsHeader(settingType: .account)
             List {
-                NavigationLink("Edit Profile", destination: ProfilePage())
+                NavigationLink(destination: ProfilePage()) {
+                    Text("Edit Profile")
+                        .foregroundColor(K.Colors.WeenyWitch.lighter)
+                }
+
                     .listRowSeparator(.hidden)
+                    .listRowBackground(K.Colors.WeenyWitch.black)
                 sendPasswordResetButton
                     .listRowSeparator(.hidden)
+                    .listRowBackground(K.Colors.WeenyWitch.black)
                 signOutButton
                     .listRowSeparator(.hidden)
+                    .listRowBackground(K.Colors.WeenyWitch.black)
             }
             .listStyle(.plain)
+            
             .frame(height: 160)
         }
         /// //MARK: - Confirm Sign Out Alert
@@ -62,6 +70,7 @@ struct Account: View {
     private var sendPasswordResetButton: some View {
         Button(action: changePasswordTapped) {
             Text("Change Password")
+                .foregroundColor(K.Colors.WeenyWitch.lighter)
         }
     }
     
@@ -70,7 +79,8 @@ struct Account: View {
             Text("SIGN OUT")
                 .font(.callout)
                 .fontWeight(.light)
-                .foregroundColor(.red)
+                .foregroundColor(K.Colors.WeenyWitch.lighter)
+//                .foregroundColor(.red)
         }
     }
   

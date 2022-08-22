@@ -10,9 +10,19 @@ import SwiftUI
 struct Favorites: View {
     
     @ObservedObject var locationStore = LocationStore.instance
+    
+    let columns = [GridItem(.flexible()), GridItem(.flexible())]
         
     var body: some View {
-        locationsList
+        ZStack {
+            K.Colors.WeenyWitch.black
+            locationsList
+        }
+
+//            .padding()
+//            .background(Image(K.Images.paperBackground).opacity(0.5))
+//
+        
     }
     
     var locationsList: some View {
@@ -22,9 +32,10 @@ struct Favorites: View {
                     NavigationLink {
                         LD(location: location)
                     } label: {
-//                        LargeImageLocationView(location: location)
-                        MainLocCell(location: location)
-                    }
+                        FavoritesCell(location: location)
+//                    }
+                    }.padding(.top, 8)
+                    
 
                 }
                 

@@ -34,7 +34,18 @@ class GeoFireManager: ObservableObject {
             let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
             circleQuery.observe(.keyEntered, with: { key, loc in
                 
-                self.firebaseManager.getSelectHotel(key) { locModel in
+//                self.firebaseManager.getSelectHotel(key) { locModel in
+//                    let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: "👻")
+//
+//                    if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
+//                        self.gfNearbyLocations.append(anno)
+//
+//                        if !self.locationStore.nearbyLocations.contains(where: { "\($0.location.id)" == key }) {
+//                            self.locationStore.nearbyLocations.append(locModel)
+//                        }
+//                    }
+//                } /// REPLACED BY
+                self.firebaseManager.getHotelWithReviews(key) { locModel in
                     let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: "👻")
                     
                     if !self.gfNearbyLocations.contains(where: { $0.id == key }) {
@@ -60,7 +71,8 @@ class GeoFireManager: ObservableObject {
         let circleQuery = geoLocRef.query(at: cllocation, withRadius: radius)
         locationHandle = circleQuery.observe(.keyEntered, with: { key, loc in
             
-            self.firebaseManager.getSelectHotel(key) { locModel in
+//            self.firebaseManager.getSelectHotel(key) { locModel in
+            self.firebaseManager.getHotelWithReviews(key) { locModel in
                 
                 let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: "👻")
                 

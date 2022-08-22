@@ -19,7 +19,15 @@ struct ExploreByList: View {
     
     @Environment(\.managedObjectContext) var moc
     
-        
+    
+    init() {
+        let fbManager = FirebaseManager.instance
+        fbManager.getHauntedHotels()
+        fbManager.getAllReviews { review in
+            LocationStore.instance.reviewBucket.append(review)
+        }
+    }
+    
     var body: some View {
         ZStack {
             locationsCollections
@@ -48,7 +56,7 @@ struct ExploreByList: View {
             }
         
         //        }
-            .background(Image("PaperBackground").opacity(0.5))
+            .background(Image(K.Images.paperBackground).opacity(0.5))
 
     }
     
@@ -81,6 +89,7 @@ struct ExploreByList: View {
                         LocationCollection(collectionType: .search)
                         LocationCollection(collectionType: .nearby)
                         LocationCollection(collectionType: .trending)
+                        LocationCollection(collectionType: .featured)
                     }
                 })
                 .frame(width: UIScreen.main.bounds.width)
@@ -94,9 +103,8 @@ struct ExploreByList: View {
     private var mapButton: some View {
         CircleButton(size: .small,
                      image: Image(systemName: "map"),
-                     outlineColor: K.Colors.WeenyWitch.brown,
-                     iconColor: K.Colors.WeenyWitch.orange,
-                     backgroundColor: K.Colors.WeenyWitch.lightest,
+                     mainColor: K.Colors.WeenyWitch.brown,
+                     accentColor: K.Colors.WeenyWitch.lightest,
                      clicked: isShowingMap)
     }
     

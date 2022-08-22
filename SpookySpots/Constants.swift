@@ -61,5 +61,9 @@ enum K {
         static let splashOne = "SplashOne"
         static let splashTwo = "SplashTwo"
         static let logo = "Logo"
+        static let paperBackground = "PaperBackground"
+        static let directions = "arrow.triangle.turn.up.right.diamond.fill"
+        static let share = "square.and.arrow.up"
+        static let placeholder = "placeholder"
     }
 }

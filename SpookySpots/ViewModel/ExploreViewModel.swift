@@ -45,8 +45,9 @@ class ExploreViewModel: ObservableObject {
         geoFireManager.getNearbyLocations(
             region: locServiceIsEnabled() ? self.searchRegion : MapDetails.defaultRegion,
             radius: 700)
-        
-        FirebaseManager.instance.getTrendingLocations()
+        let firebaseManager = FirebaseManager.instance
+        firebaseManager.getTrendingLocations()
+        firebaseManager.getFeaturedLocations()
 
     }
     

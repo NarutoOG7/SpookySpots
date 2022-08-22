@@ -16,11 +16,39 @@ struct TabBarSetup: View {
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
     init() {
-        let appearance =  UITabBar.appearance()
-        //        appearance.barTintColor = UIColor(K.Colors.LetsHang.DarkPurple)
-        //        appearance.unselectedItemTintColor = UIColor(K.Colors.LetsHang.lightBrown)
-        appearance.barTintColor = UIColor(K.Colors.WeenyWitch.black)
-        appearance.unselectedItemTintColor = UIColor(K.Colors.WeenyWitch.light)
+        
+
+        let tabBarAppearance =  UITabBar.appearance()
+        tabBarAppearance.barTintColor = UIColor(K.Colors.WeenyWitch.black)
+        tabBarAppearance.unselectedItemTintColor = UIColor(K.Colors.WeenyWitch.light)
+        
+        ///This background color is to maintain the same color on scrolling.
+        tabBarAppearance.backgroundColor = UIColor(K.Colors.WeenyWitch.black).withAlphaComponent(0.92)
+        tabBarAppearance.tintColor = UIColor(K.Colors.WeenyWitch.orange)
+        
+        
+        if #available(iOS 15, *) {
+            let appearance = UINavigationBarAppearance()
+            
+            appearance.backgroundColor = 
+            UIColor( K.Colors.WeenyWitch.orange)
+                .withAlphaComponent(0.94)
+            
+            appearance.titleTextAttributes =
+            [.foregroundColor : UIColor(K.Colors.WeenyWitch.brown)]
+            
+            appearance.largeTitleTextAttributes =
+            [.foregroundColor : UIColor(K.Colors.WeenyWitch.black)]
+            
+            appearance.shadowColor = .clear
+            appearance.backButtonAppearance.normal.titleTextAttributes =
+            [.foregroundColor : UIColor(K.Colors.WeenyWitch.brown)]
+            
+            UINavigationBar.appearance().standardAppearance = appearance
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+            
+        }
+
 
     }
     
@@ -33,7 +61,6 @@ struct TabBarSetup: View {
             settingsTab
         }
         .accentColor(K.Colors.WeenyWitch.orange)
-        .tint(Color("WeenyWitch/ColorThree"))
         .environmentObject(favoritesLogic)
         .environmentObject(tripLogic)
 
@@ -50,6 +77,7 @@ struct TabBarSetup: View {
                 .navigationBarHidden(true)
         }
         .background(Color.clear)
+        .accentColor(K.Colors.WeenyWitch.black)
         
             .tabItem {
                 Text("Explore")
@@ -63,9 +91,13 @@ struct TabBarSetup: View {
     
     private var favoritesTab: some View {
         NavigationView {
+
             Favorites()
+                
                 .navigationTitle("Favorites")
+                
         }
+        .accentColor(K.Colors.WeenyWitch.black)
             .tabItem {
                 Text("Favorites")
                 Image(systemName: "heart")
@@ -73,6 +105,7 @@ struct TabBarSetup: View {
                     .frame(width: 25, height: 25)
             }
             .tag(1)
+   
     }
     
     
@@ -82,6 +115,7 @@ struct TabBarSetup: View {
                 .navigationTitle("Trip")
                 .navigationBarHidden(true)
         }
+        .accentColor(K.Colors.WeenyWitch.black)
             .tabItem {
                 VStack {
                     Image(systemName: "car.fill")
@@ -99,6 +133,7 @@ struct TabBarSetup: View {
             SettingsPage()
                 .navigationTitle("Settings")
         }
+        .accentColor(K.Colors.WeenyWitch.black)
             .tabItem {
                 Text("Settings")
                 Image(systemName: "gear")

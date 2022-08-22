@@ -16,7 +16,7 @@ struct LocationModel: Identifiable, Equatable {
     var id = UUID()
     var location: LocationData
     var imageURLs: [URL]
-    var reviews: [Review]
+    var reviews: [ReviewModel]
     
     var mainImageURL: URL? {
         imageURLs.first
@@ -26,22 +26,23 @@ struct LocationModel: Identifiable, Equatable {
     
     
     
-    func getAvgRating() -> String {
+    func getAvgRatingIntAndString() -> (number: Int, string: String) {
         var avgRatingString = ""
+        var avgRatingDouble = 0
         if let review = location.review {
-            let avgRating = review.avgRating
+            avgRatingDouble = Int(review.avgRating)
 //            if avgRating / avgRating == 1 {
 //                avgRatingString = "\(avgRating)"
 //            } else {
 //                avgRatingString = String(format: "%.1f", avgRating)
 //            }
-            avgRatingString = String(format: "%g", avgRating)
+            avgRatingString = String(format: "%g", avgRatingDouble)
             
             if avgRatingString == "" {
                 avgRatingString = "(No Reviews Yet)"
             }
         }
-        return avgRatingString
+        return (avgRatingDouble , avgRatingString)
     }
     
 }

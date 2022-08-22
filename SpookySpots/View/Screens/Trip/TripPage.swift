@@ -428,10 +428,10 @@ struct TripPage: View {
                 
                 CircleButton(size: .small,
                              image: Image(systemName: "location"),
-                             outlineColor: .black,
-                             iconColor: .black,
-                             backgroundColor: .white,
+                             mainColor: K.Colors.WeenyWitch.brown,
+                             accentColor: K.Colors.WeenyWitch.lightest,
                              clicked: currentLocationPressed)
+                
             }
             Spacer()
         }

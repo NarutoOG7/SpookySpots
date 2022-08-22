@@ -33,38 +33,23 @@ class FirebaseManager: ObservableObject {
         db = Firestore.firestore()
     }
     
-    func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
-        
-        guard let db = db else { return }
-
-        db.collection("Images")
-        
-            .whereField("locID", isEqualTo: locID)
-        
-            .getDocuments() { (querySnapshot, err) in
-                
-                if let err = err {
-                    print("Error getting documents: \(err)")
-                } else {
-                    
-                    if let snapshot = querySnapshot {
-                        for document in snapshot.documents {
-                            let dict = document.data()
-                            let image = FSImage(dict: dict)
-                            completion(image)
-                        }
-                    }
-                }
+    func getHotelWithReviews(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
+        getSelectHotel(locID) { location in
+            self.getReviewsForLocation(locID) { reviews in
+                var newLoc = location
+                newLoc.reviews = reviews
+                completion(newLoc)
             }
+        }
     }
-    
     
     func getSelectHotel(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         
         let ref = Database.database().reference().child("Haunted Hotels/\(locID)")
         
-        ref.observeSingleEvent(of: .value) { snapshot in
-            
+//        ref.observeSingleEvent(of: .value) { snapshot in
+        ref.observe(.value) { snapshot in
+
             if let data = snapshot.value as? [String : AnyObject] {
                 
                 let locData = LocationData(data: data)
@@ -75,10 +60,11 @@ class FirebaseManager: ObservableObject {
                         imageURLS.append(url)
                     }
                 }
-                
+        
                 let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
-                
                 completion(locModel)
+                
+                
                 
             }
         }
@@ -128,19 +114,7 @@ class FirebaseManager: ObservableObject {
     //            }
     //    }
     
-    func getImageURLFromFBPath(_ urlString: String, withCompletion completion: @escaping ((_ url: URL) -> (Void))) {
-        
-        let storageRef = Storage.storage().reference().child(urlString)
-        
-        storageRef.downloadURL { url, error in
-            if let error = error {
-                print(error.localizedDescription)
-            }
-            guard let url = url else { return }
-            completion(url)
-        }
-    }
-    
+ 
     func getTrendingLocations() {
         
         guard let db = db else { return }
@@ -155,7 +129,12 @@ class FirebaseManager: ObservableObject {
                         let dict = document.data()
                         let key = dict["id"] as? Int ?? 0
                         
-                        self.getSelectHotel("\(key)") { locModel in
+//                        self.getSelectHotel("\(key)") { locModel in
+//                            if !self.locationStore.trendingLocations.contains(locModel) {
+//                                self.locationStore.trendingLocations.append(locModel)
+//                            }
+//                        } /// REPLACED BY
+                        self.getHotelWithReviews("\(key)") { locModel in
                             if !self.locationStore.trendingLocations.contains(locModel) {
                                 self.locationStore.trendingLocations.append(locModel)
                             }
@@ -166,7 +145,38 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    func getFavoritesAsIDsOnly(withCompletion completion: @escaping(FavoriteLocation) -> Void) {
+    
+    func getFeaturedLocations() {
+        
+        guard let db = db else { return }
+
+        db.collection("Featured").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                
+                if let snapshot = querySnapshot {
+                    for document in snapshot.documents {
+                        let dict = document.data()
+                        let key = dict["id"] as? Int ?? 0
+                        
+//                        self.getSelectHotel("\(key)") { locModel in
+//                            if !self.locationStore.featuredLocations.contains(locModel) {
+//                                self.locationStore.featuredLocations.append(locModel)
+//                            }
+//                        } /// REPLACED BY
+                        self.getHotelWithReviews("\(key)") { locModel in
+                            if !self.locationStore.featuredLocations.contains(locModel) {
+                                self.locationStore.featuredLocations.append(locModel)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func getFavorites(withCompletion completion: @escaping(FavoriteLocation) -> Void) {
         
         guard let db = db else { return }
 
@@ -188,32 +198,6 @@ class FirebaseManager: ObservableObject {
                 }
             }
         
-    }
-    
-    
-    func getReviewsForUser(_ user: User, withCompletion completion: @escaping(_ review: ReviewModel) -> Void) {
-        
-        guard let db = db else { return }
-
-        db.collection("Reviews")
-        
-            .whereField("userID", isEqualTo: user.id)
-        
-            .getDocuments { querySnapshot, error in
-                if let error = error {
-                    print("Error getting reviews: \(error.localizedDescription)")
-                } else {
-                    if let snapshot = querySnapshot {
-                        for doc in snapshot.documents {
-                            let dict = doc.data()
-                            
-                            let review = ReviewModel(dictionary: dict)
-                            
-                            completion(review)
-                        }
-                    }
-                }
-            }
     }
     
     func addLocToFavoritesBucket(_ favLoc: FavoriteLocation, withCompletion completion: ((Bool) -> ())? = nil) {
@@ -247,6 +231,186 @@ class FirebaseManager: ObservableObject {
                 }
             }
     }
+    //MARK: - Reviews
+    func addReviewToFirestoreBucket(_ review: ReviewModel, locationID: String, withcCompletion completion: @escaping (Error?) -> () = {_ in}) {
+        guard let db = db else { return }
+
+        db.collection("Reviews").document(UUID().uuidString).setData([
+            "title" : review.lastReviewTitle,
+            "review" : review.lastReview,
+            "rating" : review.lastRating,
+            "username" : review.userName,
+            "locationID" : locationID
+        ]) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                completion(error)
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    func getReviewsForLocation(_ locationID: String, withCompletion completion: @escaping ([ReviewModel]) -> (Void)) {
+        guard let db = db else { return }
+
+        db.collection("Reviews")
+            .whereField("locationID", isEqualTo: locationID)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else if let snapshot = snapshot {
+                    var reviews: [ReviewModel] = []
+                    for doc in snapshot.documents {
+                        let dict = doc.data()
+                        let review = ReviewModel(dictionary: dict)
+                        reviews.append(review)
+                    }
+                    completion(reviews)
+                }
+            }
+        
+    }
+    
+    func getAllReviews(withCompletion completion: @escaping(ReviewModel) -> (Void)) {
+        guard let db = db else { return }
+
+        db.collection("Reviews")
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else if let snapshot = snapshot {
+                    for doc in snapshot.documents {
+                        let dict = doc.data()
+                        let review = ReviewModel(dictionary: dict)
+                        completion(review)
+                    }
+                }
+            }
+    }
+    
+    func getReviewsForUser(_ user: User, withCompletion completion: @escaping(_ review: ReviewModel) -> Void) {
+        
+        guard let db = db else { return }
+
+        db.collection("Reviews")
+        
+            .whereField("userID", isEqualTo: user.id)
+        
+            .getDocuments { querySnapshot, error in
+                if let error = error {
+                    print("Error getting reviews: \(error.localizedDescription)")
+                } else {
+                    if let snapshot = querySnapshot {
+                        for doc in snapshot.documents {
+                            let dict = doc.data()
+                            
+                            let review = ReviewModel(dictionary: dict)
+                            
+                            completion(review)
+                        }
+                    }
+                }
+            }
+    }
+    //MARK: - Add Location to 'User Created Locations' Bucket
+    func addUserCreatedLocationToBucket(_ loc: LocationData, _ image: UIImage?, withCompletion completion: @escaping (Error?) -> () = {_ in}) {
+        let imageName = loc.name + UUID().uuidString
+        if let image = image {
+            uploadImageToFirebaseStorage(image, imageName: imageName) { error in
+                if let error = error {
+                    print("Error saving image to firebase.: \(error)")
+                }
+            }
+        }
+        
+        guard let db = db else { return }
+        
+        let docID = userStore.user.name + " " + UUID().uuidString
+
+        db.collection("UserCreatedLocations").document(docID).setData([
+            "name" : loc.name,
+            "street" : loc.address?.address,
+            "city" : loc.address?.city,
+            "state" : loc.address?.state,
+            "country" : loc.address?.country,
+            "zipCode" : loc.address?.zipCode,
+            "description" : loc.description,
+            "moreInfoLink" : loc.moreInfoLink,
+            "locationType" : loc.locationType,
+            "imageName" : image == nil ? "" : imageName
+        ]) { error in
+            if let error = error {
+                print(error.localizedDescription)
+                completion(error)
+            } else {
+                completion(nil)
+            }
+        }
+    }
+    
+    //MARK: - Images
+    
+    func uploadImageToFirebaseStorage(_ image: UIImage, imageName: String, withCompletion completion: @escaping (Error?) -> () = {_ in}) {
+        let storage = Storage.storage()
+        let storageRef = storage.reference().child(imageName)
+        let data = image.jpegData(compressionQuality: 0.2)
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpg"
+        
+        if let data = data {
+            storageRef.putData(data, metadata: metadata) { (metadata, error) in
+                if let error = error {
+                    print("error uploading file: \(error.localizedDescription)")
+                    completion(error)
+                }
+                
+                if let _ = metadata {
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func getImageURLFromFBPath(_ urlString: String, withCompletion completion: @escaping ((_ url: URL) -> (Void))) {
+        
+        let storageRef = Storage.storage().reference().child(urlString)
+        
+        storageRef.downloadURL { url, error in
+            if let error = error {
+                print(error.localizedDescription)
+            }
+            guard let url = url else { return }
+            completion(url)
+        }
+    }
+    
+    
+    func getLocationImages(locID: String, withCompletion completion: @escaping(_ fsImage: FSImage) -> Void) {
+        
+        guard let db = db else { return }
+
+        db.collection("Images")
+        
+            .whereField("locID", isEqualTo: locID)
+        
+            .getDocuments() { (querySnapshot, err) in
+                
+                if let err = err {
+                    print("Error getting documents: \(err)")
+                } else {
+                    
+                    if let snapshot = querySnapshot {
+                        for document in snapshot.documents {
+                            let dict = document.data()
+                            let image = FSImage(dict: dict)
+                            completion(image)
+                        }
+                    }
+                }
+            }
+    }
+    
     
     //MARK: - Search
     
