@@ -41,7 +41,7 @@ struct LocationReviewView: View {
         .navigationTitle(location.location.name)
         
         .alert("Success", isPresented: $shouldShowSuccessMessage, actions: {
-            Button("OK", role: .cancel, action: { self.presentationMode.wrappedValue.dismiss() })
+            Button("OK", role: .cancel, action: { self.presentationMode.wrappedValue.dismiss()})
         })
     }
     
@@ -112,21 +112,21 @@ struct LocationReviewView: View {
     
     private func submitTapped() {
         let name = nameInput == "" ? userStore.user.name : nameInput
-        let review = ReviewModel(avgRating: 0, lastRating: pickerSelection, lastReview: descriptionInput, lastReviewTitle: titleInput, userName: isAnonymous ? "Anonymous" : name, locationID: "\(location.location.id)")
+        let review = ReviewModel(rating: pickerSelection, review: descriptionInput, title: titleInput, username: isAnonymous ? "Anonymous" : name, locationID: "\(location.location.id)")
         FirebaseManager.instance.addReviewToFirestoreBucket(review, locationID: "\(location.location.id)")
         self.shouldShowSuccessMessage = true
         
         var newLocation = location
         newLocation.reviews.append(review)
-        LocationStore.instance.switchNewLocationIntoAllBucketsIfExists(newLocation)
         self.location = newLocation
+        LocationStore.instance.switchNewLocationIntoAllBucketsIfExists(newLocation)
 
     }
 }
 
 struct LocationReviewView_Previews: PreviewProvider {
     static var previews: some View {
-        LocationReviewView(location: .constant(LocationModel(id: UUID(), location: .example, imageURLs: [], reviews: [])))
+        LocationReviewView(location: .constant(LocationModel(location: .example, imageURLs: [], reviews: [])))
         
     }
 }

@@ -236,10 +236,10 @@ class FirebaseManager: ObservableObject {
         guard let db = db else { return }
 
         db.collection("Reviews").document(UUID().uuidString).setData([
-            "title" : review.lastReviewTitle,
-            "review" : review.lastReview,
-            "rating" : review.lastRating,
-            "username" : review.userName,
+            "title" : review.title,
+            "review" : review.review,
+            "rating" : review.rating,
+            "username" : review.username,
             "locationID" : locationID
         ]) { error in
             if let error = error {

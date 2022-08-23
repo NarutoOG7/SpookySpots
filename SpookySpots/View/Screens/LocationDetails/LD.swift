@@ -11,7 +11,7 @@ import SDWebImageSwiftUI
 struct LD: View {
     
     @State var location: LocationModel
-    
+        
     @State private var imageURL = URL(string: "")
     @State private var isSharing = false
     @State private var imageIsAvailable = false
@@ -24,79 +24,6 @@ struct LD: View {
     
     
     @Environment(\.presentationMode) var presentationMode
-    
-//    var body: some View {
-//        ScrollView {
-//
-//        VStack {
-//            GeometryReader { geo in
-//                WebImage(url: self.imageURL)
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fill)
-//                    .blur(radius: self.getBlurRadiusForImage(geo))
-//                    .shadow(radius: self.calculateShadow(geo))
-//                    .overlay(header
-//                        .opacity(self.getBlurRadiusForImage(geo) - 0.35))
-//                    .frame(width: geo.size.width, height: self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
-//                    .offset(y: geo.frame(in: .global).origin.y < 0
-//                            ? abs(geo.frame(in: .global).origin.y)
-//                            : -geo.frame(in: .global).origin.y)
-////
-//                card
-//            }
-//            }
-////            .overlay(card)
-//        }
-//        
-//        .onAppear {
-//            loadImageFromFirebase()
-//        }
-//        .sheet(isPresented: $isSharing) {
-//            ShareActivitySheet(itemsToShare: [location.location.name])
-//        }
-//
-//        .background(Image(K.Images.paperBackground).opacity(0.5))
-////    .edgesIgnoringSafeArea(.vertical)
-//    .navigationBarHidden(true)
-//}
-    
-    var card: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            title
-            address
-            avgRatingDisplay
-            buttons
-            Divider()
-            description
-            Spacer()
-            moreInfoLink
-            Spacer()
-            reviewHelper
-        }
-        .padding()
-        .padding(.vertical, 100)
-        .onAppear {
-            if LocationStore.instance.reviewBucket.contains(where: { $0.locationID == "\(location.location.id)" }) {
-                var newLocation = location
-            for review in LocationStore.instance.reviewBucket.filter({ $0.locationID == "\(location.location.id)" }) {
-                newLocation.reviews.append(review)
-            }
-                self.location = newLocation
-            }
-        }
-    }
-    
-    var buttons: some View {
-        HStack(alignment: .top) {
-            Spacer()
-            directionsButton
-            shareButton
-            addRemoveFromTrip
-            favoriteButton
-            Spacer()
-        }.padding(.top)
-            .frame(height: 150)
-    }
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -199,9 +126,24 @@ struct LD: View {
     }
     
     private var avgRatingDisplay: some View {
+        HStack {
             FiveStars(
-                rating: .constant(location.getAvgRatingIntAndString().number),
+                rating: $location.avgRating,
                 color: K.Colors.WeenyWitch.orange)
+            Text("")
+        }
+    }
+    
+    var buttons: some View {
+        HStack(alignment: .top) {
+            Spacer()
+            directionsButton
+            shareButton
+            addRemoveFromTrip
+            favoriteButton
+            Spacer()
+        }.padding(.top)
+            .frame(height: 150)
     }
     
     private var description: some View {
@@ -219,9 +161,9 @@ struct LD: View {
                 Text("No Reviews")
                     .foregroundColor(K.Colors.WeenyWitch.brown)
             } else {
-                if let random = location.reviews.randomElement() {
+                if let last = location.reviews.last {
                     
-                    ReviewCard(review: random)
+                    ReviewCard(review: last)
                 }
             }
             leaveAReviewView
@@ -250,15 +192,19 @@ struct LD: View {
     }
     
     private var leaveAReviewView: some View {
-        VStack(alignment: .leading) {
+        let locReviewView = LocationReviewView(location: $location)
+        return VStack(alignment: .leading) {
             Text("Been here before?")
                 .italic()
                 .foregroundColor(K.Colors.WeenyWitch.brown)
-            NavigationLink(destination: LocationReviewView(location: $location)) {
+            NavigationLink(destination: locReviewView) {
                 Text("Leave A Review")
                     .underline()
                     .foregroundColor(K.Colors.WeenyWitch.orange)
             }
+//            }.onDisappear {
+//                self.location = locReviewView.location
+//            }
         }
     }
     
@@ -500,17 +446,17 @@ struct ReviewCard: View {
     }
     
     var title: some View {
-        Text(review.lastReviewTitle)
+        Text(review.title)
             .fontWeight(.medium)
             .foregroundColor(K.Colors.WeenyWitch.brown)
     }
     
     var stars: some View {
-        FiveStars(rating: .constant(review.lastRating), color: K.Colors.WeenyWitch.orange)
+        FiveStars(rating: .constant(review.rating), color: K.Colors.WeenyWitch.orange)
     }
     
     var description: some View {
-        Text(review.lastReview)
+        Text(review.review)
             .fontWeight(.light)
             .foregroundColor(K.Colors.WeenyWitch.brown)
             .fixedSize(horizontal: true, vertical: false)
@@ -519,7 +465,7 @@ struct ReviewCard: View {
     var name: some View {
         HStack {
             Spacer()
-            Text("-\(review.userName)")
+            Text("-\(review.username)")
                 .fontWeight(.medium)
                 .foregroundColor(K.Colors.WeenyWitch.brown)
         }

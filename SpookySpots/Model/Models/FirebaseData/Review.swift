@@ -8,37 +8,33 @@
 import Foundation
 
 struct Review: Codable {
-    var avgRating: Double = 0
-    var lastRating: Int = 0
-    var lastReview: String = ""
-    var lastReviewTitle: String = ""
-    var userName: String = ""
+    var rating: Int = 0
+    var review: String = ""
+    var title: String = ""
+    var username: String = ""
     var locationID: String
 }
 
 struct ReviewModel {
-    var avgRating: Double = 0
-    var lastRating: Int = 0
-    var lastReview: String = ""
-    var lastReviewTitle: String = ""
-    var userName: String = ""
+    var rating: Int = 0
+    var review: String = ""
+    var title: String = ""
+    var username: String = ""
     var locationID: String
     
-    init(avgRating: Double, lastRating: Int, lastReview: String, lastReviewTitle: String, userName: String, locationID: String) {
-        self.avgRating = avgRating
-        self.lastRating = lastRating
-        self.lastReview = lastReview
-        self.lastReviewTitle = lastReviewTitle
-        self.userName = userName
+    init(rating: Int, review: String, title: String, username: String, locationID: String) {
+        self.rating = rating
+        self.review = review
+        self.title = title
+        self.username = username
         self.locationID = locationID
     }
     
     init(dictionary: [String:Any]) {
-        self.userName = dictionary["userName"] as? String ?? ""
-        self.avgRating = dictionary["avgRating"] as? Double ?? 0
-        self.lastRating = dictionary["lastRating"] as? Int ?? 0
-        self.lastReview = dictionary["lastReview"] as? String ?? ""
-        self.lastReviewTitle = dictionary["lastReviewTitle"] as? String ?? ""
+        self.username = dictionary["username"] as? String ?? ""
+        self.rating = dictionary["rating"] as? Int ?? 0
+        self.review = dictionary["review"] as? String ?? ""
+        self.title = dictionary["title"] as? String ?? ""
         self.locationID = dictionary["locationID"] as? String ?? ""
     }
 }

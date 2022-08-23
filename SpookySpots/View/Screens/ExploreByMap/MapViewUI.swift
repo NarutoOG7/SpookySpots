@@ -89,7 +89,7 @@ struct MapViewUI: UIViewRepresentable {
             case _ as MKClusterAnnotation:
                 
                 let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "cluster") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "cluster")
-                annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.orange)
+                annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.lightest)
                 annotationView.titleVisibility = .hidden
                 annotationView.subtitleVisibility = .hidden
                 return annotationView
@@ -102,6 +102,7 @@ struct MapViewUI: UIViewRepresentable {
                 annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.black)
                 annotationView.titleVisibility = .hidden
                 annotationView.glyphText = "👻"
+//                annotationView.glyphImage = UIImage(named: "Ghost")
 
                 return annotationView
                 
@@ -180,3 +181,4 @@ struct MapViewUI: UIViewRepresentable {
     }
 
 }
+

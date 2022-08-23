@@ -12,8 +12,8 @@ struct LocationCollection: View {
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
-    @ObservedObject var locationStore = LocationStore.instance
-    
+    @StateObject var locationStore = LocationStore.instance
+
     var collectionType: LocationCollectionTypes
     
     var body: some View {
@@ -30,7 +30,6 @@ struct LocationCollection: View {
             .font(.title2)
             .fontWeight(.bold)
             .offset(x: 15, y: 17)
-//            .foregroundColor(K.Colors.LetsHang.purple)
             .foregroundColor(K.Colors.WeenyWitch.brown)
     }
     
@@ -70,7 +69,6 @@ struct LocationCollection: View {
         ForEach(locationStore.trendingLocations) { location in
             VStack(alignment: .leading) {
                 NavigationLink {
-//                    LocationDetails(location: location)
                     LD(location: location)
                 } label: {
                     
@@ -90,10 +88,10 @@ struct LocationCollection: View {
     
     //MARK: - Featured
     
-    private var featured: some View {     ForEach(locationStore.featuredLocations) { location in
+    private var featured: some View {
+        ForEach(locationStore.featuredLocations) { location in
         VStack(alignment: .leading) {
             NavigationLink {
-//                    LocationDetails(location: location)
                 LD(location: location)
             } label: {
                 
@@ -142,7 +140,7 @@ private func isLastInFeatued(_ location: LocationModel) -> Bool {
 
 struct LocationCollection_Previews: PreviewProvider {
     static var previews: some View {
-        LocationCollection(collectionType: .nearby)
+        LocationCollection(collectionType: .featured)
     }
 }
 
