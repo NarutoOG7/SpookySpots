@@ -22,13 +22,8 @@ struct Account: View {
         VStack {
             SettingsHeader(settingType: .account)
             List {
-                NavigationLink(destination: ProfilePage()) {
-                    Text("Edit Profile")
-                        .foregroundColor(K.Colors.WeenyWitch.lighter)
-                }
-
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(K.Colors.WeenyWitch.black)
+                editProfile
+                manageReviews
                 sendPasswordResetButton
                     .listRowSeparator(.hidden)
                     .listRowBackground(K.Colors.WeenyWitch.black)
@@ -64,6 +59,26 @@ struct Account: View {
         } message: {
             Text(AuthErrorTypes.firebaseTrouble.rawValue)
         }
+    }
+    
+    private var editProfile: some View {
+        NavigationLink(destination: ProfilePage()) {
+            Text("Edit Profile")
+                .foregroundColor(K.Colors.WeenyWitch.lighter)
+        }
+
+            .listRowSeparator(.hidden)
+            .listRowBackground(K.Colors.WeenyWitch.black)
+    }
+    
+    private var manageReviews: some View {
+        NavigationLink(destination: ManageReviews()) {
+            Text("Manage Reviews")
+                .foregroundColor(K.Colors.WeenyWitch.lighter)
+        }
+
+            .listRowSeparator(.hidden)
+            .listRowBackground(K.Colors.WeenyWitch.black)
     }
     
     //MARK: - Buttons

@@ -39,7 +39,13 @@ struct AddLocationView: View {
     @State var shouldShowStateErrorMessage = false
     @State var shouldShowCountryErrorMessage = false
     
+    
+    //MARK: - Focused Text Field
+    @FocusState private var focusedField: Field?
+    
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
+    let weenyWitch = K.Colors.WeenyWitch.self
     
     init() {
         let textViewAppearance = UITextView.appearance()
@@ -59,7 +65,7 @@ struct AddLocationView: View {
                 description
                 moreInfoLinkView
                 submitButton
-                    .padding(.bottom, 30)
+                    .padding(.vertical, 30)
             }
         }
         .sheet(isPresented: $showingImagePicker) {
@@ -82,6 +88,28 @@ struct AddLocationView: View {
             Button("Awesome!", role: .destructive, action: { self.submitConfirmed() })
             Button("Whoops, UNDO", role: .cancel, action: {})
         })
+        
+        .onSubmit {
+            switch focusedField {
+            case .imageSource:
+                focusedField = .locationName
+            case .locationName:
+                focusedField = .streetAddress
+            case .streetAddress:
+                focusedField = .city
+            case .city:
+                focusedField = .state
+            case .state:
+                focusedField = .country
+            case .country:
+                focusedField = .zipCode
+            case .zipCode:
+                focusedField = .description
+            case .description:
+                focusedField = .moreInfoLink
+            default: break
+            }
+        }
         
         .background(K.Colors.WeenyWitch.black)
         .navigationBarTitleDisplayMode(.inline)
@@ -110,28 +138,32 @@ struct AddLocationView: View {
     }
     
     private var imageSource: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+         UserInputCellWithIcon(
             input: $imageSourceInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Photographer Name (optional)",
             errorMessage: "",
-            shouldShowErrorMessage: .constant(false))
+            shouldShowErrorMessage: .constant(false),
+            isSecured: .constant(false))
+         .focused($focusedField, equals: .imageSource)
+         .submitLabel(.next)
      
     }
     
     private var name: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+         UserInputCellWithIcon(
             input: $nameInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Location Name",
             errorMessage: "Please provide a name for this place.",
-            shouldShowErrorMessage: $shouldShowLocationNameError)
+            shouldShowErrorMessage: $shouldShowLocationNameError,
+            isSecured: .constant(false))
+        .focused($focusedField, equals: .locationName)
+        .submitLabel(.next)
     }
 
     //MARK: - Address
@@ -146,67 +178,75 @@ struct AddLocationView: View {
     }
     
     private var streetAddress: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+         UserInputCellWithIcon(
             input: $addressInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Street Address",
             errorMessage: "Please provide a street address.",
-            shouldShowErrorMessage: $shouldShowStreetErrorMessage)
-
+            shouldShowErrorMessage: $shouldShowStreetErrorMessage,
+            isSecured: .constant(false))
+         .focused($focusedField, equals: .streetAddress)
+         .submitLabel(.next)
         
     }
     private var cityAddress: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+        UserInputCellWithIcon(
             input: $cityInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "City",
             errorMessage: "Please provide a city.",
-            shouldShowErrorMessage: $shouldShowCityErrorMessage)
+            shouldShowErrorMessage: $shouldShowCityErrorMessage,
+            isSecured: .constant(false))
+        .focused($focusedField, equals: .city)
+        .submitLabel(.next)
     }
     private var stateAddress: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+        UserInputCellWithIcon(
             input: $stateInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "State",
             errorMessage: "Please provide a state.",
-            shouldShowErrorMessage: $shouldShowStateErrorMessage)
+            shouldShowErrorMessage: $shouldShowStateErrorMessage,
+            isSecured: .constant(false))
+        .focused($focusedField, equals: .state)
+        .submitLabel(.next)
     }
     private var countryAddress: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+        UserInputCellWithIcon(
             input: $countryInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Country",
             errorMessage: "Please provide a country.",
-            shouldShowErrorMessage: $shouldShowCountryErrorMessage)
+            shouldShowErrorMessage: $shouldShowCountryErrorMessage,
+            isSecured: .constant(false))
+        .focused($focusedField, equals: .country)
+        .submitLabel(.next)
     }
     private var zipCodeView: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+        UserInputCellWithIcon(
             input: $zipCodeInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Zip Code (optional)",
             errorMessage: "",
-            shouldShowErrorMessage: .constant(false))
+            shouldShowErrorMessage: .constant(false),
+            isSecured: .constant(false))
         .keyboardType(.numberPad)
+
     }
     
+    
     var description: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return TextEditor(text: $descriptionInput)
+        TextEditor(text: $descriptionInput)
             .placeholder(when: descriptionInput.isEmpty, alignment: .topLeading, placeholder: {
                 Text("Description (optional)")
                     .foregroundColor(weenyWitch.light)
@@ -216,7 +256,8 @@ struct AddLocationView: View {
             .padding()
             .frame(height: 250)
             .foregroundColor(weenyWitch.orange)
-            
+            .focused($focusedField, equals: .description)
+            .submitLabel(.next)
             .overlay(
                 
             RoundedRectangle(cornerRadius: 16)
@@ -227,15 +268,17 @@ struct AddLocationView: View {
     }
     
     var moreInfoLinkView: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+         UserInputCellWithIcon(
             input: $moreInfoLinkInput,
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "More Info Link (optional)",
             errorMessage: "",
-            shouldShowErrorMessage: .constant(false))
+            shouldShowErrorMessage: .constant(false),
+            isSecured: .constant(false))
+         .focused($focusedField, equals: .moreInfoLink)
+         .submitLabel(.done)
     }
     
     //MARK: - Submit Button
@@ -258,15 +301,13 @@ struct AddLocationView: View {
         checkRequiredFields()
         if requisiteFieldsAreFilled() {
             self.shouldDipslayLocationSubmitConfirmationAlert = true
-        } else {
-            // show error for needed fields
         }
     }
 
     func submitConfirmed() {
         // Submit Location To Firebase Bucket 'User Added Locations'
         let address = Address(address: addressInput, city: cityInput, state: stateInput, zipCode: zipCodeInput, country: countryInput)
-        let location = LocationData(id: 0, name: nameInput, address: address, description: descriptionInput, moreInfoLink: moreInfoLinkInput, review: nil, locationType: nil, tours: nil, imageName: nil, distanceToUser: nil, price: nil)
+        let location = LocationData(id: 0, name: nameInput, address: address, description: descriptionInput, moreInfoLink: moreInfoLinkInput, locationType: nil, tours: nil, imageName: nil, distanceToUser: nil, price: nil)
         
         FirebaseManager.instance.addUserCreatedLocationToBucket(location, inputImage)
         self.presentationMode.wrappedValue.dismiss()
@@ -320,6 +361,19 @@ struct AddLocationView: View {
         } else {
             self.shouldShowCountryErrorMessage = false
         }
+    }
+    
+    //MARK: - Field
+    enum Field {
+        case imageSource,
+        locationName,
+        streetAddress,
+        city,
+        state,
+        country,
+        zipCode,
+        description,
+        moreInfoLink
     }
 }
 

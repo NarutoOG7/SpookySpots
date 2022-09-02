@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LocationModel: Identifiable, Equatable {
+struct LocationModel: Identifiable, Equatable, Hashable {
 
     static let example = LocationModel(location: LocationData.example, imageURLs: [], reviews: [])
     

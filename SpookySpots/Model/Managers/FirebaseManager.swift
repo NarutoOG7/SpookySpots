@@ -225,22 +225,25 @@ class FirebaseManager: ObservableObject {
         db.collection("Favorites").document(favLoc.id)
             .delete() { err in
                 if let err = err {
-                    print("Error removing document: \(err)")
+                    print("Error removing favorite: \(err)")
                 } else {
-                    print("Document successfully removed!")
+                    print("Favorite successfully removed!")
                 }
             }
     }
     //MARK: - Reviews
-    func addReviewToFirestoreBucket(_ review: ReviewModel, locationID: String, withcCompletion completion: @escaping (Error?) -> () = {_ in}) {
+    func addReviewToFirestoreBucket(_ review: ReviewModel, location: LocationData, withcCompletion completion: @escaping (Error?) -> () = {_ in}) {
         guard let db = db else { return }
-
-        db.collection("Reviews").document(UUID().uuidString).setData([
+        let id = review.title + review.username + review.locationID
+        db.collection("Reviews").document(id).setData([
+            "id" : id,
+            "userID" : userStore.user.id,
             "title" : review.title,
             "review" : review.review,
             "rating" : review.rating,
             "username" : review.username,
-            "locationID" : locationID
+            "locationID" : "\(location.id)",
+            "locationName" : location.name
         ]) { error in
             if let error = error {
                 print(error.localizedDescription)
@@ -249,6 +252,44 @@ class FirebaseManager: ObservableObject {
                 completion(nil)
             }
         }
+    }
+    
+    func removeReviewFromFirestore(_ review: ReviewModel, withCompletion completion: @escaping(Error?) -> () = {_ in}) {
+        guard let db = db else { return }
+        let id = review.title + review.username + review.locationID
+        db.collection("Reviews").document(id)
+            .delete() { err in
+                if let err = err {
+                    print("Error removing review: \(err)")
+                    completion(err)
+                } else {
+                    print("Review successfully removed!")
+                    completion(nil)
+                }
+            }
+    }
+    
+    func updateReviewInFirestore(_ review: ReviewModel, forID id: String, withCompletion completion: @escaping(Error?) -> () = {_ in}) {
+        guard let db = db else { return }
+        db.collection("Reviews").document(id)
+            .updateData([
+                "id" : id,
+                "userID" : userStore.user.id,
+                "title" : review.title,
+                "review" : review.review,
+                "rating" : review.rating,
+                "username" : review.username,
+                "locationID" : review.locationID,
+                "locationName" : review.locationName
+            ], completion: { err in
+                if let err = err {
+                    print("Error updating review: \(err)")
+                    completion(err)
+                } else {
+                    print("Review successfully updated!")
+                    completion(nil)
+                }
+            })
     }
     
     func getReviewsForLocation(_ locationID: String, withCompletion completion: @escaping ([ReviewModel]) -> (Void)) {
@@ -417,26 +458,35 @@ class FirebaseManager: ObservableObject {
     func searchForLocationInFullDatabase(text: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         let ref = Database.database().reference().child("Haunted Hotels")
         
-        ref.queryStarting(atValue: text)
-        ref.queryEnding(atValue: text)
-        ref.getData { error, snapshot in
-            
-            if let data = snapshot.value as? [String : AnyObject] {
-                
-                let locData = LocationData(data: data)
-                
-                var imageURLS: [URL] = []
-                self.getLocationImages(locID: "\(locData.id)") { fsImage in
-                    if let url = URL(string: "\(fsImage.imageURL)") {
-                        imageURLS.append(url)
-                    }
-                }
-                
-                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
-                
-                completion(locModel)
-                
+        ref.queryOrdered(byChild: "name")
+        ref.queryLimited(toFirst: 10)
+        ref.queryStarting(atValue: text, childKey: "name")
+        ref.queryEnding(atValue: text, childKey: "name")
+//        ref.getData { error, snapshot in
+        
+        ref.observeSingleEvent(of: .value) { snapshot in
+
+//            if let data = snapshot..value as? [String : AnyObject] {
+            if snapshot.hasChildren() {
+                print("has children")
+                print(snapshot.value)
             }
+//            } else {
+//
+//                let locData = LocationData(data: data)
+//
+//                var imageURLS: [URL] = []
+//                self.getLocationImages(locID: "\(locData.id)") { fsImage in
+//                    if let url = URL(string: "\(fsImage.imageURL)") {
+//                        imageURLS.append(url)
+//                    }
+//                }
+//
+//                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
+//
+//                completion(locModel)
+//
+//            }
         }
     }
     

@@ -27,17 +27,20 @@ struct SettingsPage: View {
                 about
                 admin
                 addLocationView
+                    .padding(.top, 85)
             }
-            .padding(.vertical, 30)
+            .
+                padding(.vertical, 30)
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(false)
 //        }
         }
             .background(K.Colors.WeenyWitch.black)
     }
     
-    //MARK: - About
     
+    //MARK: - About
     private var about: some View {
         VStack {
             SettingsHeader(settingType: .about)
@@ -104,6 +107,7 @@ struct SettingsPage: View {
         }
         .padding()
     }
+    
 }
 
 

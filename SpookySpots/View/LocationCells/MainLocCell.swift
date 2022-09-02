@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
 struct MainLocCell: View {
     
@@ -28,29 +27,17 @@ struct MainLocCell: View {
     }
     
     private var image: some View {
-        WebImage(url: self.imageURL)
-            .resizable()
-            .aspectRatio(0.9, contentMode: .fill)
-            .frame(width: 240, height: 270)
-            .cornerRadius(15)
-            .shadow(color: .black, radius: 3, x: 0, y: 1.5)
+        AsyncImage(url: self.imageURL) { image in
+            image
+                .resizable()
+                .aspectRatio(0.9, contentMode: .fill)
+                .frame(width: 240, height: 270)
+                .cornerRadius(15)
+                .shadow(color: .black, radius: 3, x: 0, y: 1.5)
+        } placeholder: {
+            ProgressView()
+        }
     }
-    
-    
-    //    private var image: some View {
-    //        var view = Image("bannack")
-    //        if let imageString = location.imageName {
-    //            FirebaseManager.instance.getUIImageFromURLString(imageString) { image in
-    //                view = Image(uiImage: image)
-    //            }
-    //        }
-    //        return view
-    //            .resizable()
-    //            .aspectRatio(0.9, contentMode: .fill)
-    //            .frame(width: 240, height: 270)
-    //            .cornerRadius(15)
-    //            .shadow(color: .black, radius: 3, x: 0, y: 1.5)
-    //    }
     
     private var title: some View {
         VStack {

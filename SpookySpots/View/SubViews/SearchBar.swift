@@ -10,23 +10,39 @@ import SwiftUI
 struct SearchBar: View {
     
     
-//    @State var searchText: String = ""
+    //    @State var searchText: String = ""
     var type: SearchFromType
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
     @ObservedObject var locationStore = LocationStore.instance
     
+    let listRowPadding: Double = 5 // guess
+    let listRowMinHeight: Double = 45 // guess
+    
+    var listRowHeight: Double {
+        max(listRowMinHeight, 20 * listRowPadding)
+    }
+    
     var body: some View {
-        
-        HStack {
-            HStack(spacing: -20) {
-            magGlass
-            searchField
+        VStack {
+            HStack {
+                HStack(spacing: -20) {
+                    magGlass
+                    searchField
+                }
+                cancelButton
             }
-            cancelButton
+            if exploreVM.searchText != "" {
+                searchResults
+            }
         }
+
         .background(background)
+        
+        .onAppear {
+            UITableView.appearance().backgroundColor = .clear
+        }
         
     }
     
@@ -40,15 +56,30 @@ struct SearchBar: View {
     private var searchField: some View {
         TextField("Search",
                   text:
-                    typeIsList() ?
-                    $exploreVM.searchText
-                  :
                     $exploreVM.searchText)
-            .padding()
-            .foregroundColor(K.Colors.WeenyWitch.brown)
-            .accentColor(K.Colors.WeenyWitch.orange)
-            
+        .padding()
+        .foregroundColor(K.Colors.WeenyWitch.brown)
+        .accentColor(K.Colors.WeenyWitch.orange)
+        
+        
+    }
+    
+    private var searchResults: some View {
+        List {
+        ForEach(0..<exploreVM.searchedLocations.count, id: \.self) { index in
+            NavigationLink {
+                LD(location: $exploreVM.searchedLocations[index])
+            } label: {
+                Text(exploreVM.searchedLocations[index].location.name)
+            }
+            .listRowBackground(Color.clear)
+        }
+        }
+//        .frame(height: CGFloat(exploreVM.searchedLocations.count) * CGFloat(self.listRowHeight))
 
+        .frame(maxHeight: 450)
+        .listStyle(.insetGrouped)
+        .offset(y: -40)
     }
     
     private var background: some View {
@@ -66,10 +97,10 @@ struct SearchBar: View {
             Text("Cancel")
         }
         .opacity(typeIsList() ?
-                    (exploreVM.searchText.isEmpty ? 0 : 1)
+                 (exploreVM.searchText.isEmpty ? 0 : 1)
                  :
                     (exploreVM.searchText.isEmpty ? 0 : 1))
-            .padding()
+        .padding()
     }
     
     
@@ -89,7 +120,7 @@ struct SearchBar: View {
     private func typeIsList() -> Bool {
         type == .exploreByList
     }
-
+    
     
     //MARK: - SearchFromType
     enum SearchFromType {

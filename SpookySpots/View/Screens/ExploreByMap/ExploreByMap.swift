@@ -17,9 +17,7 @@ struct ExploreByMap: View {
     @State private var swipeDirection: ExploreViewModel.SwipeDirection?
     
     @State private var shouldNavigate = false
-    
-    @State private var navigateToLocation: LocationModel?
-    
+            
     @ObservedObject var locationStore = LocationStore.instance
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
@@ -57,7 +55,9 @@ struct ExploreByMap: View {
         .navigationBarHidden(true)
         
         .fullScreenCover(isPresented: $shouldNavigate) {
-            LD(location: navigateToLocation ?? LocationModel.example)
+            Binding($exploreVM.displayedLocation).map {
+                LD(location: $0)
+            }
         }
     }
 }
@@ -74,7 +74,7 @@ extension ExploreByMap {
                 if exploreVM.displayedLocation == location {
                     LargeImageLocationView(location: location)
                         .onTapGesture {
-                            self.navigateToLocation = location
+                            exploreVM.displayedLocation = location
                             self.shouldNavigate = true
                         }
                         .gesture(DragGesture(minimumDistance: 3.0, coordinateSpace: .local)
@@ -159,36 +159,36 @@ extension ExploreByMap {
         return view
     }
     
-    private var searchLocations: some View {
-        VStack {
-            
-            List(exploreVM.searchedLocations) { location in
-
-                NavigationLink {
-                    LD(location: location)
-                } label: {
-                    Text("\(location.location.name), \(location.location.address?.state ?? "")")
-                }
-                
-            }
-            .listStyle(.plain)
-            .frame(width: 276, height: 300)
-            Spacer()
-        }.frame(maxHeight: 222)
-            .shadow(color: .black, radius: 2, x: 0, y: 0)
-        
-    }
+//    private var searchLocations: some View {
+//        VStack {
+//
+//            List(exploreVM.searchedLocations) { location in
+//
+//                NavigationLink {
+//                    LD(location: )
+//                } label: {
+//                    Text("\(location.location.name), \(location.location.address?.state ?? "")")
+//                }
+//
+//            }
+//            .listStyle(.plain)
+//            .frame(width: 276, height: 300)
+//            Spacer()
+//        }.frame(maxHeight: 222)
+//            .shadow(color: .black, radius: 2, x: 0, y: 0)
+//
+//    }
     
-    private var searchResults: some View {
-        let view: AnyView
-        if exploreVM.searchedLocations.isEmpty {
-            view = AnyView(EmptyView())
-        } else {
-            view = AnyView(searchLocations)
-        }
-        return view
-            .offset(y: 26)
-    }
+//    private var searchResults: some View {
+//        let view: AnyView
+//        if exploreVM.searchedLocations.isEmpty {
+//            view = AnyView(EmptyView())
+//        } else {
+//            view = AnyView(searchLocations)
+//        }
+//        return view
+//            .offset(y: 26)
+//    }
     
     
     //MARK: - Buttons

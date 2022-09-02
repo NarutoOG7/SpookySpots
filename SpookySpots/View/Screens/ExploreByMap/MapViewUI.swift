@@ -101,8 +101,8 @@ struct MapViewUI: UIViewRepresentable {
                 annotationView.clusteringIdentifier = "cluster"
                 annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.black)
                 annotationView.titleVisibility = .hidden
-                annotationView.glyphText = "👻"
-//                annotationView.glyphImage = UIImage(named: "Ghost")
+//                annotationView.glyphText = "👻"
+                annotationView.glyphImage = UIImage(named: "Ghost")
 
                 return annotationView
                 
@@ -118,6 +118,7 @@ struct MapViewUI: UIViewRepresentable {
                 
                 exploreVM.showingLocationList = true
                 exploreVM.highlightedAnnotation = locAnnotation
+                
                 
                 if let loc = LocationStore.instance.onMapLocations.first(where: { "\($0.location.id)"
                     == locAnnotation.id }) {

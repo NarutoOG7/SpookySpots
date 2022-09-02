@@ -11,13 +11,22 @@ import FirebaseFirestore
 
 
 enum AuthErrorTypes: String {
-    case incorrectEmailOrPassword = "Email or Password is invalid"
-    case passwordsDontMatch = "Passwords DO NOT match"
-    case firebaseTrouble = "There was an issue creating your account."
+    // Email
+    case unrecognizedEmail = "This email isn't recognized."
+    case incorrectEmail = "Email is invalid."
+    case emailIsBadlyFormatted = "This is not recognized as an email."
     case emailInUse = "This email is already in use."
-    case failedToSaveUser = "There was a problem saving the user"
+    
+    // Password
+    case incorrectPassword = "Password is incorrect."
+    case insufficientPassword = "Password must be at least 6 characters long."
+    case passwordsDontMatch = "Passwords DO NOT match"
+    
+    // Network
     case troubleConnectingToFirebase = "There seems to be an issue with the connection to firebase."
     case failToSignOut = "There was an error signing out of your account. Check your connection and try again."
+    case firebaseTrouble = "There was an issue creating your account."
+    case failedToSaveUser = "There was a problem saving the user"
 }
 
 class Authorization {
@@ -44,7 +53,22 @@ class Authorization {
             
             if let error = error {
                 print(error.localizedDescription)
-                onError(.firebaseTrouble)
+                switch error.localizedDescription {
+                case let str where str.contains("no user record corresponding to this identifier"):
+                    onError(.unrecognizedEmail)
+                case let str where str.contains("email address"):
+                    onError(.incorrectEmail)
+                case let str where str.contains("password must be 6 characters"):
+                    onError(.insufficientPassword)
+                case let str where str.contains("email in use"):
+                    onError(.emailInUse)
+                case let str where str.contains("password is invalid"):
+                    onError(.incorrectPassword)
+                case let str where str.contains("network error has occurred"):
+                    onError(.troubleConnectingToFirebase)
+                default:
+                    onError(.firebaseTrouble)
+                }
             }
             
             if let result = authResult {
@@ -54,11 +78,6 @@ class Authorization {
                 var favorites: [FavoriteLocation] = []
                 FirebaseManager.instance.getFavorites { favLoc in
                     favorites.append(favLoc)
-                }
-                
-                var reviews: [ReviewModel] = []
-                FirebaseManager.instance.getReviewsForUser(user) { review in
-                    reviews.append(review)
                 }
                 
                 DispatchQueue.main.async {
@@ -85,13 +104,24 @@ class Authorization {
         auth.createUser(withEmail: email, password: password) { (result, error) in
                 
             if let error = error {
-                if error.localizedDescription.contains("email in use") {
-                    print("Email is in use")
+                print(error.localizedDescription)
+                
+                switch error.localizedDescription {
+                    
+                case let str where str.contains("network error has occurred"):
+                    onError(.troubleConnectingToFirebase)
+                case let str where str.contains("email address is already in use"):
                     onError(.emailInUse)
-                } else {
-                print("Trouble creating account \(error)")
+                case let str where str.contains("email address is badly formatted"):
+                    onError(.emailIsBadlyFormatted)
+                case let str where str.contains("password must be 6 characters"):
+                    onError(.insufficientPassword)
+                case let str where str.contains("passwords do not match"):
+                    onError(.passwordsDontMatch)
+                default:
                     onError(.firebaseTrouble)
                 }
+                
             } else {
                 guard let result = result else {
                     print("No result")

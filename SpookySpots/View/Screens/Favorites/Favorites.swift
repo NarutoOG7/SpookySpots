@@ -18,21 +18,19 @@ struct Favorites: View {
             K.Colors.WeenyWitch.black
             locationsList
         }
+        .navigationBarTitleDisplayMode(.inline)
 
-//            .padding()
-//            .background(Image(K.Images.paperBackground).opacity(0.5))
-//
-        
     }
     
     var locationsList: some View {
         VStack {
             ScrollView(showsIndicators: false) {
-                ForEach(locationStore.favoriteLocations) { location in
+                ForEach(0..<locationStore.favoriteLocations.count, id: \.self) { index in
                     NavigationLink {
-                        LD(location: location)
+                        LD(location: $locationStore.favoriteLocations[index])
                     } label: {
-                        FavoritesCell(location: location)
+                        
+                        FavoritesCell(location: locationStore.favoriteLocations[index])
 //                    }
                     }.padding(.top, 8)
                     

@@ -11,7 +11,7 @@ import SwiftUI
 import Firebase
 import Contacts
 
-struct LocationData: Identifiable, Equatable, Codable {
+struct LocationData: Identifiable, Equatable, Codable, Hashable {
     static func == (lhs: LocationData, rhs: LocationData) -> Bool {
         return lhs.id == rhs.id && lhs.name == rhs.name
     }
@@ -22,7 +22,6 @@ struct LocationData: Identifiable, Equatable, Codable {
                                   address: Address(address: "721 Bannack Rd", city: "Dillon", state: "MT", zipCode: "59725", country: "USA"),
                                   description: "Bannack State Park is a National Historic Landmark and is the best preserved of all Montana ghost towns. Back in the “Old West”, during the mighty gold rush of 1862, Bannack’s population grew over 3,000. Today, no residents remain in this town.",
                                   moreInfoLink: "https://fwp.mt.gov/stateparks/bannack-state-park",
-                                      review: Review(rating: 5, review: "Must visit anytime you are in Montana!", title: "Breathtaking", username: "Spencer", locationID: "\(1111)"),
                                   locationType: "Ghost Town",
                                   tours: true,
                                   imageName: "FairbanksBridge.jpg",
@@ -34,7 +33,6 @@ struct LocationData: Identifiable, Equatable, Codable {
     var address: Address?
     var description: String?
     var moreInfoLink: String?     //
-    var review: Review?           
     var locationType: String?
     var tours: Bool?              //
     var hours: String?            //
@@ -59,11 +57,7 @@ struct LocationData: Identifiable, Equatable, Codable {
         let zipCode = data["zipCode"] as? String ?? ""
         let description = data["description"] as? String ?? ""
         let moreInfoLink = data["moreInfoLink"] as? String ?? ""
-        let avgRating = data["avgRating"] as? Double ?? 0
-        let lastReview = data["lastReview"] as? String ?? ""
-        let lastRating = data["lastRating"] as? Int ?? 0
-        let lastReviewTitle = data["lastReviewTitle"] as? String ?? ""
-        let lastReviewUser = data["lastReviewUser"] as? String ?? ""
+
         let imageName = data["imageName"] as? String ?? ""
         let hasTours = data["offersGhostTours"] as? Bool ?? false
         let hotelKey = data["hotelKey"] as? String ?? ""
@@ -78,12 +72,6 @@ struct LocationData: Identifiable, Equatable, Codable {
             country: country)
         self.description = description
         self.moreInfoLink = moreInfoLink
-        self.review = Review(
-            rating: lastRating,
-            review: lastReview,
-            title: lastReviewTitle,
-            username: lastReviewUser,
-            locationID: "\(id)")
         self.imageName = imageName
         self.tours = hasTours
         self.hotelKey = hotelKey
@@ -91,13 +79,12 @@ struct LocationData: Identifiable, Equatable, Codable {
     }
    
     
-        init(id: Int, name: String, address: Address?, description: String?, moreInfoLink: String?, review: Review?, locationType: String?, tours: Bool?, imageName: String?, distanceToUser: Double?, price: Double?) {
+        init(id: Int, name: String, address: Address?, description: String?, moreInfoLink: String?, locationType: String?, tours: Bool?, imageName: String?, distanceToUser: Double?, price: Double?) {
             self.id = id
             self.name = name
             self.address = address
             self.description = description
             self.moreInfoLink = moreInfoLink
-            self.review = review
             self.locationType = locationType
             self.tours = tours
             self.imageName = imageName
@@ -111,6 +98,7 @@ struct LocationData: Identifiable, Equatable, Codable {
         result.price = price
         self = result
     }
+    
 }
 
 

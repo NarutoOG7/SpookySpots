@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     
     @State var showSplash = true
-    
+        
     @ObservedObject var userStore = UserStore.instance
 
 

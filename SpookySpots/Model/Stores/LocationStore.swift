@@ -17,7 +17,7 @@ class LocationStore: ObservableObject {
     @Published var onMapLocations: [LocationModel] = []
     @Published var nearbyLocations: [LocationModel] = []
     @Published var hauntedHotels: [LocationModel] = []
-    @Published var trendingLocations: [LocationModel] = []
+    @Published var trendingLocations: [LocationModel] = [] 
     @Published var featuredLocations: [LocationModel] = []
     
     @Published var reviewBucket: [ReviewModel] = []
@@ -40,6 +40,9 @@ class LocationStore: ObservableObject {
         if let trendingIndex = trendingLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             trendingLocations[trendingIndex] = location
         }
+//        for trendIndx in 0..<trendingLocations.filter({ $0.location.id == location.location.id }).count {
+//            trendingLocations[trendIndx] = location
+//        }
         if let featuredIndex = featuredLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             featuredLocations[featuredIndex] = location
         }

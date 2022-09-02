@@ -16,9 +16,11 @@ struct ExploreByList: View {
     
     @ObservedObject private var exploreVM = ExploreViewModel.instance
     @ObservedObject private var tripLogic = TripLogic.instance
+    @ObservedObject private var locationStore = LocationStore.instance
     
     @Environment(\.managedObjectContext) var moc
     
+    let weenyWitch = K.Colors.WeenyWitch.self
     
     init() {
         let fbManager = FirebaseManager.instance
@@ -30,36 +32,58 @@ struct ExploreByList: View {
     
     var body: some View {
         ZStack {
-            locationsCollections
-            VStack(spacing: -4) {
+            VStack {
                 greeting
-                    .padding(.bottom, 10)
-                HStack {
-                    VStack {
-                        HStack {
-                            SearchBar(type: .exploreByList)
-                            mapButton
-                        }
-                        Divider()
-                            .frame(height: 1.5)
-                            .background(K.Colors.WeenyWitch.brown)
-                            .padding(.top, 12)
-                        
-                    } .padding()
-                }
+                mapButton
+                divider
+                ScrollView(showsIndicators: false) {
+                locationsCollections
+            }
+            }
+            VStack {
+            SearchBar(type: .exploreByList)
+                    .padding(.top, 70)
+                    .padding(.horizontal)
+                    .padding(.trailing, 65)
                 Spacer()
             }
-        }.padding(.top, 30)
-            .onAppear {
-                exploreVM.supplyLocationLists()
-//                self.tripLogic.setUp(self.moc)
-            }
         
-        //        }
-            .background(Image(K.Images.paperBackground).opacity(0.5))
-
+        }
+        .onAppear {
+            exploreVM.supplyLocationLists()
+        }
+        .background(Image(K.Images.paperBackground).opacity(0.5))
     }
-    
+//
+//    var body: some View {
+//        ZStack {
+//            locationsCollections
+//            VStack(spacing: -4) {
+//                greeting
+//                    .padding(.bottom, 10)
+//                HStack {
+//                    VStack {
+//                        HStack {
+//                            SearchBar(type: .exploreByList)
+//                            mapButton
+//                        }
+//divider
+//
+//                    } .padding()
+//                }
+//                Spacer()
+//            }
+//        }.padding(.top, 30)
+//            .onAppear {
+//                exploreVM.supplyLocationLists()
+////                self.tripLogic.setUp(self.moc)
+//            }
+//
+//        //        }
+//            .background(Image(K.Images.paperBackground).opacity(0.5))
+//
+//    }
+//
     
     //MARK: - SubViews
     var greeting: some View {
@@ -76,36 +100,54 @@ struct ExploreByList: View {
                 .foregroundColor(K.Colors.WeenyWitch.orange)
             Spacer()
         }
+        .padding(.top, 20)
+//        .padding(.bottom, )
     }
     
     private var locationsCollections: some View {
         VStack {
             
-            Spacer(minLength: 130)
-            VStack {
-                ScrollView(.vertical, showsIndicators: false, content: {
-                    
-                    VStack(spacing: -14) {
-                        LocationCollection(collectionType: .search)
+//            Spacer(minLength: 130)
+//            VStack {
+//                ScrollView(.vertical, showsIndicators: false, content: {
+//
+//                    VStack(spacing: -14) {
+//                        LocationCollection(locations: $locationStore.nearbyLocations, title: "Nearby Spooks")
+//                        LocationCollection(locations: $locationStore.trendingLocations, title: "Trending")
+//                        LocationCollection(locations: $locationStore.featuredLocations, title: "Featured")
+                        
+//                        LocationCollection(collectionType: .search)
                         LocationCollection(collectionType: .nearby)
                         LocationCollection(collectionType: .trending)
                         LocationCollection(collectionType: .featured)
                     }
-                })
+//                })
                 .frame(width: UIScreen.main.bounds.width)
                 
-            }
-        }
+//            }
+//        }
+    }
+    
+    private var divider: some View {
+        Divider()
+            .frame(height: 1.5)
+            .background(K.Colors.WeenyWitch.brown)
+            .padding(.top, 12)
     }
     
     //MARK: - Buttons
     
     private var mapButton: some View {
+        HStack {
+            Spacer()
+            Spacer()
         CircleButton(size: .small,
                      image: Image(systemName: "map"),
                      mainColor: K.Colors.WeenyWitch.brown,
                      accentColor: K.Colors.WeenyWitch.lightest,
                      clicked: isShowingMap)
+        }
+        .padding(.horizontal)
     }
     
     //MARK: - Methods

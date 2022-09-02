@@ -32,5 +32,7 @@ class UserStore: ObservableObject {
     @Published var trip: Trip?
     @Published var selectedLocationDistanceToUser: Double = 0
     
+    @Published var reviews: [ReviewModel] = []
+    
 
 }

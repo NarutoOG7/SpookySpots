@@ -16,25 +16,30 @@ struct DatabaseView: View {
     @State var showingMoreAllLocations = false
     @State var showingMoreFailedLocations = false
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     var body: some View {
         VStack {
             ScrollView {
                 allLocationsView
                 failedLocationsView
                 createGeoFireCoordsButton
+                    .padding(.vertical)
             }
         }
+        .background(weenyWitch.black)
         .navigationTitle("Database")
     }
     
     //MARK: - All Locations View
     
     var allLocationsView: some View {
-        VStack {
+        VStack(alignment: .leading) {
             HStack {
                 Text("All Locations")
                     .font(.title2)
                     .fontWeight(.thin)
+                    .foregroundColor(weenyWitch.lightest)
                 Spacer()
                 allLocationsButton
             }.padding()
@@ -47,6 +52,8 @@ struct DatabaseView: View {
         VStack(alignment: .leading) {
             ForEach(locationStore.hauntedHotels.prefix(self.showingMoreAllLocations ? .max : 4)) { location in
                 Text("\(location.location.id): \(location.location.name)")
+                    .foregroundColor(weenyWitch.lightest)
+
             }.padding(3)
         }
     }
@@ -61,6 +68,8 @@ struct DatabaseView: View {
                 Text("Failed Locations")
                     .font(.title2)
                     .fontWeight(.thin)
+                    .foregroundColor(weenyWitch.lightest)
+
                 Spacer()
                 failedLocationsButton
             }.padding()
@@ -71,7 +80,9 @@ struct DatabaseView: View {
     
     var failedLocationsList: some View {
         List(failedLocations) { location in
-            Text("\(location.location.id), \(location.location.name)")
+            Text("\(location.location.id): \(location.location.name)")
+                .foregroundColor(weenyWitch.lightest)
+
         }
         .lineLimit(self.showingMoreFailedLocations ? .none : 4)
     }
@@ -81,12 +92,14 @@ struct DatabaseView: View {
     var allLocationsButton: some View {
         Button(action: allTapped) {
             Text(self.showingMoreAllLocations ? "Less" : "More")
+                .foregroundColor(weenyWitch.orange)
         }
     }
     
     private var failedLocationsButton: some View {
         Button(action: moreFailedTapped) {
             Text(self.showingMoreFailedLocations ? "Less" : "More")
+                .foregroundColor(weenyWitch.orange)
         }
     }
     
@@ -95,9 +108,10 @@ struct DatabaseView: View {
             Text("Create GeoFire Coordinates")
                 .font(.subheadline)
                 .fontWeight(.black)
-                .foregroundColor(.white)
+                .foregroundColor(weenyWitch.orange)
                 .padding()
-                .background(Capsule().fill(.orange))
+                .overlay(RoundedRectangle(cornerRadius: 25)
+                    .stroke(weenyWitch.orange, lineWidth: 3))
         }
     }
     

@@ -31,8 +31,8 @@ struct TabBarSetup: View {
             let appearance = UINavigationBarAppearance()
             
             appearance.backgroundColor = 
-            UIColor( K.Colors.WeenyWitch.orange)
-                .withAlphaComponent(0.94)
+            UIColor( K.Colors.WeenyWitch.lightest)
+//                .withAlphaComponent(0.94)
             
             appearance.titleTextAttributes =
             [.foregroundColor : UIColor(K.Colors.WeenyWitch.brown)]

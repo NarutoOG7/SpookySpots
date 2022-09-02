@@ -10,11 +10,13 @@ import SDWebImageSwiftUI
 
 struct LD: View {
     
-    @State var location: LocationModel
+    @Binding var location: LocationModel
         
     @State private var imageURL = URL(string: "")
     @State private var isSharing = false
     @State private var imageIsAvailable = false
+    
+    @State private var isCreatingNewReview = false
     
     @EnvironmentObject var favoritesLogic: FavoritesLogic
     @EnvironmentObject var tripLogic: TripLogic
@@ -59,6 +61,7 @@ struct LD: View {
                 
                     .onAppear {
                         loadImageFromFirebase()
+                        print(location.reviews.count)
                     }
                     .sheet(isPresented: $isSharing) {
                         ShareActivitySheet(itemsToShare: [location.location.name])
@@ -120,7 +123,7 @@ struct LD: View {
     
     private var address: some View {
         Text(location.location.address?.fullAddress() ?? "")
-            .font(.avenirNextRegular(size: 17))
+            .font(.avenirNextRegular(size: 19))
             .lineLimit(nil)
             .foregroundColor(K.Colors.WeenyWitch.brown)
     }
@@ -130,7 +133,11 @@ struct LD: View {
             FiveStars(
                 rating: $location.avgRating,
                 color: K.Colors.WeenyWitch.orange)
-            Text("")
+            let reviewCount = location.reviews.count
+            let textEnding = reviewCount == 1 ? "" : "s"
+            Text("(\(reviewCount) review\(textEnding))")
+                .font(.avenirNextRegular(size: 17))
+                .foregroundColor(K.Colors.WeenyWitch.brown)
         }
     }
     
@@ -166,9 +173,14 @@ struct LD: View {
                     ReviewCard(review: last)
                 }
             }
+                
+                
             leaveAReviewView
-                .padding(.vertical)
+                .padding(.vertical, 30)
             Spacer(minLength: 200)
+        }
+        .sheet(isPresented: $isCreatingNewReview) {
+            LocationReviewView(location: $location, isPresented: $isCreatingNewReview, review: .constant(nil))
         }
     }
     
@@ -192,16 +204,24 @@ struct LD: View {
     }
     
     private var leaveAReviewView: some View {
-        let locReviewView = LocationReviewView(location: $location)
-        return VStack(alignment: .leading) {
+
+         VStack(alignment: .leading) {
             Text("Been here before?")
                 .italic()
                 .foregroundColor(K.Colors.WeenyWitch.brown)
-            NavigationLink(destination: locReviewView) {
-                Text("Leave A Review")
-                    .underline()
-                    .foregroundColor(K.Colors.WeenyWitch.orange)
-            }
+//             NavigationLink(destination: LocationReviewView(location: $location, isPresented: $isCreatingNewReview)) {
+                    Button {
+                 self.isCreatingNewReview = true
+
+             } label: {
+                 Text("Leave A Review")
+                     .underline()
+                     .foregroundColor(K.Colors.WeenyWitch.orange)
+             }
+
+                    
+                
+//            }
 //            }.onDisappear {
 //                self.location = locReviewView.location
 //            }
@@ -366,7 +386,7 @@ struct LD: View {
 //MARK: - Previews
 struct LD_Previews: PreviewProvider {
     static var previews: some View {
-        LD(location: LocationModel.example)
+        LD(location: .constant(LocationModel.example))
             .environmentObject(FavoritesLogic())
             .environmentObject(TripLogic())
     }
