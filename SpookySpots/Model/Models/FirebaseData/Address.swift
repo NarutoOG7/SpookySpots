@@ -14,7 +14,7 @@ struct Address: Codable, Hashable {
     var zipCode: String
     var country: String
     
-    init(address: String, city: String, state: String, zipCode: String, country: String) {
+    init(address: String = "", city: String = "", state: String = "", zipCode: String = "", country: String = "") {
         self.address = address
         self.city = city
         self.state = state

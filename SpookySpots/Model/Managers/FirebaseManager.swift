@@ -16,7 +16,7 @@ import MapKit
 
 
 class FirebaseManager: ObservableObject {
-    let constantToNeverTouch = FirebaseApp.configure()
+    let constantToNeverTouch: Void = FirebaseApp.configure()
     static let instance = FirebaseManager()
     
     //    @ObservedObject var userLocManager = UserLocationManager.instance
@@ -34,7 +34,7 @@ class FirebaseManager: ObservableObject {
     }
     
     func getHotelWithReviews(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
-        getSelectHotel(locID) { location in
+        getSelectHotel(byID: locID) { location in
             self.getReviewsForLocation(locID) { reviews in
                 var newLoc = location
                 newLoc.reviews = reviews
@@ -43,7 +43,34 @@ class FirebaseManager: ObservableObject {
         }
     }
     
-    func getSelectHotel(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
+//    func getSelectHotel(byName locName: String, withCompletion completion: @escaping(LocationModel) -> Void) {
+//
+//        let ref = Database.database().reference().child("Haunted Hotels").
+//
+//        ref.observe(.value) { snapshot in
+//
+//            if let data = snapshot.value as? [String : AnyObject] {
+//
+//                let locData = LocationData(data: data)
+//
+//                var imageURLS: [URL] = []
+//                self.getLocationImages(locID: "\(locData.id)") { fsImage in
+//                    if let url = URL(string: "\(fsImage.imageURL)") {
+//                        imageURLS.append(url)
+//                    }
+//                }
+//
+//                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
+//                completion(locModel)
+//
+//
+//
+//            }
+//        }
+//    }
+    
+    
+    func getSelectHotel(byID locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         
         let ref = Database.database().reference().child("Haunted Hotels/\(locID)")
         
@@ -73,7 +100,7 @@ class FirebaseManager: ObservableObject {
     
     func getHauntedHotels() {
         let ref = Database.database().reference().child("Haunted Hotels")
-        ref.observe(.value) { (snapshot) in
+        ref.observeSingleEvent(of: .value) { (snapshot) in
             if snapshot.childrenCount > 0 {
                 self.locationStore.hauntedHotels.removeAll()
                 
@@ -82,11 +109,11 @@ class FirebaseManager: ObservableObject {
                         if let data = object.value as? [String : AnyObject] {
                             let locData = LocationData(data: data)
                             var imageURLs: [URL] = []
-                            self.getLocationImages(locID: "\(locData.id)") { fsImage in
-                                if let url = URL(string: "\(fsImage.imageURL)") {
-                                    imageURLs.append(url)
-                                }
-                            }
+//                            self.getLocationImages(locID: "\(locData.id)") { fsImage in
+//                                if let url = URL(string: "\(fsImage.imageURL)") {
+//                                    imageURLs.append(url)
+//                                }
+//                            }
                             
                             
                             let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
@@ -455,6 +482,31 @@ class FirebaseManager: ObservableObject {
     
     //MARK: - Search
     
+    
+    func searchByLocationName(text: String, withCompletion completion: @escaping(String) -> Void) {
+           
+           guard let db = db else { return }
+
+        db.collection("Location Names")
+            .whereField("name", isGreaterThanOrEqualTo: text)
+            .whereField("name", isLessThanOrEqualTo: text + "/uf8ff")
+            .getDocuments() { (querySnapshot, err) in
+               if let err = err {
+                   print("Error getting documents: \(err)")
+               } else {
+                   
+                   if let snapshot = querySnapshot {
+                       for document in snapshot.documents {
+                           let dict = document.data()
+                           let name = dict["name"] as? String ?? ""
+                           
+                           completion(name)
+                       }
+                   }
+               }
+           }
+       }
+    
     func searchForLocationInFullDatabase(text: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         let ref = Database.database().reference().child("Haunted Hotels")
         
@@ -518,7 +570,7 @@ class FirebaseManager: ObservableObject {
     }
     
     
-    func getAddressFrom(coordinates: CLLocationCoordinate2D, withCompletion completion: @escaping ((_ location: Address) -> (Void))) {
+    func getAddressFrom(coordinates: CLLocationCoordinate2D, withCompletion completion: @escaping ((_ address: Address) -> (Void))) {
         let location  = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
         let geoCoder = CLGeocoder()
         geoCoder.reverseGeocodeLocation(location) { (placemarks, error) in

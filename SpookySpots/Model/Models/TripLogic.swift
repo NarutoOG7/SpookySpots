@@ -102,6 +102,7 @@ class TripLogic: ObservableObject {
             //            setHighlightedRouteTravelTimeAsTime()
         }
     }
+    @Published var currentDestination: Destination?
     @Published var currentRouteTravelTime: Time?
     @Published var currentRouteDistanceString: String?
     @Published var steps: [MKRoute.Step] = [] {
@@ -202,6 +203,8 @@ class TripLogic: ObservableObject {
     
     @Published var coreDataTrip: CDTrip?
     
+    
+    
 //    @Published var moc: NSManagedObjectContext?
     
     
@@ -225,7 +228,7 @@ class TripLogic: ObservableObject {
     init() {
                 
         if userStore.isSignedIn || userStore.isGuest {
-            
+                        
             self.currentTrip = PersistenceController.shared.activeTrip()
             
 //  //          loadFromFirebase()
@@ -300,24 +303,35 @@ class TripLogic: ObservableObject {
     func resetTrip() {
         if let currentLoc = userStore.currentLocation {
             
+            var currentLocAddress = Address()
+            firebaseManager.getAddressFrom(coordinates: currentLoc.coordinate) { address in
+                currentLocAddress = address
+            }
+            
             let startLoc = Destination(id: UUID().uuidString,
                                        lat: currentLoc.coordinate.latitude,
                                        lon: currentLoc.coordinate.longitude,
+                                       address: currentLocAddress.streetCityState(),
                                        name: "Current Location")
             
             let endLoc = Destination(id: UUID().uuidString,
                                      lat: currentLoc.coordinate.latitude,
                                      lon: currentLoc.coordinate.longitude,
+                                     address: currentLocAddress.streetCityState(),
                                      name: "Current Location")
             
-            let trip = Trip(id: UUID().uuidString,
+            var trip = Trip(id: UUID().uuidString,
                             userID: userStore.user.id,
                             isActive: true,
                             destinations: [],
                             startLocation: startLoc,
                             endLocation: endLoc,
                             routes: [])
+            trip.recentlyCompletedDestination = startLoc
+            trip.nextDestination = endLoc
+            
             self.currentTrip = trip
+
         }
     }
     
@@ -424,6 +438,7 @@ class TripLogic: ObservableObject {
                 id: "\(location.location.id)",
                 lat: cloc.coordinate.latitude,
                 lon: cloc.coordinate.longitude,
+                address: location.location.address?.streetCityState() ?? Address().streetCityState(),
                 name: location.location.name)
             if let currentTrip = self.currentTrip {
                 
@@ -493,7 +508,7 @@ class TripLogic: ObservableObject {
         let usesMetric = locale.usesMetricSystem
         
         self.distance = 0
-        var unitSystem = usesMetric ? "meters" : "miles"
+        let unitSystem = usesMetric ? "meters" : "miles"
   
         for route in tripRoutes {
             let meters = route.rt.distance
@@ -501,6 +516,25 @@ class TripLogic: ObservableObject {
             let distance = usesMetric ? meters : miles
             self.distance += distance
         }
+        print(unitSystem)
+        return (distance, unitSystem)
+    }
+    
+    func getCurrentRouteDistanceAndUnit() -> (Double,String) {
+        let locale = Locale.current
+        let usesMetric = locale.usesMetricSystem
+        
+        self.distance = 0
+        let unitSystem = usesMetric ? "meters" : "miles"
+  
+        if let route = currentRoute {
+            let meters = route.rt.distance
+            let miles = meters * 0.000621371
+            let distance = usesMetric ? meters : miles
+            self.distance += distance
+        }
+        
+        
         print(unitSystem)
         return (distance, unitSystem)
     }
@@ -722,8 +756,11 @@ class TripLogic: ObservableObject {
 //        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
         if let first = self.tripRoutes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
+            self.currentDestination = currentTrip?.destinations.first
         //        self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
+            self.currentTrip?.recentlyCompletedDestination = currentTrip?.startLocation
+            
         
         }
         

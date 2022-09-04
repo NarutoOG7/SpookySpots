@@ -24,6 +24,7 @@
 		C92DB78128A85E23009B7646 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C92DB78028A85E23009B7646 /* LaunchScreen.storyboard */; };
 		C936DC992863F51900D10C65 /* Destination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC982863F51900D10C65 /* Destination.swift */; };
 		C936DC9D288EF48C00D10C65 /* Route.swift in Sources */ = {isa = PBXBuildFile; fileRef = C936DC9C288EF48A00D10C65 /* Route.swift */; };
+		C938C25628C3C54B006D6D7D /* TheTripPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C938C25528C3C54B006D6D7D /* TheTripPage.swift */; };
 		C94046A127F56C97006837D6 /* PagedScrollViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */; };
 		C94046DE27F9210A006837D6 /* LargeImageLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046DD27F9210A006837D6 /* LargeImageLocationView.swift */; };
 		C94046E027F93867006837D6 /* HotelPriceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C94046DF27F93867006837D6 /* HotelPriceManager.swift */; };
@@ -137,6 +138,7 @@
 		C92DB78028A85E23009B7646 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C936DC982863F51900D10C65 /* Destination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Destination.swift; sourceTree = "<group>"; };
 		C936DC9C288EF48A00D10C65 /* Route.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Route.swift; sourceTree = "<group>"; };
+		C938C25528C3C54B006D6D7D /* TheTripPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TheTripPage.swift; sourceTree = "<group>"; };
 		C94046A027F56C97006837D6 /* PagedScrollViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedScrollViewModifier.swift; sourceTree = "<group>"; };
 		C94046DD27F9210A006837D6 /* LargeImageLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeImageLocationView.swift; sourceTree = "<group>"; };
 		C94046DF27F93867006837D6 /* HotelPriceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotelPriceManager.swift; sourceTree = "<group>"; };
@@ -490,6 +492,7 @@
 				C9EFD6242826B4B200B3BFDC /* TripPage.swift */,
 				C9F3F443282A9EEA00D794CE /* NavigationScreen.swift */,
 				C96BA74C282B2E3A00BEFD3D /* MapForNavigation.swift */,
+				C938C25528C3C54B006D6D7D /* TheTripPage.swift */,
 			);
 			path = Trip;
 			sourceTree = "<group>";
@@ -923,6 +926,7 @@
 				C936DC9D288EF48C00D10C65 /* Route.swift in Sources */,
 				C94046EE27F95E82006837D6 /* Review.swift in Sources */,
 				C9A8CA5327ED7BFF00116B61 /* MapForTrip.swift in Sources */,
+				C938C25628C3C54B006D6D7D /* TheTripPage.swift in Sources */,
 				C9D5642228ACBB4800DBD631 /* FavoritesCell.swift in Sources */,
 				C9D5643128BAB9AF00DBD631 /* NotificationBanner.swift in Sources */,
 				C96A50C727F14CA600E44B9F /* AppDelegate.swift in Sources */,

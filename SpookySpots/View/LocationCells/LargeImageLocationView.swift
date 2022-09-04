@@ -45,13 +45,25 @@ struct LargeImageLocationView: View {
     }
     
     //MARK: - SubViews
+//    private var image: some View {
+//        WebImage(url: self.imageURL)
+//            .resizable()
+//            .aspectRatio(contentMode: .fill)
+//            .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
+////            .padding(.bottom)
+//
+//    }
     private var image: some View {
-        WebImage(url: self.imageURL)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
-//            .padding(.bottom)
-        
+        AsyncImage(url: self.imageURL) { image in
+            image
+                .resizable()
+                .aspectRatio(0.9, contentMode: .fill)
+                .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
+                .cornerRadius(15)
+                .shadow(color: .black, radius: 3, x: 0, y: 1.5)
+        } placeholder: {
+            ProgressView()
+        }
     }
     
     

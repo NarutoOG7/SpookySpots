@@ -31,7 +31,7 @@ struct ExploreByMap: View {
                 .ignoresSafeArea()
             VStack {
                 HStack {
-                     SearchBar(type: .exploreByMap)
+                     SearchBar()
                         .offset(y: -30)
                     VStack {
                         listButton

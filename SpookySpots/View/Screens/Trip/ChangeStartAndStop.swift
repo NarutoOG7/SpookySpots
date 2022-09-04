@@ -169,8 +169,8 @@ struct ChangeStartAndStop: View {
         let endName = endInput == "" ? tripLogic.currentTrip?.endLocation.name : endInput
             
             
-            var startDest = Destination(id: "\(TripDetails.startingLocationID)", lat: 0, lon: 0, name: startName ?? "")
-            var endDest = Destination(id: "\(TripDetails.endLocationID)", lat: 0, lon: 0, name: endName ?? "")
+            var startDest = Destination(id: "\(TripDetails.startingLocationID)", lat: 0, lon: 0, address: "", name: startName ?? "")
+            var endDest = Destination(id: "\(TripDetails.endLocationID)", lat: 0, lon: 0, address: "", name: endName ?? "")
             
             if let currentLocation = userStore.currentLocation {
                 if startName == "Current Location" {

@@ -35,21 +35,30 @@ class ExploreViewModel: ObservableObject {
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var userLocManager = UserLocationManager.instance
     
-    @Published var searchText = ""
-    {
+    @Published var searchText = "" {
         willSet {
             self.searchedLocations = []
-            
-            for loc in locationStore.hauntedHotels.filter({ $0.location.name.localizedCaseInsensitiveContains(newValue) }) {
-                if !self.searchedLocations.contains(loc) {
-                    self.searchedLocations.append(loc)
+            self.searchLogic(text: newValue) { locations in
+                if let locations = locations {
+                    self.searchedLocations = locations
                 }
             }
-//            FirebaseManager.instance.searchForLocationInFullDatabase(text: newValue) { loc in
-//                self.searchedLocations.append(loc)
-//            }
         }
     }
+//    {
+//        willSet {
+//            self.searchedLocations = []
+//            
+//            for loc in locationStore.hauntedHotels.filter({ $0.location.name.localizedCaseInsensitiveContains(newValue) }) {
+//                if !self.searchedLocations.contains(loc) {
+//                    self.searchedLocations.append(loc)
+//                }
+//            }
+////            FirebaseManager.instance.searchForLocationInFullDatabase(text: newValue) { loc in
+////                self.searchedLocations.append(loc)
+////            }
+//        }
+//    }
     
     func supplyLocationLists() {
         geoFireManager.getNearbyLocations(
@@ -58,6 +67,11 @@ class ExploreViewModel: ObservableObject {
         let firebaseManager = FirebaseManager.instance
         firebaseManager.getTrendingLocations()
         firebaseManager.getFeaturedLocations()
+        firebaseManager.getHauntedHotels()
+        
+        firebaseManager.getAllReviews { review in
+            self.locationStore.reviewBucket.append(review)
+        }
 
     }
     
@@ -143,11 +157,17 @@ class ExploreViewModel: ObservableObject {
     
     //MARK: - Search Logic
     
-    func searchLogic(withCompletion completion: @escaping(LocationModel?) -> () = {_ in}) {
-        if self.searchText != "" {
-            FirebaseManager.instance.searchForLocationInFullDatabase(text: searchText) { locModel in
-                completion(locModel)
-            }
+    func searchLogic(text: String, withCompletion completion: @escaping([LocationModel]?) -> () = {_ in}) {
+        if text != "" {
+//            FirebaseManager.instance.searchForLocationInFullDatabase(text: searchText) { locModel in
+//            FirebaseManager.instance.searchByLocationName(text: searchText) { locName in
+//
+//                FirebaseManager.instance.getSelectHotel(byID: locName) { locModel in
+//                    completion(locModel)
+//                }
+//            }
+            let filtered = locationStore.hauntedHotels.filter({ $0.location.name.localizedCaseInsensitiveContains(text) })
+            completion(filtered)
         } else {
             completion(nil)
         }

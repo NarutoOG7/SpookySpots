@@ -24,6 +24,7 @@ struct LD: View {
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
     
+    private let images = K.Images.self
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -67,7 +68,7 @@ struct LD: View {
                         ShareActivitySheet(itemsToShare: [location.location.name])
                     }
             }
-            .background(Image(K.Images.paperBackground).opacity(0.5))
+            .background(K.Images.paperBackground.opacity(0.5))
         }
         .edgesIgnoringSafeArea(.vertical)
         .navigationBarHidden(true)
@@ -238,7 +239,7 @@ struct LD: View {
 //            tapped: directionsTapped)
         CircleButton(
             size: .medium,
-            image: Image(systemName: K.Images.directions),
+            image: images.directions,
             mainColor: K.Colors.WeenyWitch.brown,
             accentColor: K.Colors.WeenyWitch.lightest,
             title: "Directions",
@@ -254,7 +255,7 @@ struct LD: View {
 //
         CircleButton(
             size: .medium,
-            image: Image(systemName: K.Images.share),
+            image: images.share,
             mainColor: K.Colors.WeenyWitch.brown,
             accentColor: K.Colors.WeenyWitch.lightest,
             title: "Share",

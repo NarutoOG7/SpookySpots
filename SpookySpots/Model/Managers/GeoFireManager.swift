@@ -95,7 +95,7 @@ class GeoFireManager: ObservableObject {
     }
          
     
-    //MARK: - GeoFire wire into RTD
+    //MARK: - GeoFire wire into Real Time Database
     
     ///  This should only be accessible by  admin
     func createSpookySpotForLocation(_ location: LocationModel, withCompletion completion: @escaping(Bool) -> Void) {

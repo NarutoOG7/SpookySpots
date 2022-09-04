@@ -137,10 +137,16 @@ extension UserLocationManager: CLLocationManagerDelegate {
 ////          tripLogic.directionsLabel = message
         } else {
             let message = "You have arrived at your destination."
+            print(message)
 //            tripLogic.directionsLabel = message
 ////            tripLogic.stepsCounter = 0
             tripLogic.completedSteps = []
-
+            if let completedDestination = tripLogic.currentTrip?.nextDestination {
+                tripLogic.currentTrip?.completedDestinations.append(completedDestination)
+                
+            }
+            tripLogic.currentTrip?.remainingDestinations.removeFirst()
+            tripLogic.currentTrip?.nextDestination = tripLogic.currentTrip?.remainingDestinations.first
             locationManager?.monitoredRegions.forEach({ locationManager?.stopMonitoring(for: $0) })
         }
     }

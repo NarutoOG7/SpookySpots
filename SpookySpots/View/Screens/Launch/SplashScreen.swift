@@ -13,7 +13,7 @@ struct SplashScreen: View {
         ZStack {
             K.Colors.WeenyWitch.black
                 .edgesIgnoringSafeArea(.all)
-            Image(K.Images.logo)
+            K.Images.logo
                 .padding(.bottom, 110)
                 
         }

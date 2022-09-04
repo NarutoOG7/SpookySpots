@@ -20,64 +20,12 @@ struct Trip: Equatable, Identifiable {
     var endLocation: Destination
     var routes: [Route]
     
-    //MARK: - Init from Firebase
-    init(dict: [String:AnyObject]) {
-        
-        self.id = dict["id"] as? String ?? ""
-        
-        self.userID = dict["userID"] as? String ?? ""
-        
-        self.isActive = dict["isActive"] as? Bool ?? false
-
-        self.destinations = []
-        self.startLocation = Destination(dict: [:])
-        self.endLocation = Destination(dict: [:])
-        self.routes = []
-        
-        setDestinations(dict: dict)
-        setStartLoc(dict: dict)
-        setEndLoc(dict: dict)
-        setRoutes(dict: dict)
-    }
+    var nextDestination: Destination?
+    var recentlyCompletedDestination: Destination?
+    var completedDestinations: [Destination] = []
+    var remainingDestinations: [Destination] = []
     
-    mutating func setDestinations(dict: [String:AnyObject]) {
-        if let destinations = dict["destinations"] as? [[String:AnyObject]] {
-            for destination in destinations {
-                let dest = Destination(dict: destination)
-                self.destinations.append(dest)
-            }
-        } else {
-            self.destinations = []
-        }
-    }
-    
-    mutating func setStartLoc(dict: [String:AnyObject]) {
-        if let start = dict["startLocation"] as? [String:AnyObject] {
-            let startLocation = Destination(dict: start)
-            self.startLocation = startLocation
-        } else {
-            self.startLocation = Destination(dict: [:])
-        }
-    }
-    
-    mutating func setEndLoc(dict: [String:AnyObject]) {
-        if let end = dict["endLocation"] as? [String:AnyObject] {
-            let endLocation = Destination(dict: end)
-            self.endLocation = endLocation
-        } else {
-            self.endLocation = Destination(dict: [:])
-        }
-    }
-    
-    mutating func setRoutes(dict: [String:AnyObject]) {
-        if let routes = dict["routes"] as? [[String:AnyObject]] {
-            for route in routes {
-                let rt = Route(dict: route)
-                self.routes.append(rt)
-            }
-        }
-    }
-    
+     
     //MARK: - Init from Code
     init(id: String = "",
          userID: String = "",
@@ -98,31 +46,78 @@ struct Trip: Equatable, Identifiable {
     
     //MARK: - Init From CoreDataTrip
     init(_ cdTrip: CDTrip) {
+        
         var destinations: [Destination] = []
         if let cdDests = cdTrip.destinations?.allObjects as? [CDDestination] {
             for cdDest in cdDests {
                 let destination = Destination(id: cdDest.id ?? "",
                                               lat: cdDest.lat,
                                               lon: cdDest.lon,
+                                              address: cdDest.address ?? "",
                                               name: cdDest.name ?? "")
                 destinations.append(destination)
             }
         }
+        
+        var remainingDests: [Destination] = []
+        if let cdRemainingDests = cdTrip.remainingDestinations?.allObjects as? [CDDestination] {
+            for cdDest in cdRemainingDests {
+                let remainingDest = Destination(id: cdDest.id ?? "",
+                                                lat: cdDest.lat,
+                                                lon: cdDest.lon,
+                                                address: cdDest.address ?? "",
+                                                name: cdDest.name ?? "")
+                remainingDests.append(remainingDest)
+            }
+        }
+        
+        var completedDests: [Destination] = []
+        if let cdCompletedDests = cdTrip.completedDestinations?.allObjects as? [CDDestination] {
+            for cdDest in cdCompletedDests {
+                let completedDest = Destination(id: cdDest.id ?? "",
+                                                lat: cdDest.lat,
+                                                lon: cdDest.lon,
+                                                address: cdDest.address ?? "",
+                                                name: cdDest.name ?? "")
+                completedDests.append(completedDest)
+            }
+        }
+        
         
         var start = Destination()
         var end = Destination()
         if let endPoints = cdTrip.endPoints?.allObjects as? [CDEndPoint] {
             if let cdStart = endPoints.first(where: { $0.id == "Start" }),
                let cdEnd = endPoints.first(where: { $0.id == "End" }) {
-                start = Destination(id: cdStart.destination?.id ?? "",
-                                    lat: cdStart.destination?.lat ?? 0,
-                                    lon: cdStart.destination?.lon ?? 0,
-                                    name: cdStart.destination?.name ?? "")
-                end = Destination(id: cdEnd.destination?.id ?? "",
-                                  lat: cdEnd.destination?.lat ?? 0,
-                                  lon: cdEnd.destination?.lon ?? 0,
-                                  name: cdEnd.destination?.name ?? "")
+                start = Destination(id: cdStart.id ?? "",
+                                    lat: cdStart.lat,
+                                    lon: cdStart.lon,
+                                    address: cdStart.address ?? "",
+                                    name: cdStart.name ?? "")
+                end = Destination(id: cdEnd.id ?? "",
+                                  lat: cdEnd.lat,
+                                  lon: cdEnd.lon,
+                                  address: cdEnd.address ?? "",
+                                  name: cdEnd.name ?? "")
+
             }
+        }
+        var nextDest = Destination()
+        if let cdNextDest = cdTrip.nextDestination {
+            nextDest = Destination(id: cdNextDest.id ?? "",
+                                   lat: cdNextDest.lat,
+                                   lon: cdNextDest.lon,
+                                   address: cdNextDest.address ?? "",
+                                   name: cdNextDest.name ?? "")
+        }
+        
+        var recentCompletedDest = Destination()
+        if let cdRecentCompleteDest = cdTrip.recentlyCompletedDestination {
+            recentCompletedDest = Destination(id: cdRecentCompleteDest.id ?? "",
+                                              lat: cdRecentCompleteDest.lat,
+                                              lon: cdRecentCompleteDest.lon,
+                                              address: cdRecentCompleteDest.address ?? "",
+                                              name: cdRecentCompleteDest.name ?? "")
         }
         
         var routes: [Route] = []
@@ -165,6 +160,12 @@ struct Trip: Equatable, Identifiable {
         self.startLocation = start
         self.endLocation = end
         self.routes = routes
+        
+        self.completedDestinations = completedDests
+        self.remainingDestinations = remainingDests
+        self.nextDestination = nextDest
+        self.recentlyCompletedDestination = recentCompletedDest
+        
     }
     
     //MARK: - Equatable
@@ -211,3 +212,65 @@ private func getSpecificRouteMatching(name: String, distance: Double, duration: 
         
     }
 }
+
+//MARK: - Init From Firebase ? Future ?
+/*
+ 
+ init(dict: [String:AnyObject]) {
+     
+     self.id = dict["id"] as? String ?? ""
+     
+     self.userID = dict["userID"] as? String ?? ""
+     
+     self.isActive = dict["isActive"] as? Bool ?? false
+
+     self.destinations = []
+     self.startLocation = Destination(dict: [:])
+     self.endLocation = Destination(dict: [:])
+     self.routes = []
+     
+     setDestinations(dict: dict)
+     setStartLoc(dict: dict)
+     setEndLoc(dict: dict)
+     setRoutes(dict: dict)
+ }
+ 
+ mutating func setDestinations(dict: [String:AnyObject]) {
+     if let destinations = dict["destinations"] as? [[String:AnyObject]] {
+         for destination in destinations {
+             let dest = Destination(dict: destination)
+             self.destinations.append(dest)
+         }
+     } else {
+         self.destinations = []
+     }
+ }
+ 
+ mutating func setStartLoc(dict: [String:AnyObject]) {
+     if let start = dict["startLocation"] as? [String:AnyObject] {
+         let startLocation = Destination(dict: start)
+         self.startLocation = startLocation
+     } else {
+         self.startLocation = Destination(dict: [:])
+     }
+ }
+ 
+ mutating func setEndLoc(dict: [String:AnyObject]) {
+     if let end = dict["endLocation"] as? [String:AnyObject] {
+         let endLocation = Destination(dict: end)
+         self.endLocation = endLocation
+     } else {
+         self.endLocation = Destination(dict: [:])
+     }
+ }
+ 
+ mutating func setRoutes(dict: [String:AnyObject]) {
+     if let routes = dict["routes"] as? [[String:AnyObject]] {
+         for route in routes {
+             let rt = Route(dict: route)
+             self.routes.append(rt)
+         }
+     }
+ }
+ 
+ */

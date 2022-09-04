@@ -111,7 +111,7 @@ struct TabBarSetup: View {
     
     private var tripTab: some View {
         NavigationView {
-            TripPage()
+            TheTripPage()
                 .navigationTitle("Trip")
                 .navigationBarHidden(true)
         }

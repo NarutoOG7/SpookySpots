@@ -11,19 +11,11 @@ struct SearchBar: View {
     
     
     //    @State var searchText: String = ""
-    var type: SearchFromType
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
     @ObservedObject var locationStore = LocationStore.instance
-    
-    let listRowPadding: Double = 5 // guess
-    let listRowMinHeight: Double = 45 // guess
-    
-    var listRowHeight: Double {
-        max(listRowMinHeight, 20 * listRowPadding)
-    }
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -65,7 +57,9 @@ struct SearchBar: View {
     }
     
     private var searchResults: some View {
-        List {
+        let listHasMoreThanTenItems = exploreVM.searchedLocations.count > 10
+        let listHasNoItems = exploreVM.searchedLocations.count == 0
+        return List {
         ForEach(0..<exploreVM.searchedLocations.count, id: \.self) { index in
             NavigationLink {
                 LD(location: $exploreVM.searchedLocations[index])
@@ -74,12 +68,10 @@ struct SearchBar: View {
             }
             .listRowBackground(Color.clear)
         }
+            
         }
-//        .frame(height: CGFloat(exploreVM.searchedLocations.count) * CGFloat(self.listRowHeight))
-
-        .frame(maxHeight: 450)
-        .listStyle(.insetGrouped)
-        .offset(y: -40)
+        .frame(height: listHasNoItems ? 0 : (listHasMoreThanTenItems ? 450 : (CGFloat(exploreVM.searchedLocations.count) * 45)))
+        .listStyle(.inset)
     }
     
     private var background: some View {
@@ -96,36 +88,18 @@ struct SearchBar: View {
         Button(action: cancelSearchTapped) {
             Text("Cancel")
         }
-        .opacity(typeIsList() ?
-                 (exploreVM.searchText.isEmpty ? 0 : 1)
-                 :
-                    (exploreVM.searchText.isEmpty ? 0 : 1))
+        .opacity(exploreVM.searchText.isEmpty ? 0 : 1)
         .padding()
     }
     
     
     //MARK: - Methods
     private func cancelSearchTapped() {
-        switch type {
-        case .exploreByMap:
+        DispatchQueue.main.async {
             exploreVM.searchText = ""
             exploreVM.searchedLocations = []
-        case .exploreByList:
-            exploreVM.searchText = ""
-            exploreVM.searchedLocations = []
-            
         }
-    }
-    
-    private func typeIsList() -> Bool {
-        type == .exploreByList
-    }
-    
-    
-    //MARK: - SearchFromType
-    enum SearchFromType {
-        case exploreByList
-        case exploreByMap
+            
     }
 }
 
@@ -134,6 +108,6 @@ struct SearchBar: View {
 
 struct SearchBar_Previews: PreviewProvider {
     static var previews: some View {
-        SearchBar(type: .exploreByList)
+        SearchBar()
     }
 }

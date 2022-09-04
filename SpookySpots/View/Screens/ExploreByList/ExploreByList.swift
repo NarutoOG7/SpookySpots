@@ -22,13 +22,13 @@ struct ExploreByList: View {
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    init() {
-        let fbManager = FirebaseManager.instance
-        fbManager.getHauntedHotels()
-        fbManager.getAllReviews { review in
-            LocationStore.instance.reviewBucket.append(review)
-        }
-    }
+//    init() {
+//        let fbManager = FirebaseManager.instance
+//        fbManager.getHauntedHotels()
+//        fbManager.getAllReviews { review in
+//            LocationStore.instance.reviewBucket.append(review)
+//        }
+//    }
     
     var body: some View {
         ZStack {
@@ -41,7 +41,7 @@ struct ExploreByList: View {
             }
             }
             VStack {
-            SearchBar(type: .exploreByList)
+            SearchBar()
                     .padding(.top, 70)
                     .padding(.horizontal)
                     .padding(.trailing, 65)
@@ -52,7 +52,7 @@ struct ExploreByList: View {
         .onAppear {
             exploreVM.supplyLocationLists()
         }
-        .background(Image(K.Images.paperBackground).opacity(0.5))
+        .background(K.Images.paperBackground.opacity(0.5))
     }
 //
 //    var body: some View {

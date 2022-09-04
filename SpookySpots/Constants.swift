@@ -58,12 +58,20 @@ enum K {
     //MARK: - Images
     
     enum Images {
-        static let splashOne = "SplashOne"
-        static let splashTwo = "SplashTwo"
-        static let logo = "Logo"
-        static let paperBackground = "PaperBackground"
-        static let directions = "arrow.triangle.turn.up.right.diamond.fill"
-        static let share = "square.and.arrow.up"
-        static let placeholder = "placeholder"
+        enum Trip {
+            static let completed = Image(systemName: "checkmark.circle")
+            static let currentLocationIcon = Image("CurrentLocationIcon")
+            static let currentLocationIconWithDots = Image("CurrentLocationMarker.WithDots")
+            static let lastDestinationIcon = Image("DestinationPin.WithDots.TopSide")
+            static let destinationIcon = Image("DestinationPin.WithDots.BothSides")
+        }
+        static let splashOne = Image("SplashOne")
+        static let splashTwo = Image("SplashTwo")
+        static let logo = Image("Logo")
+        static let paperBackground = Image("PaperBackground")
+        static let directions = Image(systemName:"arrow.triangle.turn.up.right.diamond.fill")
+        static let share = Image(systemName: "square.and.arrow.up")
+        static let placeholder = Image("placeholder")
+        
     }
 }

@@ -125,7 +125,7 @@ struct AddLocationView: View {
             .resizable()
             .frame(width: screen.width, height: screen.height / 4)
             } else {
-                Image(K.Images.placeholder)
+                K.Images.placeholder
                     .resizable()
                     .frame(width: screen.width, height: screen.height / 4)
 

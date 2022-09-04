@@ -16,12 +16,30 @@ struct PersistenceController {
     
     init() {
         container = NSPersistentContainer(name: "TripCDModel")
+//        destroyPersistentStore()
         container.loadPersistentStores { description, error in
             if let error = error {
                 fatalError("Error: \(error.localizedDescription)")
             }
         }
+//        deleteAll()
     }
+    
+    
+    func destroyPersistentStore() {
+        guard let firstStoreURL = container.persistentStoreCoordinator.persistentStores.first?.url else {
+            print("Missing first store URL - could not destroy")
+            return
+        }
+
+        do {
+            try container.persistentStoreCoordinator.destroyPersistentStore(at: firstStoreURL, type: .sqlite, options: nil)
+//            try container.persistentStoreCoordinator.destroyPersistentStore(at: firstStoreURL, ofType: "", options: nil)
+        } catch  {
+            print("Unable to destroy persistent store: \(error) - \(error.localizedDescription)")
+       }
+    }
+    
     
     func save(completion: @escaping (Error?) -> () = {_ in}) {
         let context = container.viewContext
@@ -42,6 +60,21 @@ struct PersistenceController {
         save(completion: completion)
     }
     
+    func deleteAll(completion: @escaping (Error?) -> () = {_ in}) {
+        do {
+            let context = container.viewContext
+            let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
+            let trips = try context.fetch(request)
+            
+            for trip in trips {
+                context.delete(trip)
+            }
+            save(completion: completion)
+        } catch {
+            print("Error fetching request: \(error)")
+        }
+    }
+    
     func createOrUpdateTrip(_ trip: Trip) {
         let context = container.viewContext
         do {
@@ -51,6 +84,7 @@ struct PersistenceController {
             if numberOfRecords == 0 {
                 let newTrip = CDTrip(context: context)
                 
+                print(newTrip)
                 
                 for route in trip.routes {
                     let routeContext = CDRoute(context: context)
@@ -66,10 +100,9 @@ struct PersistenceController {
                     routeContext.mkRoute = mkRouteContext
                     newTrip.addToRoutes(routeContext)
                     
-                    //            cdRoutes.append(routeContext)
                 }
                 
-                //        var cdDestinations: [CDDestination] = []
+                print(trip.destinations)
                 for dest in trip.destinations {
                     let destContext = CDDestination(context: context)
                     destContext.id = dest.id
@@ -78,46 +111,37 @@ struct PersistenceController {
                     destContext.name = dest.name
                     destContext.trip = newTrip
                     newTrip.addToDestinations(destContext)
-                    //            cdDestinations.append(destContext)
                 }
                 
-                //        var cdEndPoints: [CDDestination] = []
                 
                 let startContext = CDEndPoint(context: context)
                 let tripStart = trip.startLocation
                 startContext.position = 0
-                let startDestContext = CDDestination(context: context)
-                startDestContext.lat = tripStart.lat
-                startDestContext.lon = tripStart.lon
-                startDestContext.id = tripStart.id
-                startDestContext.name = tripStart.name
-                startDestContext.trip = newTrip
-                startContext.destination = startDestContext
+                startContext.lat = tripStart.lat
+                startContext.lon = tripStart.lon
+                startContext.id = "Start"
+                startContext.name = tripStart.name
+                startContext.trip = newTrip
+
                 newTrip.addToEndPoints(startContext)
-                //        cdEndPoints.append(startContext)
                 
                 let endContext = CDEndPoint(context: context)
                 let tripEnd = trip.endLocation
                 endContext.position = 1
-                let endDestContext = CDDestination(context: context)
-                endDestContext.id = tripEnd.id
-                endDestContext.name = tripEnd.name
-                endDestContext.lat = tripEnd.lat
-                endDestContext.lon = tripEnd.lon
-                endDestContext.trip = newTrip
-                endContext.destination = endDestContext
-                newTrip.addToEndPoints(endContext)
-                //        cdEndPoints.append(endContext)
+                endContext.id = "End"
+                endContext.name = tripEnd.name
+                endContext.lat = tripEnd.lat
+                endContext.lon = tripEnd.lon
+                endContext.trip = newTrip
                 
+                newTrip.addToEndPoints(endContext)
+
                 
                 newTrip.id = trip.id
-                //        cdTrip.routes = NSSet(array: cdRoutes)
-                //        cdTrip.endPoints = NSSet(array: cdEndPoints)
-                //        cdTrip.destinations = NSSet(array: cdDestinations)
                 newTrip.isActive = trip.isActive
                 newTrip.userID = UserStore.instance.user.id
                 
-                
+                print(newTrip)
                 
             } else {
                 // update
@@ -150,6 +174,7 @@ struct PersistenceController {
                     }
                     
                     //        var cdDestinations: [CDDestination] = []
+                    print(trip.destinations)
                     for dest in trip.destinations {
                         let destContext = CDDestination(context: context)
                         destContext.id = dest.id
@@ -166,28 +191,26 @@ struct PersistenceController {
                     let startContext = CDEndPoint(context: context)
                     let tripStart = trip.startLocation
                     startContext.position = 0
-                    let startDestContext = CDDestination(context: context)
-                    startDestContext.lat = tripStart.lat
-                    startDestContext.lon = tripStart.lon
-                    startDestContext.id = tripStart.id
-                    startDestContext.name = tripStart.name
-                    startDestContext.trip = tripToUpdate
-                    startContext.destination = startDestContext
+                    startContext.lat = tripStart.lat
+                    startContext.lon = tripStart.lon
+                    startContext.id = tripStart.id
+                    startContext.name = tripStart.name
+                    startContext.trip = tripToUpdate
                     tripToUpdate.addToEndPoints(startContext)
-                    //        cdEndPoints.append(startContext)
                     
                     let endContext = CDEndPoint(context: context)
                     let tripEnd = trip.endLocation
                     endContext.position = 1
-                    let endDestContext = CDDestination(context: context)
-                    endDestContext.id = tripEnd.id
-                    endDestContext.name = tripEnd.name
-                    endDestContext.lat = tripEnd.lat
-                    endDestContext.lon = tripEnd.lon
-                    endDestContext.trip = tripToUpdate
-                    endContext.destination = endDestContext
+                    endContext.id = tripEnd.id
+                    endContext.name = tripEnd.name
+                    endContext.lat = tripEnd.lat
+                    endContext.lon = tripEnd.lon
+                    endContext.trip = tripToUpdate
                     tripToUpdate.addToEndPoints(endContext)
+                    
+                    print(tripToUpdate)
                 }
+                
                 
             }
             
@@ -208,7 +231,8 @@ struct PersistenceController {
             let context = container.viewContext
             let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
             let trips = try context.fetch(request)
-            if let cdTrip = trips.first(where: { $0.isActive }) {
+            
+            if let cdTrip = trips.last {
                 print(cdTrip)
                 return Trip(cdTrip)
             }
