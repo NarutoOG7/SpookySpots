@@ -71,8 +71,8 @@ struct ChangeStartAndStop: View {
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var tripPageVM = TripPageVM.instance
 
-    @State var startInput: String
-    @State var endInput: String
+    @State var startInput: String = ""
+    @State var endInput: String = ""
     
     @State var startPlaceholder: String = ""
     @State var endPlaceholder: String = ""

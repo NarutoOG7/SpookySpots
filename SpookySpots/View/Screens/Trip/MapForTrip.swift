@@ -30,6 +30,8 @@ struct MapForTrip: UIViewRepresentable {
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
         
+        addRoutePolylineFromCD(to: mapView)
+        
         return mapView
     }
     
@@ -41,6 +43,7 @@ struct MapForTrip: UIViewRepresentable {
         addRoute(to: mapView)
         addPlacemarks(to: mapView)
         addStartAndEndLocations(to: mapView)
+        addRoutePolylineFromCD(to: mapView)
 //        addCurrentLocation(to: mapView)
         addAlternateRoutes(to: mapView)
         addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
@@ -93,18 +96,41 @@ struct MapForTrip: UIViewRepresentable {
     
     func addActivePolylines(to view: MKMapView) {
         for route in tripLogic.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 }) {
-            let polyline = route.polyline            
+            if let polyline = route.polyline {
 //            view.setVisibleMapRect(mapRect, edgePadding: UIEdgeInsets(top: ®10, left: 10, bottom: 10, right: 10), animated: true)
             view.addOverlay(polyline)
+            }
         }
 
     }
     
     func addAlternateRoutes(to view: MKMapView) {
         for route in tripLogic.alternates {
-            let polyline = route.polyline
-            view.addOverlay(polyline)
+            if let polyline = route.polyline {
+                view.addOverlay(polyline)
+            }
         }
+    }
+    
+    
+    func addRoutePolylineFromCD(to view: MKMapView) {
+        
+        if let routes = tripLogic.currentTrip?.routes {
+            for route in routes {
+                if let polyline = route.polyline {
+                    view.addOverlay(polyline)
+                }
+            }
+        }
+        
+//        for route in tripLogic.currentTrip?.routes ?? [] {
+//            var coordinates = [CLLocationCoordinate2D]()
+//            for pt in route.polyline.pts ?? [] {
+//                coordinates.append(CLLocationCoordinate2D(latitude: pt.latitude ?? 0, longitude: pt.longitude ?? 0))
+//            }
+//            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+//            view.addOverlay(polyline)
+//        }
     }
     
     func setCurrentLocationRegion() {
@@ -120,6 +146,7 @@ struct MapForTrip: UIViewRepresentable {
             view.addOverlay(circle)
         }
     }
+
     
     //MARK: - MapViewDelegate
     
@@ -183,6 +210,14 @@ struct MapForTrip: UIViewRepresentable {
                 
                 return renderer
                 
+            }
+            
+            // from core data
+            if let routePolyline = overlay as? MKPolyline {
+                let renderer = MKPolylineRenderer(polyline: routePolyline)
+                renderer.lineWidth = 7
+                renderer.strokeColor = UIColor.blue
+                return renderer
             }
             
             if overlay is MKCircle {
@@ -270,7 +305,6 @@ struct MapForTrip: UIViewRepresentable {
                         
                         if tripLogic.alternatesAreOnBoard() {
                             tripLogic.selectedAlternate = nearestPoly.route
-                            
                         }
                         
                         tripLogic.routeIsHighlighted = true
@@ -296,6 +330,8 @@ struct MapForTrip: UIViewRepresentable {
         
         func distanceOf(pt: MKMapPoint, toPoly poly: MKPolyline) -> Double {
             var distance: Double = Double(MAXFLOAT)
+            
+            if poly.pointCount > 0 {
             
             for n in 0..<poly.pointCount - 1 {
                 
@@ -324,6 +360,7 @@ struct MapForTrip: UIViewRepresentable {
                 
                 distance = min(distance, ptClosest.distance(to: pt))
             }
+            }
             return distance
         }
         
@@ -348,9 +385,37 @@ class RoutePolyline: MKPolyline, Identifiable {
     var id = UUID()
     var parentCollectionID: String?
     var color: Color?
-    var route: Route?
     var startLocation: Destination?
     var endLocation: Destination?
+    var pts: [Route.Point]?
+    
+    private var _route: Any?
+
+     var route: Route? {
+         get {
+             return _route as? Route
+         }
+         set {
+             _route = newValue
+         }
+     }
+    
+    
+//    init(parentCollectionID: String? = "",
+//         color: Color? = .blue,
+//         route: Route? = Route(),
+//         startLocation: Destination? = Destination(),
+//         endLocation: Destination? = Destination(),
+//         pts: [Route.Point]? = []) {
+//        self.parentCollectionID = parentCollectionID
+//        self.color = color
+//        self.route = route
+//        self.startLocation = startLocation
+//        self.endLocation = endLocation
+//        self.pts = pts
+//
+//
+//    }
 }
 
 

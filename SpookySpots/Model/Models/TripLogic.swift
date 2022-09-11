@@ -51,6 +51,21 @@ enum AlternateRouteState {
 }
 
 
+extension DispatchQueue {
+
+    static func background(_ task: @escaping () -> ()) {
+        DispatchQueue.global(qos: .background).async {
+            task()
+        }
+    }
+
+    static func main(_ task: @escaping () -> ()) {
+        DispatchQueue.main.async {
+            task()
+        }
+    }
+}
+
 class TripLogic: ObservableObject {
 
     static let instance = TripLogic()
@@ -75,7 +90,7 @@ class TripLogic: ObservableObject {
 
             if let first = newValue.first(where:  { $0.tripPosition == 0 }) {
                 self.steps = []
-                self.steps = first.rt.steps
+                self.steps.append(first.steps.first ?? Route.Step())
             }
         }
         
@@ -102,17 +117,16 @@ class TripLogic: ObservableObject {
             //            setHighlightedRouteTravelTimeAsTime()
         }
     }
-    @Published var currentDestination: Destination?
     @Published var currentRouteTravelTime: Time?
     @Published var currentRouteDistanceString: String?
-    @Published var steps: [MKRoute.Step] = [] {
+    @Published var steps: [Route.Step] = [] {
         willSet {
-            print(newValue)
+            
             guard let first = newValue.first else { return }
             guard let locManager = self.userLocManager.locationManager else { return }
             locManager.monitoredRegions.forEach({ locManager.stopMonitoring(for: $0) })
             
-            let region = CLCircularRegion(center: first.polyline.coordinate, radius: 20, identifier: "\(newValue.firstIndex(where: { $0 == first }) )")
+            let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: first.latitude ?? 0, longitude: first.longitude ?? 0), radius: 20, identifier: "\(newValue.firstIndex(where: { $0 == first }) )")
             let circle = MKCircle(center: region.center, radius: region.radius)
             
             self.geoFencingCircles.append(circle)
@@ -153,7 +167,7 @@ class TripLogic: ObservableObject {
     
 
     
-    @Published var completedSteps: [MKRoute.Step] = []
+    @Published var completedSteps: [Route.Step] = []
     @Published var geoFencingCircles: [MKCircle] = []
     @Published var stepDistanceString = ""
     
@@ -306,7 +320,7 @@ class TripLogic: ObservableObject {
             var currentLocAddress = Address()
             firebaseManager.getAddressFrom(coordinates: currentLoc.coordinate) { address in
                 currentLocAddress = address
-            }
+            
             
             let startLoc = Destination(id: UUID().uuidString,
                                        lat: currentLoc.coordinate.latitude,
@@ -321,7 +335,7 @@ class TripLogic: ObservableObject {
                                      name: "Current Location")
             
             var trip = Trip(id: UUID().uuidString,
-                            userID: userStore.user.id,
+                            userID: self.userStore.user.id,
                             isActive: true,
                             destinations: [],
                             startLocation: startLoc,
@@ -331,15 +345,16 @@ class TripLogic: ObservableObject {
             trip.nextDestination = endLoc
             
             self.currentTrip = trip
-
+                
+            }
         }
     }
     
     //MARK: - Alternates
     
     func showAlternateRoutes() {
-        if let a = self.currentRoute?.polyline.startLocation,
-           let b = self.currentRoute?.polyline.endLocation  {
+        if let a = self.currentRoute?.polyline?.startLocation,
+           let b = self.currentRoute?.polyline?.endLocation  {
             self.makeDirectionsRequest(start: a, end: b) { routes in
                 self.alternates = routes
                 //                    self.alternates.append(routes)
@@ -455,6 +470,7 @@ class TripLogic: ObservableObject {
 //        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
         self.destinations.removeAll(where: { $0.name == location.location.name })
         self.tripRoutes.removeAll(where: { $0.id == "\(location.location.id)" })
+        self.currentTrip?.routes.removeAll(where: { $0.id == "\(location.location.id)" })
     }
     
     
@@ -465,23 +481,14 @@ class TripLogic: ObservableObject {
         self.destinations.remove(at: index)
         if tripRoutes.indices.contains(index) {
             self.tripRoutes.remove(at: index)
+            self.currentTrip?.routes.remove(at: index)
         }
     }
     
     //MARK: - Distance
     
-    func getDistanceAsString() -> String {
-        self.distance = 0
-        for route in self.tripRoutes {
-            let dst = route.rt.distance / 1609.344
-            self.distance += dst
-            return String(format: "%.0f", self.distance)
-        }
-        return ""
-    }
-    
     func getSingleRouteDistanceAsString() -> String {
-        if var distance = self.currentRoute?.rt.distance {
+        if var distance = self.currentRoute?.distance {
             distance /=  1609.344
             return String(format: "%.0f", distance)
         }
@@ -495,7 +502,7 @@ class TripLogic: ObservableObject {
         self.distance = 0
         
         for route in tripRoutes {
-            let meters = route.rt.distance
+            let meters = route.distance
             let miles = meters * 0.000621371
             let distance = usesMetric ? meters : miles
             self.distance += distance
@@ -511,12 +518,11 @@ class TripLogic: ObservableObject {
         let unitSystem = usesMetric ? "meters" : "miles"
   
         for route in tripRoutes {
-            let meters = route.rt.distance
+            let meters = route.distance
             let miles = meters * 0.000621371
             let distance = usesMetric ? meters : miles
             self.distance += distance
         }
-        print(unitSystem)
         return (distance, unitSystem)
     }
     
@@ -528,7 +534,7 @@ class TripLogic: ObservableObject {
         let unitSystem = usesMetric ? "meters" : "miles"
   
         if let route = currentRoute {
-            let meters = route.rt.distance
+            let meters = route.distance
             let miles = meters * 0.000621371
             let distance = usesMetric ? meters : miles
             self.distance += distance
@@ -543,7 +549,7 @@ class TripLogic: ObservableObject {
         let locale = Locale.current
         let usesMetric = locale.usesMetricSystem
         
-        if let meters = self.currentRoute?.rt.distance {
+        if let meters = self.currentRoute?.distance {
             let miles = meters * 0.000621371
             let distance = usesMetric ? meters : miles
             self.currentRouteDistanceString = String(format: "%.0f", distance)
@@ -564,14 +570,14 @@ class TripLogic: ObservableObject {
     //MARK: - Duration
     
     func getHighlightedRouteTravelTimeAsDigitalString() -> String? {
-        if let travelTime = currentRoute?.rt.expectedTravelTime {
+        if let travelTime = currentRoute?.travelTime {
             return formatTime(time: travelTime)
         }
         return nil
     }
     
     func getHighlightedRouteTravelTimeAsTime() -> Time? {
-        if let travelTime = currentRoute?.rt.expectedTravelTime {
+        if let travelTime = currentRoute?.travelTime {
             let time = secondsToHoursMinutes(travelTime)
             //            self.currentRouteTravelTime = time
             return time
@@ -582,7 +588,7 @@ class TripLogic: ObservableObject {
     func setTotalTripDuration() {
         self.duration = 0
         for route in self.tripRoutes {
-            self.duration += route.rt.expectedTravelTime
+            self.duration += route.travelTime
             let time = secondsToHoursMinutes(duration)
             self.totalTripDurationAsTime = time
         }
@@ -625,12 +631,12 @@ class TripLogic: ObservableObject {
         self.tripRoutes = []
         self.routesForDestinations { success in
             if success {
-                print("here")
-//                self.getReturnHome { route in
-//                    var newRoute = route
-//                        newRoute.tripPosition = self.tripRoutes.count
-//                    self.tripRoutes.append(newRoute)
-//                }
+                self.getReturnHome { route in
+                    var newRoute = route
+                        newRoute.tripPosition = self.tripRoutes.count
+                    self.tripRoutes.append(newRoute)
+                    self.currentTrip?.routes.append(newRoute)
+                }
             }
         }
     }
@@ -659,21 +665,84 @@ class TripLogic: ObservableObject {
 //            let tripPosition = 0
             
             for rt in response.routes.prefix(3) {
-                let polyline = RoutePolyline(points: rt.polyline.points(), count: rt.polyline.pointCount)
+                
+                var myPointsArray = [Route.Point]()
+                
+
+
+                pointsFromUnsafePointer(rt: rt) { point in
+                    myPointsArray.append(point)
+                }
+                
+//                let polyline = RoutePolyline(parentCollectionID: end.id,
+//                                             color: K.Colors.WeenyWitch.orange,
+//                                             route: nil,
+//                                             startLocation: start,
+//                                             endLocation: end,
+//                                             pts: myPointsArray)
+                let polyline = RoutePolyline(points: rt.polyline.points(),
+                                             count: rt.polyline.pointCount)
                 polyline.startLocation = start
                 polyline.endLocation = end
                 polyline.parentCollectionID = end.id
-                ///
-                var route = Route(id: UUID().uuidString, rt: rt, collectionID: end.id, polyline: polyline, altPosition: count, tripPosition: nil)
+                polyline.pts = myPointsArray
+                                
+
+//                var i = 0
+//                var len = poly.pointCount
+//                while i < len {
+//                    let point = myPointsArray[i]
+//                    let pt = Route.Point(x: point.x, y: point.y, latitude: point.coordinate.latitude, longitude: point.coordinate.longitude)
+//                    polyline.pts?.append(pt)
+//                    i += 1
+//                }
+//                for var i = 0, len = poly.pointCount; i < len; i++ {
+//                    let point = myPointsArray[i]
+//                    println(point)
+//                }
+                
+ 
+
+                
+                var steps = [Route.Step]()
+                for step in rt.steps {
+                    let stp = Route.Step(distanceInMeters: step.distance,
+                                         instructions: step.instructions,
+                                         latitude: step.polyline.coordinate.latitude,
+                                         longitude: step.polyline.coordinate.longitude)
+                    steps.append(stp)
+                }
+                
+                var route = Route(id: UUID().uuidString,
+                                  steps: steps,
+                                  travelTime: rt.expectedTravelTime,
+                                  distance: rt.distance,
+                                  collectionID: end.id,
+                                  polyline: polyline,
+                                  altPosition: count,
+                                  tripPosition: nil)
+
                 polyline.route = route
                 route.polyline = polyline
-                
+                polyline.route = route
+                print(route.polyline)
                 routesToReturn.append(route)
                 count += 1
                 //                            completion(route)
             }
             
             completion(routesToReturn)
+        }
+        func pointsFromUnsafePointer(rt: MKRoute, completion: @escaping(Route.Point) -> (Void)) {
+            for pt in UnsafeBufferPointer(start: rt.polyline.points(),
+                                          count: rt.polyline.pointCount) {
+
+                let point = Route.Point(x: pt.x,
+                                        y: pt.y,
+                                        latitude: pt.coordinate.latitude,
+                                        longitude: pt.coordinate.longitude)
+                completion(point)
+            }
         }
     }
     
@@ -731,11 +800,12 @@ class TripLogic: ObservableObject {
     
     
     func routesForDestinations(withCompletion completion: @escaping(Bool) -> (Void)) {
-        getRoutesForTrip { routes in
+        getRoutesForTrip { route in
 //            var newRoute = routes
 //            newRoute.tripPosition = self.tripRoutes.count
-            self.tripRoutes.append(routes)
-            self.allRoutes.append(routes)
+            self.tripRoutes.append(route)
+            self.currentTrip?.routes.append(route)
+            self.allRoutes.append(route)
         }
         completion(true)
     }
@@ -756,7 +826,7 @@ class TripLogic: ObservableObject {
 //        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
         if let first = self.tripRoutes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
-            self.currentDestination = currentTrip?.destinations.first
+            self.currentTrip?.nextDestination = currentTrip?.destinations.first
         //        self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
             self.currentTrip?.recentlyCompletedDestination = currentTrip?.startLocation

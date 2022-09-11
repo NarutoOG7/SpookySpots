@@ -61,6 +61,9 @@ struct LargeImageLocationView: View {
                 .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
                 .cornerRadius(15)
                 .shadow(color: .black, radius: 3, x: 0, y: 1.5)
+            let _ = print((UIScreen.main.bounds.width - 20) / (UIScreen.main.bounds.height / 3.2))
+            let _ = print(UIScreen.main.bounds.width - 20)
+            let _ = print(UIScreen.main.bounds.height / 3.2)
         } placeholder: {
             ProgressView()
         }

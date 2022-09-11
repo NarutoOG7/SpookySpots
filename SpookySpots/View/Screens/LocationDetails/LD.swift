@@ -111,6 +111,10 @@ struct LD: View {
                         ? abs(geo.frame(in: .global).origin.y)
                         : -geo.frame(in: .global).origin.y)
             
+        let _ = print(geo.size.width / (self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y)))
+            let _ = print(geo.size.width)
+            let _ = print(self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
+
         }
     }
     
