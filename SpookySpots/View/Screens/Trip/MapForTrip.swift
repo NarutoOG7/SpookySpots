@@ -29,9 +29,7 @@ struct MapForTrip: UIViewRepresentable {
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
-        
-        addRoutePolylineFromCD(to: mapView)
-        
+                
         return mapView
     }
     
@@ -43,7 +41,6 @@ struct MapForTrip: UIViewRepresentable {
         addRoute(to: mapView)
         addPlacemarks(to: mapView)
         addStartAndEndLocations(to: mapView)
-        addRoutePolylineFromCD(to: mapView)
 //        addCurrentLocation(to: mapView)
         addAlternateRoutes(to: mapView)
         addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
@@ -63,6 +60,7 @@ struct MapForTrip: UIViewRepresentable {
             view.removeOverlays(view.overlays)
         }
         addActivePolylines(to: view)
+        addRoutePolylineFromCD(to: view)
     }
     
     func addCurrentLocation(to view: MKMapView) {
@@ -173,7 +171,6 @@ struct MapForTrip: UIViewRepresentable {
                 let isThirdAlt = tripLogic.alternates.indices.contains(2) && tripLogic.alternates[2].polyline == overlay
                 
                 var color: UIColor = .white
-                var lineWidth: Int = 7
                 
                 if isShowingAlternates && !isAlternate {
                     // make gray
@@ -191,8 +188,7 @@ struct MapForTrip: UIViewRepresentable {
                         color = .systemYellow
                     }
                     
-                    //                if tripLogic.selecte
-                    
+
                 } else if !noneHighlighted && !isHighlighted {
                     // make transparent orange
                     color = .systemOrange.withAlphaComponent(0.33)
@@ -304,11 +300,12 @@ struct MapForTrip: UIViewRepresentable {
                         print("PolyLine Touched")
                         
                         if tripLogic.alternatesAreOnBoard() {
-                            tripLogic.selectedAlternate = nearestPoly.route
+
+                            tripLogic.selectedAlternate = tripLogic.alternates.first(where: { $0.id == nearestPoly.routeID })
                         }
                         
                         tripLogic.routeIsHighlighted = true
-                        tripLogic.currentRoute = nearestPoly.route
+                        tripLogic.currentRoute = tripLogic.currentTrip?.routes.first(where: { $0.id == nearestPoly.routeID })
 //                        tripLogic.currentRoute = tripLogic.allRoutes.first(where: { $0 == nearestPoly.route })
 //                        tripLogic.currentRoute = tripLogic.tripRoutes.first(where: { $0.polyline == nearestPoly })
                         
@@ -388,18 +385,7 @@ class RoutePolyline: MKPolyline, Identifiable {
     var startLocation: Destination?
     var endLocation: Destination?
     var pts: [Route.Point]?
-    
-    private var _route: Any?
-
-     var route: Route? {
-         get {
-             return _route as? Route
-         }
-         set {
-             _route = newValue
-         }
-     }
-    
+    var routeID: String?
     
 //    init(parentCollectionID: String? = "",
 //         color: Color? = .blue,

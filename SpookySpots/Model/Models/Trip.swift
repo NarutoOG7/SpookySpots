@@ -124,6 +124,7 @@ struct Trip: Equatable, Identifiable {
         if let cdRoutes = cdTrip.routes?.allObjects as? [CDRoute] {
             for cdRoute in cdRoutes {
                 
+
                 var steps = [Route.Step]()
                 if let cdSteps = cdRoute.steps?.allObjects as? [CDStep] {
                     for step in cdSteps {
@@ -135,28 +136,19 @@ struct Trip: Equatable, Identifiable {
                     }
                 }
                 
-                var route = Route(id: cdRoute.id ?? "",
-                                  steps: steps,
-                                  travelTime: cdRoute.travelTime,
-                                  distance: cdRoute.distance,
-                                  collectionID: cdRoute.collectionID ?? "",
-                                  altPosition: 0,
-                                  tripPosition: Int(cdRoute.tripPosition))
+                
+                let routeID = cdRoute.id ?? ""
                 
                 if let cdPolyline = cdRoute.polyline {
                     var points = [Route.Point]()
                     var coordinates = [CLLocationCoordinate2D]()
-                    var mkPoints = [MKMapPoint]()
                     if let cdPoints = cdPolyline.points?.allObjects as? [CDPoint] {
-                        for cdPoint in cdPoints {
-                            let point = Route.Point(x: cdPoint.x,
-                                                    y: cdPoint.y,
+                        for cdPoint in cdPoints.sorted(by: { $0.index < $1.index }) {
+                            let point = Route.Point(index: Int(cdPoint.index),
                                                     latitude: cdPoint.latitude,
                                                     longitude: cdPoint.longitude)
+                            print(point.index)
                             points.append(point)
-                            
-                            let mkPoint = MKMapPoint(x: cdPoint.x, y: cdPoint.y)
-                            mkPoints.append(mkPoint)
                             
                             let coordinate = CLLocationCoordinate2D(
                                 latitude: cdPoint.latitude,
@@ -164,29 +156,31 @@ struct Trip: Equatable, Identifiable {
                             coordinates.append(coordinate)
                         }
                     }
+                
+                
+//                let poly = RoutePolyline(points: mkPoints, count: mkPoints.count)
+                    let poly = RoutePolyline(coordinates: coordinates, count: coordinates.count)
+                poly.parentCollectionID = end.id
+                poly.startLocation = start
+                poly.endLocation = end
+                    poly.pts = points.sorted(by: { $0.index ?? 0 < $1.index ?? 1 })
+                poly.routeID = routeID
                     
-//                    let poly = RoutePolyline(coordinates: coordinates,
-//                                             count: coordinates.count)
-                    let poly = RoutePolyline(points: mkPoints, count: mkPoints.count)
-                    poly.parentCollectionID = end.id
-                    poly.startLocation = start
-                    poly.endLocation = end
-                    poly.pts = points
-                    
-                    // Thes make sure that the updated version of polyline and route is used
-                    route.polyline = poly
-                    poly.route = route
-                    route.polyline = poly
-                    poly.route = route
-                    
-//                    polyline = RoutePolyline(parentCollectionID: end.id,
-//                                             color: K.Colors.WeenyWitch.orange,
-//                                             route: route,
-//                                             startLocation: start,
-//                                             endLocation: end,
-//                                             pts: points)
+                    let locale = Locale.current
+                    let usesMetric = locale.usesMetricSystem
+                    let distance = usesMetric ? cdRoute.distanceInMeters : (cdRoute.distanceInMeters * 0.000621371)
+                
+                let route = Route(id: routeID,
+                                  steps: steps,
+                                  travelTime: cdRoute.travelTime,
+                                  distance: distance,
+                                  collectionID: cdRoute.collectionID ?? "",
+                                  polyline: poly,
+                                  altPosition: 0,
+                                  tripPosition: Int(cdRoute.tripPosition))
+                
+                    routes.append(route)
                 }
-                routes.append(route)
             }
         }
         
@@ -237,6 +231,7 @@ struct Trip: Equatable, Identifiable {
         self.recentlyCompletedDestination = recentCompletedDest
         
     }
+    
     
     //MARK: - Equatable
     static func == (lhs: Trip, rhs: Trip) -> Bool {

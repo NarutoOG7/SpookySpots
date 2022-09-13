@@ -66,7 +66,7 @@ struct RouteHelper: View {
         HStack {
             Image(systemName: "fuelpump.fill")
                 .font(.caption)
-            Text(tripLogic.getSingleRouteDistanceAsString() )
+            Text(tripLogic.getDistanceStringFromRoute(tripLogic.currentRoute ?? Route()))
         }
     }
     
@@ -181,9 +181,9 @@ struct DirectionsLabel: View {
 
 struct DurationDistanceString: View {
     let time: Time
-    let distanceAndUnit: (Double,String)
+    let distanceString: String
     var body: some View {
-        Text("\(time.hours) hr \(time.minutes) min(\(Int(distanceAndUnit.0)) \(distanceAndUnit.1))")
+        Text("\(time.hours) hr \(time.minutes) min(\(distanceString))")
     }
 }
 
