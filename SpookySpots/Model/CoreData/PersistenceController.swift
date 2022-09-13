@@ -22,7 +22,7 @@ struct PersistenceController {
                 fatalError("Error: \(error.localizedDescription)")
             }
         }
-        deleteAll()
+//        deleteAll()
     }
     
     
@@ -76,7 +76,7 @@ struct PersistenceController {
     }
     
     func createOrUpdateTrip(_ trip: Trip) {
-        print(trip)
+        print(trip.routes.count)
         let context = container.viewContext
         do {
             let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
@@ -90,7 +90,7 @@ struct PersistenceController {
                     routeContext.id = route.id
                     routeContext.tripPosition = Int16(route.tripPosition ?? 0)
                     routeContext.collectionID = route.collectionID
-                    routeContext.distance = route.distance
+                    routeContext.distanceInMeters = route.distance
                     routeContext.travelTime = route.travelTime
                     let polylineContext = CDPolyline(context: context)
                     routeContext.polyline = polylineContext
@@ -99,8 +99,6 @@ struct PersistenceController {
                             let pointContext = CDPoint(context: context)
                             pointContext.latitude = point.latitude ?? 0
                             pointContext.longitude = point.longitude ?? 0
-                            pointContext.x = point.x ?? 0
-                            pointContext.y = point.y ?? 0
                             pointContext.polyline = polylineContext
                             polylineContext.addToPoints(pointContext)
                         }
@@ -214,32 +212,34 @@ struct PersistenceController {
                     tripToUpdate.removeFromDestinations(tripToUpdate.destinations ?? [])
                     tripToUpdate.removeFromRoutes(tripToUpdate.routes ?? [])
 
+                    print(tripToUpdate.routes?.count)
                     for route in trip.routes {
                         let routeContext = CDRoute(context: context)
+                        
+                        let locale = Locale.current
+                        let usesMetric = locale.usesMetricSystem
+                        let distance = usesMetric ? route.distance : (route.distance / 0.000621371)
    
                         routeContext.id = route.id
                         routeContext.tripPosition = Int16(route.tripPosition ?? 0)
                         routeContext.collectionID = route.collectionID
                         routeContext.trip = tripToUpdate
-                        routeContext.distance = route.distance
+                        routeContext.distanceInMeters = distance
                         routeContext.travelTime = route.travelTime
                         
                         let polylineContext = CDPolyline(context: context)
+
                         for point in route.polyline?.pts ?? [] {
-                            
                             let pointContext = CDPoint(context: context)
+                            pointContext.index = Int32(point.index ?? 0)
                             pointContext.latitude = point.latitude ?? 0
                             pointContext.longitude = point.longitude ?? 0
-                            pointContext.x = point.x ?? 0
-                            pointContext.y = point.y ?? 0
                             pointContext.polyline = polylineContext
                             polylineContext.addToPoints(pointContext)
                         }
     
-                        polylineContext.route = routeContext
+                        polylineContext.routeID = route.id
                         routeContext.polyline = polylineContext
-                        polylineContext.route = routeContext
-                        
                         
                         for step in route.steps {
                             let stepContext = CDStep(context: context)

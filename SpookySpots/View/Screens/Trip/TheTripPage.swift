@@ -88,14 +88,9 @@ struct TheTripPage: View {
             .font(.system(size: 22, weight: .medium))
     }
     
-    private var tripLegDetails: some View {
-        DurationDistanceString(
-            time: tripLogic.getHighlightedRouteTravelTimeAsTime() ?? Time(),
-            distanceAndUnit: tripLogic.getCurrentRouteDistanceAndUnit())
-    }
-    
     private var totalTripDetails: some View {
-        DurationDistanceString(time: tripLogic.totalTripDurationAsTime, distanceAndUnit: tripLogic.getTotalDistanceAndUnit())
+        DurationDistanceString(time: tripLogic.totalTripDurationAsTime,
+                               distanceString: tripLogic.totalTripDistanceAsLocalUnitString)
 
     }
     

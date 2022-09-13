@@ -20,17 +20,8 @@ struct Route: Identifiable, Equatable {
     let collectionID: String
     let altPosition: Int
     var tripPosition: Int?
-    
-    private var _polyline: Any?
-
-     var polyline: RoutePolyline? {
-         get {
-             return _polyline as? RoutePolyline
-         }
-         set {
-             _polyline = newValue
-         }
-     }
+//    var polyline: MKPolyline?
+    var polyline: RoutePolyline?
     
     //MARK: - Init from Code
     init(id: String = "",
@@ -38,6 +29,7 @@ struct Route: Identifiable, Equatable {
          travelTime: Double = 0,
          distance: Double = 0,
          collectionID: String = "",
+//         polyline: MKPolyline? = nil,
          polyline: RoutePolyline? = nil,
          altPosition: Int = 0,
          tripPosition: Int? = 0) {
@@ -46,7 +38,7 @@ struct Route: Identifiable, Equatable {
         self.travelTime = travelTime
         self.distance = distance
         self.collectionID = collectionID
-//        self.polyline = polyline
+        self.polyline = polyline
         self.altPosition = altPosition
         self.tripPosition = tripPosition
     }
@@ -61,8 +53,7 @@ struct Route: Identifiable, Equatable {
     
     //MARK: - Point
     struct Point: Equatable {
-        var x: Double?
-        var y: Double?
+        var index: Int?
         var latitude: Double?
         var longitude: Double?
     }

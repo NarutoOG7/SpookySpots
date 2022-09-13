@@ -33,13 +33,13 @@
         <relationship name="trip" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDTrip" inverseName="nextDestination" inverseEntity="CDTrip"/>
     </entity>
     <entity name="CDPoint" representedClassName="CDPoint" syncable="YES" codeGenerationType="class">
+        <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="x" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="y" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="polyline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDPolyline" inverseName="points" inverseEntity="CDPolyline"/>
     </entity>
     <entity name="CDPolyline" representedClassName="CDPolyline" syncable="YES" codeGenerationType="class">
+        <attribute name="routeID" optional="YES" attributeType="String"/>
         <relationship name="points" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDPoint" inverseName="polyline" inverseEntity="CDPoint"/>
         <relationship name="route" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDRoute" inverseName="polyline" inverseEntity="CDRoute"/>
     </entity>
@@ -61,7 +61,7 @@
     </entity>
     <entity name="CDRoute" representedClassName="CDRoute" syncable="YES" codeGenerationType="class">
         <attribute name="collectionID" optional="YES" attributeType="String"/>
-        <attribute name="distance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="distanceInMeters" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="travelTime" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="tripPosition" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -108,7 +108,7 @@
         <element name="CDCompletedDest" positionX="0" positionY="126" width="128" height="119"/>
         <element name="CDStartPoint" positionX="9" positionY="135" width="128" height="119"/>
         <element name="CDStep" positionX="18" positionY="153" width="128" height="104"/>
-        <element name="CDPolyline" positionX="36" positionY="162" width="128" height="59"/>
-        <element name="CDPoint" positionX="-9" positionY="108" width="128" height="104"/>
+        <element name="CDPolyline" positionX="36" positionY="162" width="128" height="74"/>
+        <element name="CDPoint" positionX="-9" positionY="108" width="128" height="89"/>
     </elements>
 </model>
