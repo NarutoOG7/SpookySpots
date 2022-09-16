@@ -21,23 +21,24 @@ struct RouteHelper: View {
                 Spacer()
                 
                 VStack {
-                    
-                    driveTime
-                    distance
-                    
-                    
-                    if tripLogic.alternates.indices.contains(0) {
-                        ColorBar(position: 0, title: "1.", color: .green)
+                    VStack(alignment: .leading) {
+                        
+                        driveTime
+                        distance
+                        
+                        
+                        if tripLogic.alternates.indices.contains(0) {
+                            ColorBar(position: 0, title: "1.", color: .green)
+                        }
+                        
+                        if tripLogic.alternates.indices.contains(1) {
+                            ColorBar(position: 1, title: "2.", color: .blue)
+                        }
+                        
+                        if tripLogic.alternates.indices.contains(2) {
+                            ColorBar(position: 2, title: "3.", color: .yellow)
+                        }
                     }
-                    
-                    if tripLogic.alternates.indices.contains(1) {
-                        ColorBar(position: 1, title: "2.", color: .blue)
-                    }
-                    
-                    if tripLogic.alternates.indices.contains(2) {
-                        ColorBar(position: 2, title: "3.", color: .yellow)
-                    }
-                    
                     moreRoutesButton
                     
                 }
@@ -66,7 +67,7 @@ struct RouteHelper: View {
         HStack {
             Image(systemName: "fuelpump.fill")
                 .font(.caption)
-            Text(tripLogic.getDistanceStringFromRoute(tripLogic.currentRoute ?? Route()))
+            Text(tripLogic.getDistanceStringFromRoute(tripLogic.currentRoute ?? Route(), shortened: true))
         }
     }
     

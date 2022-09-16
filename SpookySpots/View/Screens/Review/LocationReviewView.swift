@@ -260,6 +260,8 @@ struct UserInputCellWithIcon: View {
     @Binding var shouldShowErrorMessage: Bool
     @Binding var isSecured: Bool
     var canSecure = false
+    var hasDivider = true
+    var boldText = false
     
     
     
@@ -290,6 +292,7 @@ struct UserInputCellWithIcon: View {
                     
                     SecureField(input, text: self.$input)
                         .disableAutocorrection(true)
+                        .font(.title3.weight(boldText ? .bold : .regular))
                         .textInputAutocapitalization(.never)
                         .foregroundColor(primaryColor)
                         .placeholder(when: self.input.isEmpty) {
@@ -306,6 +309,7 @@ struct UserInputCellWithIcon: View {
                     
                     TextField("", text: self.$input)
                         .disableAutocorrection(true)
+                        .font(.title3.weight(boldText ? .bold : .regular))
                         .textInputAutocapitalization(.never)
                         .foregroundColor(primaryColor)
                         .placeholder(when: input.isEmpty) {
@@ -319,8 +323,9 @@ struct UserInputCellWithIcon: View {
                         }
                 }
             }
-            
+            if hasDivider {
             Divider().background(primaryColor)
+            }
         }
         .padding(.horizontal)
         .padding(.top, 40)

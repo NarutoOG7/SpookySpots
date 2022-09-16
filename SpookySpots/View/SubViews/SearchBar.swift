@@ -59,6 +59,8 @@ struct SearchBar: View {
     private var searchResults: some View {
         let listHasMoreThanTenItems = exploreVM.searchedLocations.count > 10
         let listHasNoItems = exploreVM.searchedLocations.count == 0
+        let screenHeight = UIScreen.main.bounds.height
+        let listHeight = listHasMoreThanTenItems ? (screenHeight / 3) : (CGFloat(exploreVM.searchedLocations.count) * 45)
         return List {
         ForEach(0..<exploreVM.searchedLocations.count, id: \.self) { index in
             NavigationLink {
@@ -70,7 +72,7 @@ struct SearchBar: View {
         }
             
         }
-        .frame(height: listHasNoItems ? 0 : (listHasMoreThanTenItems ? 450 : (CGFloat(exploreVM.searchedLocations.count) * 45)))
+        .frame(height: listHasNoItems ? 0 : listHeight)
         .listStyle(.inset)
     }
     

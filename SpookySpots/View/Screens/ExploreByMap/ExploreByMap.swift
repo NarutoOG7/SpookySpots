@@ -22,7 +22,7 @@ struct ExploreByMap: View {
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
-    let map = MapViewUI()
+    let map = MapViewUI(mapIsForExplore: true)
     
     var body: some View {
         
@@ -30,26 +30,34 @@ struct ExploreByMap: View {
             map
                 .ignoresSafeArea()
             VStack {
-                HStack {
-                     SearchBar()
-                        .offset(y: -30)
-                    VStack {
-                        listButton
-                        currentLocationButton
-                    }
-                }.padding()
+                SearchBar()
+//                    .padding(.top, 70)
+                    .padding(.horizontal)
+                    .padding(.trailing, 65)
                 Spacer()
             }
+            HStack {
+                Spacer()
+            
+            VStack {
+                listButton
+                currentLocationButton
+                Spacer()
+            }
+            .padding(.top, 2)
+            .padding(.horizontal)
+            }
+            
             locationList
                 .padding()
-
+            
         }
-        
-        .onAppear {
-            GeoFireManager.instance.startLocationListener(region: map.getRegion())
-        } .onDisappear {
-            GeoFireManager.instance.endLocationListener()
-        }
+//
+//        .onAppear {
+//            GeoFireManager.instance.startLocationListener(region: map.getRegion())
+//        } .onDisappear {
+//            GeoFireManager.instance.endLocationListener()
+//        }
         
         .navigationTitle("Map")
         .navigationBarHidden(true)
@@ -84,11 +92,11 @@ extension ExploreByMap {
                                     print("left swipe")
                                     self.swipeDirection = .forward
                                     if let anno = exploreVM.highlightedAnnotation {
-                                    map.deselectAnnotation(anno, animated: true)
+//                                    map.deselectAnnotation(anno, animated: true)
                                     exploreVM.showLocationOnSwipe(direction: .forward)
                                         print(anno.id)
                                         DispatchQueue.main.async {
-                                            map.selectAnnotation(anno, animated: true)
+//                                            map.selectAnnotation(anno, animated: true)
                                         }
                                     }
                                 case (0..., -200...200):
@@ -100,7 +108,7 @@ extension ExploreByMap {
                                     if let anno = exploreVM.highlightedAnnotation {
                                     exploreVM.displayedLocation = nil
                                         exploreVM.highlightedAnnotation = nil
-                                        map.deselectAnnotation(anno, animated: true)
+//                                        map.deselectAnnotation(anno, animated: true)
                                     }
                                 default: print("no clue")
                                     print(value.translation.height)

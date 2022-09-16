@@ -72,42 +72,12 @@ class TripLogic: ObservableObject {
     
     @ObservedObject var navigationLogic = NavigationLogic.instance
     
-    let mapView = MKMapView()
-    
-    
     @Published var destinations: [Destination] = [] {
         didSet {
             self.getRoutes()
         }
     }
-    
-    @Published var tripRoutes: [Route] = [] {
-        willSet {
-            
-       
-            self.setCenterOnRoute()
-            self.currentTrip?.routes = newValue
 
-            if let first = newValue.first(where:  { $0.tripPosition == 0 }) {
-                self.steps = []
-                self.steps.append(first.steps.first ?? Route.Step())
-            }
-        }
-        
-        didSet {
-            //                tripRoutes.sort { a, b in
-            //                    guard let aPos = a.tripPosition,
-            //                          let bPos = b.tripPosition else { return a.altPosition < b.altPosition }
-            //                    return aPos < bPos
-            //                }
-            
-  
-         
-        }
-        
-    }
-    
-    
     @Published var isNavigating = false
     @Published var currentRoute: Route? {
         willSet {
@@ -205,6 +175,11 @@ class TripLogic: ObservableObject {
     @Published var currentTrip: Trip? {
         willSet {
             if let newValue = newValue {
+                if let first = newValue.routes.first(where:  { $0.tripPosition == 0 }) {
+                    self.steps = []
+                    self.steps.append(first.steps.first ?? Route.Step())
+                }
+                self.setCenterOnRoute()
                 PersistenceController.shared.createOrUpdateTrip(newValue)
             }
         }
@@ -395,9 +370,9 @@ class TripLogic: ObservableObject {
     }
     
     func alternateSelectedForNextPhase() {
-        if let rtIndice = tripRoutes.firstIndex(where: { $0.collectionID == selectedAlternate?.collectionID }),
+        if let rtIndice = self.currentTrip?.routes.firstIndex(where: { $0.collectionID == selectedAlternate?.collectionID }),
            let alt = selectedAlternate {
-            tripRoutes[rtIndice] = alt
+            self.currentTrip?.routes[rtIndice] = alt
         }
     }
     
@@ -495,7 +470,6 @@ class TripLogic: ObservableObject {
         self.currentTrip?.destinations.removeAll(where: { $0.name == location.location.name })
 //        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
         self.destinations.removeAll(where: { $0.name == location.location.name })
-        self.tripRoutes.removeAll(where: { $0.id == "\(location.location.id)" })
         self.currentTrip?.routes.removeAll(where: { $0.id == "\(location.location.id)" })
     }
     
@@ -505,27 +479,28 @@ class TripLogic: ObservableObject {
         self.currentTrip?.destinations.remove(at: index)
 //        self.locationStore.activeTripLocations.remove(at: index)
         self.destinations.remove(at: index)
-        if tripRoutes.indices.contains(index) {
-            self.tripRoutes.remove(at: index)
+        if currentTrip?.routes.indices.contains(index) ?? false {
             self.currentTrip?.routes.remove(at: index)
         }
     }
     
     //MARK: - Distance
     
-    func getDistanceStringFromRoute(_ route: Route) -> String {
+    func getDistanceStringFromRoute(_ route: Route, shortened: Bool) -> String {
         let locale = Locale.current
         let usesMetric = locale.usesMetricSystem
         
         var distance: Double = 0
         let unitSystem = usesMetric ? "meters" : "miles"
+        let shortenedUnitSystem  = usesMetric ? "m" : "mi"
 
             let meters = route.distance
             let miles = meters * 0.000621371
             let dist = usesMetric ? meters : miles
             distance += dist
         
-        let str = String(format: "%.0f \(unitSystem)", distance)
+        let unitString = shortened ? shortenedUnitSystem : unitSystem
+        let str = String(format: "%.0f \(unitString)", distance)
 
         return str
     }
@@ -595,13 +570,12 @@ class TripLogic: ObservableObject {
     //MARK: -  Routes
     
     private func getRoutes() {
-        self.tripRoutes = []
+        self.currentTrip?.routes = []
         self.routesForDestinations { success in
             if success {
                 self.getReturnHome { route in
                     var newRoute = route
-                        newRoute.tripPosition = self.tripRoutes.count
-                    self.tripRoutes.append(newRoute)
+                    newRoute.tripPosition = self.currentTrip?.routes.count
                     self.currentTrip?.routes.append(newRoute)
                 }
             }
@@ -762,7 +736,7 @@ class TripLogic: ObservableObject {
                                                 ///
                         
                         var route = first
-                        route.tripPosition = self.tripRoutes.count
+                        route.tripPosition = self.currentTrip?.routes.count
                         
                                     completion(route)
                     }
@@ -795,13 +769,11 @@ class TripLogic: ObservableObject {
     
     
     func routesForDestinations(withCompletion completion: @escaping(Bool) -> (Void)) {
-        self.tripRoutes = []
         self.currentTrip?.routes = []
         self.allRoutes = []
         getRoutesForTrip { route in
 //            var newRoute = routes
 //            newRoute.tripPosition = self.tripRoutes.count
-            self.tripRoutes.append(route)
             self.currentTrip?.routes.append(route)
             self.allRoutes.append(route)
         }
@@ -810,7 +782,7 @@ class TripLogic: ObservableObject {
     
     
     func tripRoutesContains(_ route: Route) -> Bool {
-        tripRoutes.contains(where: { $0.id == route.id })
+        self.currentTrip?.routes.contains(where: { $0.id == route.id }) ?? false
     }
     
     //MARK: - Navigation
@@ -822,7 +794,7 @@ class TripLogic: ObservableObject {
         }
         
 //        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
-        if let first = self.tripRoutes.first(where: { $0.tripPosition == 0 }) {
+        if let first = self.currentTrip?.routes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
             self.currentTrip?.nextDestination = currentTrip?.destinations.first
         //        self.highlightedPolyline = self.tripRoutes.first?.polyline

@@ -61,9 +61,9 @@ enum K {
         enum Trip {
             static let completed = Image(systemName: "checkmark.circle")
             static let currentLocationIcon = Image("CurrentLocationIcon")
-            static let currentLocationIconWithDots = Image("CurrentLocationMarker.WithDots")
-            static let lastDestinationIcon = Image("DestinationPin.WithDots.TopSide")
-            static let destinationIcon = Image("DestinationPin.WithDots.BothSides")
+            static let currentLocationIconWithDots = Image("CurrentLocationMarker.WithDots.orange")
+            static let lastDestinationIcon = Image("DestinationPin.WithDots.TopSide.orange")
+            static let destinationIcon = Image("DestinationPin.WithDots.bothSides.orange")
         }
         static let splashOne = Image("SplashOne")
         static let splashTwo = Image("SplashTwo")

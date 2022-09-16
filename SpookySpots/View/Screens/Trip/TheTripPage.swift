@@ -21,11 +21,7 @@ struct TheTripPage: View {
     
     @ObservedObject var tripLogic = TripLogic.instance
     
-    private let map = MapForTrip()
-    
-    init() {
-        UITableView.appearance().backgroundColor = .clear
-    }
+    private var map = MapViewUI(mapIsForExplore: false)
     
     var body: some View {
         ZStack {
@@ -37,10 +33,10 @@ struct TheTripPage: View {
                 currentLocationButton
                 routeStepHelper
             } else if tripLogic.routeIsHighlighted {
-                RouteHelper()
-                
+                    RouteHelper()
+                    .padding(.top, 40)
             }
-            SlideOverCard(position: .middle, canSlide: .constant(true), color: weenyWitch.lightest, handleColor: weenyWitch.black) { () -> AnyView in 
+            SlideOverCard(position: .middle, canSlide: .constant(true), color: weenyWitch.black, handleColor: weenyWitch.orange) { () -> AnyView in
                 if tripLogic.currentTrip?.destinations == [] {
                     return AnyView(emptyTripView)
                 } else {
@@ -50,6 +46,7 @@ struct TheTripPage: View {
         }
         
         .onAppear {
+            UITableView.appearance().backgroundColor = .clear
             self.destinations = []
             self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
             tripLogic.currentTrip?.destinations.forEach({ self.destinations.append($0) })
@@ -71,26 +68,42 @@ struct TheTripPage: View {
                 huntButton
             }
             .padding(.horizontal, 30)
-           DestinationsList(destinations: $destinations)
+            DestinationsList(destinations: $destinations,
+                             mainColor: weenyWitch.lightest,
+                             accentColor: weenyWitch.light)
                 .padding()
+                .padding(.top, 10)
         }
     }
     
     private var emptyTripView: some View {
         Text("Add locations to your trip.")
-            .foregroundColor(weenyWitch.black)
+            .foregroundColor(weenyWitch.orange)
             .font(.system(size: 22, weight: .medium))
     }
     
     var destinationTitle: some View {
-        TextField("Trip A*", text: $tripTitleInput)
-            .foregroundColor(weenyWitch.black)
-            .font(.system(size: 22, weight: .medium))
+        UserInputCellWithIcon(input: $tripTitleInput,
+                              primaryColor: weenyWitch.lightest,
+                              accentColor: weenyWitch.light,
+                              icon: nil,
+                              placeholderText: "Name Your Trip",
+                              errorMessage: "",
+                              shouldShowErrorMessage: .constant(false),
+                              isSecured: .constant(false),
+                              hasDivider: false,
+                              boldText: true)
+        .padding(.top, -40)
+        .padding(.leading, -15)
+//        TextField("Trip A*", text: $tripTitleInput)
+//            .foregroundColor(weenyWitch.lightest)
+//            .font(.system(size: 22, weight: .medium))
     }
     
     private var totalTripDetails: some View {
         DurationDistanceString(time: tripLogic.totalTripDurationAsTime,
                                distanceString: tripLogic.totalTripDistanceAsLocalUnitString)
+        .foregroundColor(weenyWitch.lightest)
 
     }
     
@@ -102,8 +115,12 @@ struct TheTripPage: View {
         Button(action: huntTapped) {
             Text("HUNT")
                 .foregroundColor(weenyWitch.orange)
+                .padding()
+                .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(weenyWitch.orange, lineWidth: 4)
+                )
         }
-        .buttonStyle(.borderedProminent)
     }
     
     private var currentLocationButton: some View {
@@ -113,8 +130,8 @@ struct TheTripPage: View {
                 
                 CircleButton(size: .small,
                              image: Image(systemName: "location"),
-                             mainColor: weenyWitch.brown,
-                             accentColor: weenyWitch.lightest,
+                             mainColor: weenyWitch.orange,
+                             accentColor: weenyWitch.black,
                              clicked: currentLocationPressed)
                 
             }

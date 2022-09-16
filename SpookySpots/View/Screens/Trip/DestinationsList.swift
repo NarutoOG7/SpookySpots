@@ -11,6 +11,10 @@ struct DestinationsList: View {
     
     @Binding var destinations: [Destination]
     
+    var mainColor: Color
+    var accentColor: Color
+
+    
     @ObservedObject var tripLogic = TripLogic.instance
     
     var body: some View {
@@ -33,11 +37,12 @@ struct DestinationsList: View {
             isCurrent: tripLogic.currentTrip?.recentlyCompletedDestination?.name == startLocation?.name,
             isCompleted: tripLogic.currentTrip?.completedDestinations.contains(startLocation ?? Destination()) ?? false,
             isLast: false,
+            mainColor: mainColor,
+            accentColor: accentColor,
             editable: true)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: -1, leading: 0, bottom: 0, trailing: 0))
-        
     }
     
     private var forEachDestination: some View {
@@ -49,7 +54,9 @@ struct DestinationsList: View {
                 subText: destination.address,
                 isCurrent: tripLogic.currentTrip?.recentlyCompletedDestination == destination,
                 isCompleted: tripLogic.currentTrip?.completedDestinations.contains(destination) ?? false,
-                isLast: endLocation == destination)
+                isLast: endLocation == destination,
+                mainColor: mainColor,
+                accentColor: accentColor)
         }
         .onDelete(perform: delete(at:))
         .listRowSeparator(.hidden)
@@ -67,6 +74,8 @@ struct DestinationsList: View {
             isCurrent: false,
             isCompleted: tripLogic.currentTrip?.completedDestinations.contains(endLocation ?? Destination()) ?? false,
             isLast: true,
+            mainColor: mainColor,
+            accentColor: accentColor,
             editable: true)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
@@ -101,6 +110,6 @@ struct DestinationsList: View {
 
 struct DestinationsList_Previews: PreviewProvider {
     static var previews: some View {
-        DestinationsList(destinations: .constant([Destination]()))
+        DestinationsList(destinations: .constant([Destination]()), mainColor: .orange, accentColor: .black)
     }
 }

@@ -9,7 +9,6 @@ import MapKit
 import SwiftUI
 import AVFAudio
 
-
 enum MapDetails {
     static let startingLocation = CLLocation(latitude: 45.677, longitude: -111.0429)
     static let startingLocationName = "Bozeman"

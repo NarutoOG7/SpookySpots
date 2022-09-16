@@ -30,8 +30,8 @@
             filePath = "SpookySpots/Model/Models/TripLogic.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "621"
-            endingLineNumber = "621"
+            startingLineNumber = "595"
+            endingLineNumber = "595"
             landmarkName = "makeDirectionsRequest(start:end:withCompletion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "SpookySpots/View/Screens/Trip/TheTripPage.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "131"
-            endingLineNumber = "131"
+            startingLineNumber = "148"
+            endingLineNumber = "148"
             landmarkName = "huntTapped()"
             landmarkType = "7">
          </BreakpointContent>
@@ -167,15 +167,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "0771864C-C94A-4B44-9AEC-2EB9B1370DB0"
+            uuid = "49B58BA2-A2D1-41D9-B23D-D1C5CA99AB76"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SpookySpots/View/Screens/Trip/MapForTrip.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "213"
-            endingLineNumber = "213"
+            startingLineNumber = "245"
+            endingLineNumber = "245"
             landmarkName = "mapView(_:rendererFor:)"
             landmarkType = "7">
          </BreakpointContent>

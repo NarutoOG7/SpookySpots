@@ -7,7 +7,7 @@
 
 import SwiftUI
 import MapKit
-
+import MapKitGoogleStyler
 
 struct MapForTrip: UIViewRepresentable {
     
@@ -16,16 +16,19 @@ struct MapForTrip: UIViewRepresentable {
     @ObservedObject var tripLogic = TripLogic.instance
     
     
+    let mapView = MKMapView()
+    
     func makeUIView(context: Context) -> MKMapView {
-        let mapView = tripLogic.mapView
         if tripLogic.isNavigating {
             mapView.setRegion(tripLogic.mapRegion, animated: true)
         }
-        mapView.tintColor = .black
+        mapView.mapType = .standard
+//        mapView.tintColor = .black
         mapView.delegate = context.coordinator
         mapView.isRotateEnabled = false
         mapView.isPitchEnabled = false
-        
+        configureTileOverlay()
+
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
@@ -38,6 +41,7 @@ struct MapForTrip: UIViewRepresentable {
         if tripLogic.isNavigating {
             mapView.setRegion(tripLogic.mapRegion, animated: true)
         }
+    configureTileOverlay()
         addRoute(to: mapView)
         addPlacemarks(to: mapView)
         addStartAndEndLocations(to: mapView)
@@ -59,8 +63,7 @@ struct MapForTrip: UIViewRepresentable {
         if !view.overlays.isEmpty {
             view.removeOverlays(view.overlays)
         }
-        addActivePolylines(to: view)
-        addRoutePolylineFromCD(to: view)
+        addRoutePolylineFromTrip(to: view)
     }
     
     func addCurrentLocation(to view: MKMapView) {
@@ -92,15 +95,7 @@ struct MapForTrip: UIViewRepresentable {
         }
     }
     
-    func addActivePolylines(to view: MKMapView) {
-        for route in tripLogic.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 }) {
-            if let polyline = route.polyline {
-//            view.setVisibleMapRect(mapRect, edgePadding: UIEdgeInsets(top: ®10, left: 10, bottom: 10, right: 10), animated: true)
-            view.addOverlay(polyline)
-            }
-        }
 
-    }
     
     func addAlternateRoutes(to view: MKMapView) {
         for route in tripLogic.alternates {
@@ -111,7 +106,7 @@ struct MapForTrip: UIViewRepresentable {
     }
     
     
-    func addRoutePolylineFromCD(to view: MKMapView) {
+    func addRoutePolylineFromTrip(to view: MKMapView) {
         
         if let routes = tripLogic.currentTrip?.routes {
             for route in routes {
@@ -144,6 +139,24 @@ struct MapForTrip: UIViewRepresentable {
             view.addOverlay(circle)
         }
     }
+    
+    //MARK: - MapKit Style
+        
+    private func configureTileOverlay() {
+                // We first need to have the path of the overlay configuration JSON
+                guard let overlayFileURLString = Bundle.main.path(forResource: "overlay", ofType: "json") else {
+                        return
+                }
+                let overlayFileURL = URL(fileURLWithPath: overlayFileURLString)
+                
+                // After that, you can create the tile overlay using MapKitGoogleStyler
+                guard let tileOverlay = try? MapKitGoogleStyler.buildOverlay(with: overlayFileURL) else {
+                    return
+                }
+        tileOverlay.canReplaceMapContent = true
+                // And finally add it to your MKMapView
+        mapView.addOverlay(tileOverlay)
+        }
 
     
     //MARK: - MapViewDelegate
@@ -153,8 +166,21 @@ struct MapForTrip: UIViewRepresentable {
         @StateObject var tripLogic = TripLogic.instance
         
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+//            if overlay is RoutePolyline {
+
+            if let tileOverlay = overlay as? MKTileOverlay {
+                return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+            }
             
-            if overlay is RoutePolyline {
+            if let _ = overlay as? MKCircle {
+                let renderer = MKCircleRenderer(overlay: overlay)
+                renderer.strokeColor = .clear
+                renderer.fillColor = .clear
+//                renderer.alpha = 0.5
+                return renderer
+            }
+            
+            if let _ = overlay as? RoutePolyline {
                 
                 guard let overlay = overlay as? RoutePolyline else {
                     return MKOverlayRenderer(overlay: overlay)
@@ -205,24 +231,102 @@ struct MapForTrip: UIViewRepresentable {
                 
                 
                 return renderer
-                
             }
             
-            // from core data
-            if let routePolyline = overlay as? MKPolyline {
-                let renderer = MKPolylineRenderer(polyline: routePolyline)
+            if let mkPoly = overlay as? MKPolyline {
+                let renderer = MKPolylineRenderer(polyline: mkPoly)
                 renderer.lineWidth = 7
                 renderer.strokeColor = UIColor.blue
                 return renderer
             }
             
-            if overlay is MKCircle {
-                let renderer = MKCircleRenderer(overlay: overlay)
-                renderer.strokeColor = .clear
-                renderer.fillColor = .clear
-//                renderer.alpha = 0.5
-                return renderer
-            }
+//            switch overlay {
+//            case let tileOverlay as MKTileOverlay:
+//                return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+//
+//            case is MKCircle:
+//                    let renderer = MKCircleRenderer(overlay: overlay)
+//                    renderer.strokeColor = .clear
+//                    renderer.fillColor = .clear
+//    //                renderer.alpha = 0.5
+//                    return renderer
+//
+//            case let routeOverlay as RoutePolyline:
+//
+//                guard let overlay = overlay as? RoutePolyline else {
+//                    return MKOverlayRenderer(overlay: overlay)
+//                }
+//
+//
+//                let isHighlighted = tripLogic.routeIsHighlighted && tripLogic.currentRoute?.polyline == overlay
+//                let noneHighlighted = !tripLogic.routeIsHighlighted
+//
+//                let isShowingAlternates = tripLogic.alternatesAreOnBoard()
+//                let isAlternate = tripLogic.alternates.contains(where: { $0.polyline == overlay })
+//                let isFirstAlt = tripLogic.alternates.first?.polyline == overlay
+//                let isSecondAlt = tripLogic.alternates.indices.contains(1) && tripLogic.alternates[1].polyline == overlay
+//                let isThirdAlt = tripLogic.alternates.indices.contains(2) && tripLogic.alternates[2].polyline == overlay
+//
+//                var color: UIColor = .white
+//
+//                if isShowingAlternates && !isAlternate {
+//                    // make gray
+//                    color = .gray.withAlphaComponent(0.33)
+//                } else if isAlternate {
+//
+//                    if isFirstAlt {
+//                        // make green
+//                        color = .systemGreen
+//                    } else if isSecondAlt {
+//                        // make blue
+//                        color = .systemBlue
+//                    } else if isThirdAlt {
+//                        // make yellow
+//                        color = .systemYellow
+//                    }
+//
+//
+//                } else if !noneHighlighted && !isHighlighted {
+//                    // make transparent orange
+//                    color = .systemOrange.withAlphaComponent(0.33)
+//                } else if isHighlighted || noneHighlighted && !isShowingAlternates {
+//                    // make orange
+//                    color = .systemOrange
+//                }
+//
+//                let renderer = MKPolylineRenderer(overlay: overlay)
+//                renderer.lineWidth = 7
+//                renderer.strokeColor = UIColor.systemOrange
+//                renderer.strokeColor = color
+//
+//
+//
+//                return renderer
+//
+//            case let routePolyline as MKPolyline :
+//                    let renderer = MKPolylineRenderer(polyline: routePolyline)
+//                    renderer.lineWidth = 7
+//                    renderer.strokeColor = UIColor.blue
+//                    return renderer
+//            default:
+//                return MKOverlayRenderer()
+//            }
+            
+            // from core data
+//            if let routePolyline = overlay as? MKPolyline {
+//                let renderer = MKPolylineRenderer(polyline: routePolyline)
+//                renderer.lineWidth = 7
+//                renderer.strokeColor = UIColor.blue
+//                return renderer
+//            }
+//
+//            if overlay is MKCircle {
+//                let renderer = MKCircleRenderer(overlay: overlay)
+//                renderer.strokeColor = .clear
+//                renderer.fillColor = .clear
+////                renderer.alpha = 0.5
+//                return renderer
+//            }
 
             return MKOverlayRenderer()
         }

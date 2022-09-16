@@ -22,14 +22,6 @@ struct ExploreByList: View {
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-//    init() {
-//        let fbManager = FirebaseManager.instance
-//        fbManager.getHauntedHotels()
-//        fbManager.getAllReviews { review in
-//            LocationStore.instance.reviewBucket.append(review)
-//        }
-//    }
-    
     var body: some View {
         ZStack {
             VStack {
@@ -37,11 +29,11 @@ struct ExploreByList: View {
                 mapButton
                 divider
                 ScrollView(showsIndicators: false) {
-                locationsCollections
-            }
+                    locationsCollections
+                }
             }
             VStack {
-            SearchBar()
+                SearchBar()
                     .padding(.top, 70)
                     .padding(.horizontal)
                     .padding(.trailing, 65)
@@ -133,6 +125,7 @@ struct ExploreByList: View {
             .frame(height: 1.5)
             .background(K.Colors.WeenyWitch.brown)
             .padding(.top, 12)
+            .padding(.bottom, -8)
     }
     
     //MARK: - Buttons
