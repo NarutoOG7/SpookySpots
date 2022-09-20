@@ -123,11 +123,18 @@ extension UserLocationManager: CLLocationManagerDelegate {
 //        let usesMetric = locale.usesMetricSystem
         
 //    //    if tripLogic.stepsCounter < tripLogic.steps.count {
-        if tripLogic.completedSteps.count < tripLogic.steps.count {
+        if let completed = tripLogic.currentTrip?.completedStepCount,
+            let total = tripLogic.currentTrip?.totalStepCount {
+            if completed < total {
+//        if tripLogic.completedSteps.count < tripLogic.steps.count {
 //   //         let currentStep = tripLogic.steps[tripLogic.stepsCounter]
-            let currentStep = tripLogic.steps[tripLogic.completedSteps.count]
+//            let currentStep = tripLogic.steps[tripLogic.completedSteps.count]
+            tripLogic.currentTrip?.completedStepCount += 1
+                
+                tripLogic.currentTrip?.remainingSteps.sort(by: { $0.id ?? 0 < $1.id ?? 1 })
+                tripLogic.currentTrip?.remainingSteps.remove(at: 0)
             
-            tripLogic.completedSteps.append(currentStep)
+            
 //            let distance = usesMetric ? currentStep.distance : currentStep.distance * 0.000621371
 //            let unitSystem = usesMetric ? "meters" : "miles"
 //            
@@ -139,7 +146,9 @@ extension UserLocationManager: CLLocationManagerDelegate {
             print(message)
 //            tripLogic.directionsLabel = message
 ////            tripLogic.stepsCounter = 0
-            tripLogic.completedSteps = []
+            tripLogic.currentTrip?.completedStepCount = 0
+            tripLogic.currentTrip?.totalStepCount = 0
+//            tripLogic.completedSteps = []
             if let completedDestination = tripLogic.currentTrip?.nextDestination {
                 tripLogic.currentTrip?.completedDestinations.append(completedDestination)
                 
@@ -148,6 +157,7 @@ extension UserLocationManager: CLLocationManagerDelegate {
             tripLogic.currentTrip?.nextDestination = tripLogic.currentTrip?.remainingDestinations.first
             locationManager?.monitoredRegions.forEach({ locationManager?.stopMonitoring(for: $0) })
         }
+    }
     }
     
     

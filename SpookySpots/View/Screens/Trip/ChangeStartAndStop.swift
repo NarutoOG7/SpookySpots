@@ -197,7 +197,18 @@ struct ChangeStartAndStop: View {
                 /// user won't know what the fuck is happening
             }
             
-            let newTrip = Trip(id: UUID().uuidString, userID: userStore.user.id, isActive: true, destinations: trip?.destinations ?? [], startLocation: startDest, endLocation: endDest, routes: trip?.routes ?? [])
+            let newTrip = Trip(id: UUID().uuidString,
+                               name: trip?.name ?? "",
+                               userID: userStore.user.id,
+                               isActive: true,
+                               destinations: trip?.destinations ?? [],
+                               startLocation: startDest,
+                               endLocation: endDest,
+                               routes: trip?.routes ?? [],
+                               remainingSteps: trip?.remainingSteps ?? [],
+                               completedStepCount: trip?.completedStepCount ?? 0,
+                               totalStepCount: trip?.totalStepCount ?? 0,
+                               isNavigating: false)
 //            newTrip.startLocation = newStartingLocation
 //            newTrip.endLocation = newEndingLocation
             tripLogic.currentTrip = newTrip

@@ -76,9 +76,10 @@ struct PersistenceController {
     }
     
     func createOrUpdateTrip(_ trip: Trip) {
-        print(trip.routes.count)
         let context = container.viewContext
         do {
+//            try context.performAndWait {
+                
             let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
             request.predicate = NSPredicate(format: "id == %@", trip.id)
             let numberOfRecords = try context.count(for: request)
@@ -105,6 +106,7 @@ struct PersistenceController {
                     }
                     for step in route.steps {
                         let stepContext = CDStep(context: context)
+                        stepContext.id = step.id ?? 0
                         stepContext.instructions = step.instructions
                         stepContext.longitude = step.longitude ?? 0
                         stepContext.latitude = step.latitude ?? 0
@@ -151,6 +153,16 @@ struct PersistenceController {
                 endContext.trip = newTrip
                 
                 newTrip.endPoint = endContext
+                
+                for remainingStep in trip.remainingSteps {
+                    let remStepContext = CDRemainingStep(context: context)
+                    remStepContext.id = remainingStep.id ?? 0
+                    remStepContext.instructions = remainingStep.instructions
+                    remStepContext.longitude = remainingStep.longitude ?? 0
+                    remStepContext.latitude = remainingStep.latitude ?? 0
+                    remStepContext.distance = remainingStep.distanceInMeters ?? 0
+                    newTrip.addToRemainingSteps(remStepContext)
+                }
                 
                 for remainingDest in trip.remainingDestinations {
                  let remainingContext = CDRemainingDest(context: context)
@@ -199,10 +211,14 @@ struct PersistenceController {
                 
                 
                 newTrip.id = trip.id
+                newTrip.name = trip.name
                 newTrip.isActive = trip.isActive
                 newTrip.userID = UserStore.instance.user.id
-                
-                
+                newTrip.completedStepCount = trip.completedStepCount
+                newTrip.totalStepCount = trip.totalStepCount
+                newTrip.isNavigating = trip.isNavigating
+
+
                 
             } else {
                 // update
@@ -243,6 +259,7 @@ struct PersistenceController {
                         
                         for step in route.steps {
                             let stepContext = CDStep(context: context)
+                            stepContext.id = step.id ?? 0
                             stepContext.instructions = step.instructions
                             stepContext.longitude = step.longitude ?? 0
                             stepContext.latitude = step.latitude ?? 0
@@ -289,15 +306,25 @@ struct PersistenceController {
                     endContext.trip = tripToUpdate
                     tripToUpdate.endPoint = endContext
                     
+                    for remainingStep in trip.remainingSteps {
+                        let remStepContext = CDRemainingStep(context: context)
+                        remStepContext.id = remainingStep.id ?? 0
+                        remStepContext.instructions = remainingStep.instructions
+                        remStepContext.longitude = remainingStep.longitude ?? 0
+                        remStepContext.latitude = remainingStep.latitude ?? 0
+                        remStepContext.distance = remainingStep.distanceInMeters ?? 0
+                        tripToUpdate.addToRemainingSteps(remStepContext)
+                    }
+                    
                     for remainingDest in trip.remainingDestinations {
-                     let remainingContext = CDRemainingDest(context: context)
-                        remainingContext.id = remainingDest.id
-                        remainingContext.lon = remainingDest.lon
-                        remainingContext.lat = remainingDest.lat
-                        remainingContext.name = remainingDest.name
-                        remainingContext.address = remainingDest.address
-                        remainingContext.trip = tripToUpdate
-                        tripToUpdate.addToRemainingDestinations(remainingContext)
+                     let remainingDestContext = CDRemainingDest(context: context)
+                        remainingDestContext.id = remainingDest.id
+                        remainingDestContext.lon = remainingDest.lon
+                        remainingDestContext.lat = remainingDest.lat
+                        remainingDestContext.name = remainingDest.name
+                        remainingDestContext.address = remainingDest.address
+                        remainingDestContext.trip = tripToUpdate
+                        tripToUpdate.addToRemainingDestinations(remainingDestContext)
                     }
                     
                     for completedDest in trip.completedDestinations {
@@ -333,11 +360,15 @@ struct PersistenceController {
                     tripToUpdate.recentlyCompletedDestination = recentCompleteDestContext
                     
                     
+                    tripToUpdate.name = trip.name
+                    tripToUpdate.completedStepCount = trip.completedStepCount
+                    tripToUpdate.totalStepCount = trip.totalStepCount
+                    tripToUpdate.isNavigating = trip.isNavigating
                 }
                 
                 
             }
-            
+//            }
             self.save { error in
                 if let error = error {
                     print("Error saving to core data: \(error.localizedDescription)")

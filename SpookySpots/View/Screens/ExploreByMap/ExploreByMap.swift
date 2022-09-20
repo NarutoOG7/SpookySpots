@@ -22,12 +22,14 @@ struct ExploreByMap: View {
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
-    let map = MapViewUI(mapIsForExplore: true)
+    @ObservedObject var mapVM = MapVM.instance
+    
+//    let map = MapViewUI(mapIsForExplore: true)
     
     var body: some View {
         
         ZStack {
-            map
+            mapVM.map
                 .ignoresSafeArea()
             VStack {
                 SearchBar()
@@ -224,7 +226,7 @@ extension ExploreByMap {
     }
     
     func currentLocationPressed() {
-        map.setCurrentLocationRegion()
+        mapVM.map.setCurrentLocationRegion()
     }
 
 }

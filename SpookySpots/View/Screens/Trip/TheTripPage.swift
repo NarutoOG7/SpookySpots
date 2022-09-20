@@ -7,11 +7,16 @@
 
 import SwiftUI
 
+class MapVM: ObservableObject {
+    static let instance = MapVM()
+    @Published var map = MapViewUI(mapIsForExplore: true)
+}
+
 struct TheTripPage: View {
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    @State var tripTitleInput = "Pen"
+    @State var tripTitleInput = ""
     
     @State var isShowingMoreSteps = false
     
@@ -22,19 +27,22 @@ struct TheTripPage: View {
     @ObservedObject var tripLogic = TripLogic.instance
     
     private var map = MapViewUI(mapIsForExplore: false)
-    
+        
     var body: some View {
         ZStack {
             map
                 .ignoresSafeArea()
                 .environmentObject(TripLogic.instance)
             
-            if tripLogic.isNavigating {
+            if let currentTrip = tripLogic.currentTrip {
+                if currentTrip.isNavigating {
                 currentLocationButton
                 routeStepHelper
+                
             } else if tripLogic.routeIsHighlighted {
                     RouteHelper()
                     .padding(.top, 40)
+            }
             }
             SlideOverCard(position: .middle, canSlide: .constant(true), color: weenyWitch.black, handleColor: weenyWitch.orange) { () -> AnyView in
                 if tripLogic.currentTrip?.destinations == [] {
@@ -51,9 +59,10 @@ struct TheTripPage: View {
             self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
             tripLogic.currentTrip?.destinations.forEach({ self.destinations.append($0) })
             self.destinations.append(tripLogic.currentTrip?.endLocation ?? Destination())
+            self.tripTitleInput = tripLogic.currentTrip?.name ?? ""
         }
+
         
- 
     }
     
     
@@ -95,6 +104,9 @@ struct TheTripPage: View {
                               boldText: true)
         .padding(.top, -40)
         .padding(.leading, -15)
+        .onSubmit {
+            tripLogic.currentTrip?.name = tripTitleInput
+        }
 //        TextField("Trip A*", text: $tripTitleInput)
 //            .foregroundColor(weenyWitch.lightest)
 //            .font(.system(size: 22, weight: .medium))
@@ -145,12 +157,11 @@ struct TheTripPage: View {
     
     private func huntTapped() {
         // Start Navigation
-        if tripLogic.isNavigating {
+        if tripLogic.currentTrip?.isNavigating ?? false {
             tripLogic.endDirections()
         } else {
             tripLogic.startTrip()
         }
-        tripLogic.isNavigating.toggle()
     }
     
     private func currentLocationPressed() {
@@ -168,63 +179,62 @@ struct TheTripPage_Previews: PreviewProvider {
 
 //MARK: - Navigation
 extension TheTripPage {
-private var routeStepHelper: some View {
-    VStack {
+    private var routeStepHelper: some View {
         VStack {
-            currentStep
-            if isShowingMoreSteps {
-                allRemainingSteps
-                    .frame(maxHeight: 500)
+            VStack {
+                currentStep
+                if isShowingMoreSteps {
+                    allRemainingSteps
+                        .frame(maxHeight: 500)
+                }
+                
             }
+            //            .padding(.top, 100)
+            .padding()
+            .padding(.top, 20)
+            .background(.black)
+            .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
+            Spacer()
             
         }
-//            .padding(.top, 100)
-        .padding()
-        .padding(.top, 20)
-        .background(.black)
-        .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
-        Spacer()
-        
+        //        .padding(.top, 75)
     }
-//        .padding(.top, 75)
-}
-private var currentStep: some View {
-
-    Button {
-        self.isShowingMoreSteps.toggle()
-
-    } label: {
-
-        HStack {
-//                Image("")
-
-            if let first = tripLogic.steps.first {
+    private var currentStep: some View {
+        
+        Button {
+            self.isShowingMoreSteps.toggle()
+            
+        } label: {
+            
+            DirectionsLabel(txt: tripLogic.currentTrip?.remainingSteps.first?.instructions ?? "", isShowingMore: $isShowingMoreSteps)
+        }
+        .onAppear {
+            if let first = tripLogic.currentTrip?.remainingSteps.first {
                 if first.instructions == "" {
-                    if let second = tripLogic.steps[1] {
-                        DirectionsLabel(txt: second.instructions ?? "", isShowingMore: $isShowingMoreSteps)
-                    }
-                } else {
-                    DirectionsLabel(txt: first.instructions ?? "", isShowingMore: $isShowingMoreSteps)
+                    tripLogic.currentTrip?.remainingSteps.removeFirst()
                 }
             }
         }
     }
-}
-         
-private var allRemainingSteps: some View {
-    List(tripLogic.steps, id: \.self) { step in
     
-
-//        ForEach(tripLogic.steps, id: \.self) { step in
-//            VStack(alignment: .leading) {
-        if !tripLogic.completedSteps.contains(where: { $0 == step }) {
+    private var allRemainingSteps: some View {
+        List(tripLogic.currentTrip?
+            .remainingSteps
+            .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? [],
+             id: \.self) { step in
+            
+            
+            //        ForEach(tripLogic.steps, id: \.self) { step in
+            //            VStack(alignment: .leading) {
+            //        if !tripLogic.completedSteps.contains(where: { $0 == step }) {
+            if step != tripLogic.currentTrip?.remainingSteps.first {
             if step.instructions != "" {
                 Text(step.instructions ?? "")
                     .foregroundColor(.white)
                     .listRowBackground(Color.clear)
-//                }
-        }
+                //                }
+                        }
+            }
         }
     }
-}
 }

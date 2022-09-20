@@ -78,7 +78,6 @@ class TripLogic: ObservableObject {
         }
     }
 
-    @Published var isNavigating = false
     @Published var currentRoute: Route? {
         willSet {
             setHighlightedRouteDistanceAsLocalString()
@@ -180,6 +179,8 @@ class TripLogic: ObservableObject {
                     self.steps.append(first.steps.first ?? Route.Step())
                 }
                 self.setCenterOnRoute()
+                
+                
                 PersistenceController.shared.createOrUpdateTrip(newValue)
             }
         }
@@ -336,12 +337,17 @@ class TripLogic: ObservableObject {
                                      name: "Current Location")
             
             var trip = Trip(id: UUID().uuidString,
+                            name: "",
                             userID: self.userStore.user.id,
                             isActive: true,
                             destinations: [],
                             startLocation: startLoc,
                             endLocation: endLoc,
-                            routes: [])
+                            routes: [],
+                            remainingSteps: [],
+                            completedStepCount: 0,
+                            totalStepCount: 0,
+                            isNavigating: false)
             trip.recentlyCompletedDestination = startLoc
             trip.nextDestination = endLoc
             
@@ -675,12 +681,15 @@ class TripLogic: ObservableObject {
 
                 
                 var steps = [Route.Step]()
+                var index: Int16 = 0
                 for step in rt.steps {
-                    let stp = Route.Step(distanceInMeters: step.distance,
+                    let stp = Route.Step(id: index,
+                                         distanceInMeters: step.distance,
                                          instructions: step.instructions,
                                          latitude: step.polyline.coordinate.latitude,
                                          longitude: step.polyline.coordinate.longitude)
                     steps.append(stp)
+                    index += 1
                 }
                 
                 let route = Route(id: routeID,
@@ -789,6 +798,8 @@ class TripLogic: ObservableObject {
     
     func startTrip() {
         
+        self.currentTrip?.isNavigating = true
+        
         if let currentLoc = userStore.currentLocation {
             self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         }
@@ -797,11 +808,18 @@ class TripLogic: ObservableObject {
         if let first = self.currentTrip?.routes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
             self.currentTrip?.nextDestination = currentTrip?.destinations.first
-        //        self.highlightedPolyline = self.tripRoutes.first?.polyline
+//                self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
             self.currentTrip?.recentlyCompletedDestination = currentTrip?.startLocation
             
-        
+//            DispatchQueue.background {
+//                for route in self.currentTrip?.routes ?? [] {
+//                    for step in route.steps.sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) {
+//                        self.currentTrip?.remainingSteps.append(step)
+//                    }
+//                }
+            }
+            
         }
         
     }
@@ -818,6 +836,36 @@ class TripLogic: ObservableObject {
         self.currentRoute = nil
         self.routeIsHighlighted = false
         self.shouldShowAlertForClearingTrip = true
+        self.currentTrip?.isNavigating = false
     }
     
+}
+
+extension Array where Element == CLLocationCoordinate2D {
+    func center() -> CLLocationCoordinate2D {
+        var maxLatitude: Double = -200;
+        var maxLongitude: Double = -200;
+        var minLatitude: Double = Double(MAXFLOAT);
+        var minLongitude: Double = Double(MAXFLOAT);
+        
+        for location in self {
+            if location.latitude < minLatitude {
+                minLatitude = location.latitude;
+            }
+            
+            if location.longitude < minLongitude {
+                minLongitude = location.longitude;
+            }
+            
+            if location.latitude > maxLatitude {
+                maxLatitude = location.latitude;
+            }
+            
+            if location.longitude > maxLongitude {
+                maxLongitude = location.longitude;
+            }
+        }
+        
+        return CLLocationCoordinate2DMake(CLLocationDegrees((maxLatitude + minLatitude) * 0.5), CLLocationDegrees((maxLongitude + minLongitude) * 0.5));
+    }
 }

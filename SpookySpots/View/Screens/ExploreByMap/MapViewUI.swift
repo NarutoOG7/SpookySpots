@@ -23,7 +23,7 @@ struct MapViewUI: UIViewRepresentable {
     var mapIsForExplore: Bool
     
     func makeUIView(context: Context) -> MKMapView {
-        self.configureTileOverlay()
+        
         mapView.setRegion(exploreVM.searchRegion, animated: true)
         //        setCurrentLocationRegion()
         mapView.mapType = .standard
@@ -37,15 +37,14 @@ struct MapViewUI: UIViewRepresentable {
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
-        
+        self.configureTileOverlay()
         return mapView
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        if tripLogic.isNavigating {
+        if tripLogic.currentTrip?.isNavigating ?? false {
             mapView.setRegion(tripLogic.mapRegion, animated: true)
         }
-        self.configureTileOverlay()
         if mapIsForExplore {
             mapView.addAnnotations(geoFireManager.gfOnMapLocations)
             mapView.region = exploreVM.searchRegion
@@ -57,6 +56,7 @@ struct MapViewUI: UIViewRepresentable {
             addAlternateRoutes(to: mapView)
             addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
         }
+        self.configureTileOverlay()
     }
     
     func addCurrentLocation(to view: MKMapView) {
@@ -67,9 +67,9 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func addRoute(to view: MKMapView) {
-        if !view.overlays.isEmpty {
-            view.removeOverlays(view.overlays)
-        }
+//        if !view.overlays.isEmpty {
+//            view.removeOverlays(view.overlays)
+//        }
         addRoutePolylineFromTrip(to: view)
     }
     
@@ -308,11 +308,11 @@ struct MapViewUI: UIViewRepresentable {
                     
 
                 } else if !noneHighlighted && !isHighlighted {
-                    // make transparent orange
-                    color = .systemOrange.withAlphaComponent(0.33)
+                    // make accent
+                    color = UIColor(K.Colors.WeenyWitch.lightest).withAlphaComponent(0.66)
                 } else if isHighlighted || noneHighlighted && !isShowingAlternates {
-                    // make orange
-                    color = .systemOrange
+                    // make main
+                    color = UIColor(K.Colors.WeenyWitch.lightest)
                 }
                 
                 let renderer = MKPolylineRenderer(overlay: overlay)
@@ -346,7 +346,7 @@ struct MapViewUI: UIViewRepresentable {
         
         @objc func mapTapped(_ tap: TapGestureRecognizer) {
             
-            if tap.state == .recognized && !tripLogic.isNavigating {
+            if tap.state == .recognized && !(tripLogic.currentTrip?.isNavigating ?? false) {
                 
                 if let map = tap.map {
                     
@@ -472,3 +472,6 @@ struct MapViewUI: UIViewRepresentable {
     
 }
 
+class TapGestureRecognizer: UITapGestureRecognizer {
+    var map: MKMapView?
+}

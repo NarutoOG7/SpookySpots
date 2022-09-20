@@ -23,6 +23,7 @@ struct TripDestinationCell: View {
     private let images = K.Images.Trip.self
     private let colors = K.Colors.WeenyWitch.self
     
+    @ObservedObject var locationStore = LocationStore.instance
     
     var body: some View {
         HStack {
@@ -46,9 +47,15 @@ struct TripDestinationCell: View {
                             .underline()
                     }
                 } else {
-                    Text(mainText)
-                        .foregroundColor(mainColor)
-                        .font(.avenirNext(size: 20))
+                    NavigationLink {
+                        LD(location: .constant(locationStore.hauntedHotels.first(where: { $0.location.name == mainText }) ?? LocationModel.example))
+                    } label: {
+                        
+                        Text(mainText)
+                            .foregroundColor(mainColor)
+                            .font(.avenirNext(size: 20))
+                    }
+
                 }
                 
                 Text(subText)

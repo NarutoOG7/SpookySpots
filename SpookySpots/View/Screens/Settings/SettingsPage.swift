@@ -24,10 +24,11 @@ struct SettingsPage: View {
             ScrollView {
             VStack(alignment: .leading) {
                 Account()
+                    .padding(.bottom, 20)
                 about
                 admin
                 addLocationView
-                    .padding(.top, 85)
+                    .padding(.top, 50)
             }
             .
                 padding(.vertical, 30)

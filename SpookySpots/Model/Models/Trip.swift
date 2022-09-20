@@ -13,12 +13,17 @@ import MapKit
 struct Trip: Equatable, Identifiable {
     
     var id: String
+    var name: String
     var userID: String
     var isActive: Bool
     var destinations: [Destination]
     var startLocation: Destination
     var endLocation: Destination
     var routes: [Route]
+    var remainingSteps: [Route.Step]
+    var completedStepCount: Int16
+    var totalStepCount: Int16
+    var isNavigating: Bool
     
     var nextDestination: Destination?
     var recentlyCompletedDestination: Destination?
@@ -28,20 +33,30 @@ struct Trip: Equatable, Identifiable {
      
     //MARK: - Init from Code
     init(id: String = "",
+         name: String,
          userID: String = "",
          isActive: Bool = true,
          destinations: [Destination] = [],
          startLocation: Destination = Destination(),
          endLocation: Destination = Destination(),
-         routes: [Route] = []) {
+         routes: [Route] = [],
+         remainingSteps: [Route.Step],
+         completedStepCount: Int16,
+         totalStepCount: Int16,
+         isNavigating: Bool) {
         
         self.id = id
+        self.name = name
         self.userID = userID
         self.isActive = isActive
         self.destinations = destinations
         self.startLocation = startLocation
         self.endLocation = endLocation
         self.routes = routes
+        self.remainingSteps = remainingSteps
+        self.completedStepCount = completedStepCount
+        self.totalStepCount = totalStepCount
+        self.isNavigating = isNavigating
     }
     
     //MARK: - Init From CoreDataTrip
@@ -128,7 +143,8 @@ struct Trip: Equatable, Identifiable {
                 var steps = [Route.Step]()
                 if let cdSteps = cdRoute.steps?.allObjects as? [CDStep] {
                     for step in cdSteps {
-                        let step = Route.Step(distanceInMeters: step.distance,
+                        let step = Route.Step(id: step.id,
+                                              distanceInMeters: step.distance,
                                               instructions: step.instructions,
                                               latitude: step.latitude,
                                               longitude: step.longitude)
@@ -216,14 +232,31 @@ struct Trip: Equatable, Identifiable {
 //            }
 //        }
         
+        var remainigSteps: [Route.Step] = []
+        if let cdRemainigSteps = cdTrip.remainingSteps?.allObjects as? [CDStep] {
+            for cdStep in cdRemainigSteps {
+                let step = Route.Step(id: cdStep.id,
+                                      distanceInMeters: cdStep.distance,
+                                      instructions: cdStep.instructions,
+                                      latitude: cdStep.latitude,
+                                      longitude: cdStep.longitude)
+                remainigSteps.append(step)
+            }
+        }
+        
 
         self.id = cdTrip.id ?? ""
+        self.name = cdTrip.name ?? ""
         self.userID = cdTrip.userID ?? ""
         self.isActive = cdTrip.isActive
         self.destinations = destinations
         self.startLocation = start
         self.endLocation = end
         self.routes = routes
+        self.remainingSteps = remainigSteps
+        self.completedStepCount = cdTrip.completedStepCount
+        self.totalStepCount = cdTrip.totalStepCount
+        self.isNavigating = cdTrip.isNavigating
         
         self.completedDestinations = completedDests
         self.remainingDestinations = remainingDests

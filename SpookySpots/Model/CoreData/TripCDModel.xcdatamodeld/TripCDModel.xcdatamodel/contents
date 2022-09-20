@@ -59,6 +59,14 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <relationship name="trip" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDTrip" inverseName="remainingDestinations" inverseEntity="CDTrip"/>
     </entity>
+    <entity name="CDRemainingStep" representedClassName="CDRemainingStep" syncable="YES" codeGenerationType="class">
+        <attribute name="distance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="instructions" optional="YES" attributeType="String"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="trip" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDTrip" inverseName="remainingSteps" inverseEntity="CDTrip"/>
+    </entity>
     <entity name="CDRoute" representedClassName="CDRoute" syncable="YES" codeGenerationType="class">
         <attribute name="collectionID" optional="YES" attributeType="String"/>
         <attribute name="distanceInMeters" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -79,14 +87,19 @@
     </entity>
     <entity name="CDStep" representedClassName="CDStep" syncable="YES" codeGenerationType="class">
         <attribute name="distance" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="instructions" optional="YES" attributeType="String"/>
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="route" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDRoute" inverseName="steps" inverseEntity="CDRoute"/>
     </entity>
     <entity name="CDTrip" representedClassName="CDTrip" syncable="YES" codeGenerationType="class">
+        <attribute name="completedStepCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="isActive" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isNavigating" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="totalStepCount" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="userID" optional="YES" attributeType="String"/>
         <relationship name="completedDestinations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDCompletedDest" inverseName="trip" inverseEntity="CDCompletedDest"/>
         <relationship name="destinations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDDestination" inverseName="trip" inverseEntity="CDDestination"/>
@@ -94,21 +107,23 @@
         <relationship name="nextDestination" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDNextDestination" inverseName="trip" inverseEntity="CDNextDestination"/>
         <relationship name="recentlyCompletedDestination" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDRecentCompleteDestination" inverseName="trip" inverseEntity="CDRecentCompleteDestination"/>
         <relationship name="remainingDestinations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDRemainingDest" inverseName="trip" inverseEntity="CDRemainingDest"/>
+        <relationship name="remainingSteps" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDRemainingStep" inverseName="trip" inverseEntity="CDRemainingStep"/>
         <relationship name="routes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDRoute" inverseName="trip" inverseEntity="CDRoute"/>
         <relationship name="startPoint" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDStartPoint" inverseName="trip" inverseEntity="CDStartPoint"/>
     </entity>
     <elements>
+        <element name="CDCompletedDest" positionX="0" positionY="126" width="128" height="119"/>
         <element name="CDDestination" positionX="-63" positionY="-18" width="128" height="119"/>
         <element name="CDEndPoint" positionX="-36" positionY="9" width="128" height="119"/>
-        <element name="CDRoute" positionX="-54" positionY="-9" width="128" height="149"/>
-        <element name="CDTrip" positionX="-18" positionY="27" width="128" height="194"/>
-        <element name="CDRecentCompleteDestination" positionX="-36" positionY="90" width="128" height="119"/>
         <element name="CDNextDestination" positionX="-27" positionY="99" width="128" height="119"/>
-        <element name="CDRemainingDest" positionX="-18" positionY="108" width="128" height="119"/>
-        <element name="CDCompletedDest" positionX="0" positionY="126" width="128" height="119"/>
-        <element name="CDStartPoint" positionX="9" positionY="135" width="128" height="119"/>
-        <element name="CDStep" positionX="18" positionY="153" width="128" height="104"/>
-        <element name="CDPolyline" positionX="36" positionY="162" width="128" height="74"/>
         <element name="CDPoint" positionX="-9" positionY="108" width="128" height="89"/>
+        <element name="CDPolyline" positionX="36" positionY="162" width="128" height="74"/>
+        <element name="CDRecentCompleteDestination" positionX="-36" positionY="90" width="128" height="119"/>
+        <element name="CDRemainingDest" positionX="-18" positionY="108" width="128" height="119"/>
+        <element name="CDRoute" positionX="-54" positionY="-9" width="128" height="149"/>
+        <element name="CDStartPoint" positionX="9" positionY="135" width="128" height="119"/>
+        <element name="CDStep" positionX="18" positionY="153" width="128" height="119"/>
+        <element name="CDTrip" positionX="-18" positionY="27" width="128" height="269"/>
+        <element name="CDRemainingStep" positionX="-9" positionY="117" width="128" height="119"/>
     </elements>
 </model>

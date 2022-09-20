@@ -13,6 +13,8 @@ struct RouteHelper: View {
     
     @EnvironmentObject var tripLogic: TripLogic
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     var body: some View {
         VStack {
             
@@ -43,7 +45,7 @@ struct RouteHelper: View {
                     
                 }
                 .padding()
-                .background(Color.white.cornerRadius(20))
+                .background(weenyWitch.lightest.cornerRadius(20))
             }
             .padding()
             .padding(.top, 100)
@@ -77,10 +79,13 @@ struct RouteHelper: View {
         Button(action: moreRoutesTapped) {
             if tripLogic.alternateRouteState == .selected && tripLogic.selectedAlternate != nil {
                 Text("DONE")
+                    .foregroundColor(weenyWitch.orange)
             } else if tripLogic.alternateRouteState == .showingAll {
                 Text("cancel")
+                    .foregroundColor(weenyWitch.orange)
             } else {
                 Image(systemName: "arrow.triangle.2.circlepath")
+                    .foregroundColor(weenyWitch.orange)
             }
         }
         .padding(.top)

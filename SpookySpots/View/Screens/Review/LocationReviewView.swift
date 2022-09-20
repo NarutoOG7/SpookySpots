@@ -321,6 +321,7 @@ struct UserInputCellWithIcon: View {
                                 self.shouldShowErrorMessage = false
                             }
                         }
+                        
                 }
             }
             if hasDivider {

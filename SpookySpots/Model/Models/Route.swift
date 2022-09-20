@@ -5,7 +5,7 @@
 //  Created by Spencer Belton on 7/25/22.
 //
 
-import Foundation
+import SwiftUI
 import MapKit
 
 struct Route: Identifiable, Equatable {
@@ -45,6 +45,7 @@ struct Route: Identifiable, Equatable {
     
     //MARK: - Step
     struct Step: Equatable, Hashable {
+        var id: Int16?
         var distanceInMeters: Double?
         var instructions: String?
         var latitude: Double?
@@ -59,3 +60,13 @@ struct Route: Identifiable, Equatable {
     }
 }
 
+
+class RoutePolyline: MKPolyline, Identifiable {
+    var id = UUID()
+    var parentCollectionID: String?
+    var color: Color?
+    var startLocation: Destination?
+    var endLocation: Destination?
+    var pts: [Route.Point]?
+    var routeID: String?
+}

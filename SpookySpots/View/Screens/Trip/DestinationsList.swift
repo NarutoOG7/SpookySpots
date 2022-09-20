@@ -42,7 +42,7 @@ struct DestinationsList: View {
             editable: true)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
-        .listRowInsets(EdgeInsets(top: -1, leading: 0, bottom: 0, trailing: 0))
+        .listRowInsets(EdgeInsets(top: -0.5, leading: 0, bottom: 0, trailing: 0))
     }
     
     private var forEachDestination: some View {
@@ -61,7 +61,7 @@ struct DestinationsList: View {
         .onDelete(perform: delete(at:))
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
-        .listRowInsets(EdgeInsets(top: -1, leading: 0, bottom: 0, trailing: 0))
+        .listRowInsets(EdgeInsets(top: -0.5, leading: 0, bottom: 0, trailing: 0))
         
     }
     
@@ -79,7 +79,7 @@ struct DestinationsList: View {
             editable: true)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
-        .listRowInsets(EdgeInsets(top: -1, leading: 0, bottom: 0, trailing: 0))
+        .listRowInsets(EdgeInsets(top: -0.5, leading: 0, bottom: 0, trailing: 0))
     }
     
     //MARK: - Methods
@@ -95,12 +95,17 @@ struct DestinationsList: View {
             if let newFirst = destinations.first,
                let newLast = destinations.last {
             let newTrip = Trip(id: oldTrip.id,
+                               name: oldTrip.name,
                                userID: oldTrip.userID,
                                isActive: oldTrip.isActive,
                                destinations: destinations,
                                startLocation: newFirst,
                                endLocation: newLast,
-                               routes: oldTrip.routes)
+                               routes: oldTrip.routes,
+                               remainingSteps: oldTrip.remainingSteps,
+                               completedStepCount: Int16(oldTrip.completedStepCount),
+                               totalStepCount: Int16(oldTrip.totalStepCount),
+                               isNavigating: oldTrip.isNavigating)
             tripLogic.currentTrip = newTrip
             }
         }
