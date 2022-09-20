@@ -818,7 +818,7 @@ class TripLogic: ObservableObject {
 //                        self.currentTrip?.remainingSteps.append(step)
 //                    }
 //                }
-            }
+//            }
             
         }
         

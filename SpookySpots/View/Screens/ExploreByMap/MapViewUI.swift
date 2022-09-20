@@ -25,19 +25,19 @@ struct MapViewUI: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         
         mapView.setRegion(exploreVM.searchRegion, animated: true)
-        //        setCurrentLocationRegion()
         mapView.mapType = .standard
         mapView.isRotateEnabled = false
         mapView.isPitchEnabled = false
-        if mapIsForExplore {
-        mapView.addAnnotations(geoFireManager.gfOnMapLocations)
-        }
         mapView.delegate = context.coordinator
+        
+        self.addCorrectOverlays()
         
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
+        
         self.configureTileOverlay()
+        
         return mapView
     }
     
@@ -45,6 +45,11 @@ struct MapViewUI: UIViewRepresentable {
         if tripLogic.currentTrip?.isNavigating ?? false {
             mapView.setRegion(tripLogic.mapRegion, animated: true)
         }
+        self.addCorrectOverlays()
+        self.configureTileOverlay()
+    }
+    
+    func addCorrectOverlays() {
         if mapIsForExplore {
             mapView.addAnnotations(geoFireManager.gfOnMapLocations)
             mapView.region = exploreVM.searchRegion
@@ -56,7 +61,6 @@ struct MapViewUI: UIViewRepresentable {
             addAlternateRoutes(to: mapView)
             addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
         }
-        self.configureTileOverlay()
     }
     
     func addCurrentLocation(to view: MKMapView) {

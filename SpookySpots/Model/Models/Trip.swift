@@ -19,7 +19,11 @@ struct Trip: Equatable, Identifiable {
     var destinations: [Destination]
     var startLocation: Destination
     var endLocation: Destination
-    var routes: [Route]
+    var routes: [Route] {
+        willSet {
+            self.assignRemainingSteps()
+        }
+    }
     var remainingSteps: [Route.Step]
     var completedStepCount: Int16
     var totalStepCount: Int16
@@ -263,6 +267,16 @@ struct Trip: Equatable, Identifiable {
         self.nextDestination = nextDest
         self.recentlyCompletedDestination = recentCompletedDest
         
+    }
+    
+    mutating func assignRemainingSteps() {
+        var steps = [Route.Step]()
+        for route in self.routes {
+            for step in route.steps.sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) {
+                steps.append(step)
+            }
+        }
+        self.remainingSteps = steps
     }
     
     

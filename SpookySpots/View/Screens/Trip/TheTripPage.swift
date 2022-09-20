@@ -62,7 +62,9 @@ struct TheTripPage: View {
             self.tripTitleInput = tripLogic.currentTrip?.name ?? ""
         }
 
-        
+        .onDisappear {
+            tripLogic.currentTrip?.name = tripTitleInput
+        }
     }
     
     
