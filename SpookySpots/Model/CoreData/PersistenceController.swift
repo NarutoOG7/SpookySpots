@@ -22,7 +22,7 @@ struct PersistenceController {
                 fatalError("Error: \(error.localizedDescription)")
             }
         }
-//        deleteAll()
+        deleteAll()
     }
     
     
@@ -75,8 +75,8 @@ struct PersistenceController {
         }
     }
     
-    func createOrUpdateTrip(_ trip: Trip) {
-        let context = container.viewContext
+    func createOrUpdateTrip(_ trip: Trip, context: NSManagedObjectContext) {
+//        let context = container.viewContext
         do {
 //            try context.performAndWait {
                 
@@ -211,12 +211,11 @@ struct PersistenceController {
                 
                 
                 newTrip.id = trip.id
-                newTrip.name = trip.name
                 newTrip.isActive = trip.isActive
                 newTrip.userID = UserStore.instance.user.id
                 newTrip.completedStepCount = trip.completedStepCount
                 newTrip.totalStepCount = trip.totalStepCount
-                newTrip.isNavigating = trip.isNavigating
+                newTrip.tripState = trip.tripState.rawValue
 
 
                 
@@ -227,6 +226,8 @@ struct PersistenceController {
                 if let tripToUpdate = trips.first {
                     tripToUpdate.removeFromDestinations(tripToUpdate.destinations ?? [])
                     tripToUpdate.removeFromRoutes(tripToUpdate.routes ?? [])
+                    tripToUpdate.removeFromRemainingSteps(tripToUpdate.remainingSteps ?? [])
+                    tripToUpdate.removeFromCompletedDestinations(tripToUpdate.completedDestinations ?? [])
 
                     print(tripToUpdate.routes?.count)
                     for route in trip.routes {
@@ -360,10 +361,9 @@ struct PersistenceController {
                     tripToUpdate.recentlyCompletedDestination = recentCompleteDestContext
                     
                     
-                    tripToUpdate.name = trip.name
                     tripToUpdate.completedStepCount = trip.completedStepCount
                     tripToUpdate.totalStepCount = trip.totalStepCount
-                    tripToUpdate.isNavigating = trip.isNavigating
+                    tripToUpdate.tripState = trip.tripState.rawValue
                 }
                 
                 

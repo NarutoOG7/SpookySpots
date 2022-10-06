@@ -20,7 +20,7 @@ struct MapViewUI: UIViewRepresentable {
     
     let mapView = MKMapView()
     
-    var mapIsForExplore: Bool
+    var mapIsForExplore: Bool = true
     
     func makeUIView(context: Context) -> MKMapView {
         
@@ -30,8 +30,21 @@ struct MapViewUI: UIViewRepresentable {
         mapView.isPitchEnabled = false
         mapView.delegate = context.coordinator
         
-        self.addCorrectOverlays()
-        
+//        addCorrectOverlays()
+        DispatchQueue.background {
+            
+        if mapIsForExplore {
+            mapView.addAnnotations(geoFireManager.gfOnMapLocations)
+            mapView.region = exploreVM.searchRegion
+            addCurrentLocation(to: mapView)
+        } else {
+            addRoute(to: mapView)
+            addPlacemarks(to: mapView)
+            addStartAndEndLocations(to: mapView)
+            addAlternateRoutes(to: mapView)
+            addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
+        }
+        }
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
@@ -42,11 +55,25 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        if tripLogic.currentTrip?.isNavigating ?? false {
-            mapView.setRegion(tripLogic.mapRegion, animated: true)
+//        if tripLogic.currentTrip?.tripState == .navigating {
+//            mapView.setRegion(tripLogic.mapRegion, animated: true)
+//        }
+//        addCorrectOverlays()
+        DispatchQueue.background {
+        
+        if mapIsForExplore {
+            mapView.addAnnotations(geoFireManager.gfOnMapLocations)
+            mapView.region = exploreVM.searchRegion
+            addCurrentLocation(to: mapView)
+        } else {
+            addRoute(to: mapView)
+            addPlacemarks(to: mapView)
+            addStartAndEndLocations(to: mapView)
+            addAlternateRoutes(to: mapView)
+            addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
         }
-        self.addCorrectOverlays()
-        self.configureTileOverlay()
+        }
+////        //self.configureTileOverlay()
     }
     
     func addCorrectOverlays() {
@@ -128,7 +155,7 @@ struct MapViewUI: UIViewRepresentable {
     func setCurrentLocationRegion() {
         if UserLocationManager.instance.locationServEnabled,
            let currentLoc = UserStore.instance.currentLocation {
-            mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: false)
+            mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: true)
             exploreVM.searchRegion = mapView.region
         }
     }
@@ -350,7 +377,7 @@ struct MapViewUI: UIViewRepresentable {
         
         @objc func mapTapped(_ tap: TapGestureRecognizer) {
             
-            if tap.state == .recognized && !(tripLogic.currentTrip?.isNavigating ?? false) {
+            if (tap.state == .recognized) && !(tripLogic.currentTrip?.tripState == .navigating) {
                 
                 if let map = tap.map {
                     

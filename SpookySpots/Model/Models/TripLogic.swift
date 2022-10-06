@@ -180,8 +180,12 @@ class TripLogic: ObservableObject {
                 }
                 self.setCenterOnRoute()
                 
-                
-                PersistenceController.shared.createOrUpdateTrip(newValue)
+                DispatchQueue.main.async {
+                    
+                    let persist = PersistenceController.shared
+                    let context = persist.container.viewContext
+                    persist.createOrUpdateTrip(newValue, context: context)
+                }
             }
         }
     }
@@ -247,67 +251,14 @@ class TripLogic: ObservableObject {
                         
             self.currentTrip = PersistenceController.shared.activeTrip()
             
-//  //          loadFromFirebase()
-//            if let first = cdTrips.first {
-//            self.coreDataTrip = first
-//                self.currentTrip = PersistenceController.shared.cdTripToTrip(first)
-//            }
-// //            self.currentTrip = self.trips.last
-//            if let cdTrip = coreDataTrip {
-//
-//                var destinations: [Destination] = []
-//
-//                var start = Destination(id: "", lat: 0, lon: 0, name: "")
-//                var end = Destination(id: "", lat: 0, lon: 0, name: "")
-//
-//                var routes: [Route] = []
-//
-//                if let cdDestinations = cdTrip.destinations?.allObjects as? [Destination] {
-//
-//                    destinations = cdDestinations
-//                }
-//
-//                if let endPoints = cdTrip.endPoints?.allObjects as? [Destination] {
-//                    if let cdStart = endPoints.first(where: { $0.id == "Start" }),
-//                        let cdEnd = endPoints.first(where: { $0.id == "End" }) {
-//                        start = cdStart
-//                        end = cdEnd
-//                    }
-//                }
-//
-//                if let cdRoutes = cdTrip.routes?.allObjects as? [Route] {
-//                    routes = cdRoutes
-//                }
-//
-//                let trip = Trip(
-//                    id: cdTrip.id ?? "",
-//                    userID: cdTrip.userID ?? "",
-//                    isActive: cdTrip.isActive,
-//                    destinations: destinations,
-//                    startLocation: start,
-//                    endLocation: end,
-//                    routes: routes)
-//
-//
-//                self.currentTrip = trip
-//            } else {
-//
-//            }
-            
             if let trip = currentTrip {
-                                
-//                self.destinations = trip.destinations
-//                locationStore.activeTripLocations = destinations
-//
-                
+       
                 mapRegion = MKCoordinateRegion(center:
                                                 CLLocationCoordinate2D(
                                                     latitude: trip.startLocation.lat,
                                                     longitude: trip.startLocation.lon),
                                                span: MapDetails.defaultSpan)
                 
-//                self.coreDataTrip = coreDataManager.fetchCDTrip(trip)
-
             } else {
                 resetTrip()
                 mapRegion = MapDetails.defaultRegion
@@ -317,42 +268,37 @@ class TripLogic: ObservableObject {
     }
     
     func resetTrip() {
+        
         if let currentLoc = userStore.currentLocation {
             
-            var currentLocAddress = Address()
             firebaseManager.getAddressFrom(coordinates: currentLoc.coordinate) { address in
-                currentLocAddress = address
-            
-            
-            let startLoc = Destination(id: UUID().uuidString,
+                
+                let startLoc = Destination(id: UUID().uuidString,
                                        lat: currentLoc.coordinate.latitude,
                                        lon: currentLoc.coordinate.longitude,
-                                       address: currentLocAddress.streetCityState(),
+                                       address: address.streetCityState(),
                                        name: "Current Location")
-            
-            let endLoc = Destination(id: UUID().uuidString,
+                
+               let endLoc = Destination(id: UUID().uuidString,
                                      lat: currentLoc.coordinate.latitude,
                                      lon: currentLoc.coordinate.longitude,
-                                     address: currentLocAddress.streetCityState(),
+                                     address: address.streetCityState(),
                                      name: "Current Location")
-            
-            var trip = Trip(id: UUID().uuidString,
-                            name: "",
-                            userID: self.userStore.user.id,
-                            isActive: true,
-                            destinations: [],
-                            startLocation: startLoc,
-                            endLocation: endLoc,
-                            routes: [],
-                            remainingSteps: [],
-                            completedStepCount: 0,
-                            totalStepCount: 0,
-                            isNavigating: false)
-            trip.recentlyCompletedDestination = startLoc
-            trip.nextDestination = endLoc
-            
-            self.currentTrip = trip
+                var trip = Trip(id: UUID().uuidString,
+                                userID: self.userStore.user.id,
+                                isActive: true,
+                                destinations: [],
+                                startLocation: startLoc,
+                                endLocation: endLoc,
+                                routes: [],
+                                remainingSteps: [],
+                                completedStepCount: 0,
+                                totalStepCount: 0,
+                                tripState: .building)
+                trip.recentlyCompletedDestination = startLoc
+                trip.nextDestination = endLoc
                 
+                self.currentTrip = trip
             }
         }
     }
@@ -604,7 +550,8 @@ class TripLogic: ObservableObject {
             if let error = error {
                 print(error.localizedDescription)
             }
-            guard let response = response else { return }
+            if let response = response {
+            
             
             var routesToReturn: [Route] = []
             
@@ -612,73 +559,35 @@ class TripLogic: ObservableObject {
 //            let tripPosition = 0
             
             for rt in response.routes.prefix(3) {
+                
                                 
-                var myPointsArray = [Route.Point]()
+//                var myPointsArray = [Route.Point]()
                 
                 let routeID = UUID().uuidString
 
                 let coordsPointer = UnsafeMutablePointer<CLLocationCoordinate2D>.allocate(capacity: rt.polyline.pointCount)
                 rt.polyline.getCoordinates(coordsPointer, range: NSMakeRange(0, rt.polyline.pointCount))
                 
-//                var index = 0
 //                var coords: [CLLocationCoordinate2D] = []
-//                for i in 0..<rt.polyline.pointCount {
-//                    let coord = coordsPointer[i]
-//                    coords.append(coord)
-//                    let point = Route.Point(index: index, latitude: coord.latitude, longitude: coord.longitude)
-//                    myPointsArray.append(point)
-//                    index += 1
-//                }
-                var coords: [CLLocationCoordinate2D] = []
 
-                pointsFromUnsafePointer(rt: rt) { points in
-                    myPointsArray = points
-                    for point in points.sorted(by: { $0.index ?? 0 < $1.index ?? 1 }) {
-                        let coord = CLLocationCoordinate2D(latitude: point.latitude ?? 0, longitude: point.longitude ?? 0)
-                        coords.append(coord)
-                    }
-                }
-//                for pt in UnsafeBufferPointer(start: rt.polyline.points(),
-//                                              count: rt.polyline.pointCount) {
-//                for pt in UnsafeBufferPointer(start: rt.polyline., count: rt.polyline.pointCount) {
-//                    let point = Route.Point(x: pt.x,
-//                                            y: pt.y,
-//                                            latitude: pt.coordinate.latitude,
-//                                            longitude: pt.coordinate.longitude)
-//                    myPointsArray.append(point)
+//                pointsFromUnsafePointer(rt: rt) { points in
+//                    myPointsArray = points
+//                    for point in points.sorted(by: { $0.index ?? 0 < $1.index ?? 1 }) {
+//                        let coord = CLLocationCoordinate2D(latitude: point.latitude ?? 0, longitude: point.longitude ?? 0)
+//                        coords.append(coord)
+//                    }
 //                }
-                
-//                let polyline = RoutePolyline(parentCollectionID: end.id,
-//                                             color: K.Colors.WeenyWitch.orange,
-//                                             route: nil,
-//                                             startLocation: start,
-//                                             endLocation: end,
-//                                             pts: myPointsArray)
-//                let polyline = RoutePolyline(points: rt.polyline.points(),
-//                                             count: rt.polyline.pointCount)
-                let polyline = RoutePolyline(points: rt.polyline.points(), count: coords.count)
+
+                let polyline = RoutePolyline(points: rt.polyline.points(), count: rt.polyline.pointCount)
                 polyline.startLocation = start
                 polyline.endLocation = end
                 polyline.parentCollectionID = end.id
-                polyline.pts = myPointsArray
+//                polyline.pts = myPointsArray
                 polyline.routeID = routeID
-                                
-
-//                var i = 0
-//                var len = poly.pointCount
-//                while i < len {
-//                    let point = myPointsArray[i]
-//                    let pt = Route.Point(x: point.x, y: point.y, latitude: point.coordinate.latitude, longitude: point.coordinate.longitude)
-//                    polyline.pts?.append(pt)
-//                    i += 1
-//                }
-//                for var i = 0, len = poly.pointCount; i < len; i++ {
-//                    let point = myPointsArray[i]
-//                    println(point)
-//                }
                 
- 
-
+                DispatchQueue.background {
+                polyline.setPointCoordinates(rt)
+                }
                 
                 var steps = [Route.Step]()
                 var index: Int16 = 0
@@ -705,25 +614,25 @@ class TripLogic: ObservableObject {
                 
                 routesToReturn.append(route)
                 count += 1
-                //                            completion(route)
             }
+                completion(routesToReturn)
             
-            completion(routesToReturn)
-        }
-        func pointsFromUnsafePointer(rt: MKRoute, completion: @escaping([Route.Point]) -> (Void)) {
-            var index = 0
-            var points = [Route.Point]()
-            for pt in UnsafeBufferPointer(start: rt.polyline.points(),
-                                          count: rt.polyline.pointCount) {
-
-                let point = Route.Point(index: index,
-                                        latitude: pt.coordinate.latitude,
-                                        longitude: pt.coordinate.longitude)
-                index += 1
-                points.append(point)
             }
-            completion(points)
         }
+//        func pointsFromUnsafePointer(rt: MKRoute, completion: @escaping([Route.Point]) -> (Void)) {
+//            var index = 0
+//            var points = [Route.Point]()
+//            for pt in UnsafeBufferPointer(start: rt.polyline.points(),
+//                                          count: rt.polyline.pointCount) {
+//
+//                let point = Route.Point(index: index,
+//                                        latitude: pt.coordinate.latitude,
+//                                        longitude: pt.coordinate.longitude)
+//                index += 1
+//                points.append(point)
+//            }
+//            completion(points)
+//        }
     }
     
     
@@ -798,7 +707,7 @@ class TripLogic: ObservableObject {
     
     func startTrip() {
         
-        self.currentTrip?.isNavigating = true
+        self.currentTrip?.tripState = .navigating
         
         if let currentLoc = userStore.currentLocation {
             self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
@@ -836,7 +745,7 @@ class TripLogic: ObservableObject {
         self.currentRoute = nil
         self.routeIsHighlighted = false
         self.shouldShowAlertForClearingTrip = true
-        self.currentTrip?.isNavigating = false
+        self.currentTrip?.tripState = .finished
     }
     
 }

@@ -13,7 +13,6 @@ import MapKit
 struct Trip: Equatable, Identifiable {
     
     var id: String
-    var name: String
     var userID: String
     var isActive: Bool
     var destinations: [Destination]
@@ -27,7 +26,7 @@ struct Trip: Equatable, Identifiable {
     var remainingSteps: [Route.Step]
     var completedStepCount: Int16
     var totalStepCount: Int16
-    var isNavigating: Bool
+    var tripState: TripState
     
     var nextDestination: Destination?
     var recentlyCompletedDestination: Destination?
@@ -37,7 +36,6 @@ struct Trip: Equatable, Identifiable {
      
     //MARK: - Init from Code
     init(id: String = "",
-         name: String,
          userID: String = "",
          isActive: Bool = true,
          destinations: [Destination] = [],
@@ -47,10 +45,9 @@ struct Trip: Equatable, Identifiable {
          remainingSteps: [Route.Step],
          completedStepCount: Int16,
          totalStepCount: Int16,
-         isNavigating: Bool) {
+         tripState: TripState) {
         
         self.id = id
-        self.name = name
         self.userID = userID
         self.isActive = isActive
         self.destinations = destinations
@@ -60,7 +57,7 @@ struct Trip: Equatable, Identifiable {
         self.remainingSteps = remainingSteps
         self.completedStepCount = completedStepCount
         self.totalStepCount = totalStepCount
-        self.isNavigating = isNavigating
+        self.tripState = tripState
     }
     
     //MARK: - Init From CoreDataTrip
@@ -237,7 +234,7 @@ struct Trip: Equatable, Identifiable {
 //        }
         
         var remainigSteps: [Route.Step] = []
-        if let cdRemainigSteps = cdTrip.remainingSteps?.allObjects as? [CDStep] {
+        if let cdRemainigSteps = cdTrip.remainingSteps?.allObjects as? [CDRemainingStep] {
             for cdStep in cdRemainigSteps {
                 let step = Route.Step(id: cdStep.id,
                                       distanceInMeters: cdStep.distance,
@@ -250,7 +247,6 @@ struct Trip: Equatable, Identifiable {
         
 
         self.id = cdTrip.id ?? ""
-        self.name = cdTrip.name ?? ""
         self.userID = cdTrip.userID ?? ""
         self.isActive = cdTrip.isActive
         self.destinations = destinations
@@ -260,7 +256,9 @@ struct Trip: Equatable, Identifiable {
         self.remainingSteps = remainigSteps
         self.completedStepCount = cdTrip.completedStepCount
         self.totalStepCount = cdTrip.totalStepCount
-        self.isNavigating = cdTrip.isNavigating
+        
+        let state = TripState.building.stateForString(cdTrip.tripState ?? "")
+        self.tripState = state
         
         self.completedDestinations = completedDests
         self.remainingDestinations = remainingDests
@@ -291,6 +289,39 @@ struct Trip: Equatable, Identifiable {
 enum TripDetails: String {
     case startingLocationID = "StartID123"
     case endLocationID = "EndID123"
+}
+
+enum TripState: String {
+    case building
+    case navigating
+    case paused
+    case finished
+ 
+    func stateForString(_ string: String) -> TripState {
+        switch string {
+        case "building":
+            return .building
+        case "navigating":
+            return .navigating
+        case "paused":
+            return .paused
+        case "finished":
+            return .finished
+        default:
+            return .building
+        }
+    }
+    
+    func buttonTitle() -> String {
+        switch self {
+        case .building,
+                .paused:
+            return "HUNT"
+        case .navigating,
+                .finished:
+            return "END"
+        }
+    }
 }
 
 //MARK: - DirectionsRequest to get specific Route upon init

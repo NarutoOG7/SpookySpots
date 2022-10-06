@@ -18,7 +18,7 @@ struct SpookySpotsApp: App {
     @StateObject var locationStore = LocationStore.instance
     
     @StateObject var network = Network()
-    
+        
     @Environment(\.scenePhase) var scenePhase
         
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -30,6 +30,11 @@ struct SpookySpotsApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(locationStore)
                 .environmentObject(network)
+//                .onDisappear {
+//                    if let trip = TripLogic.instance.currentTrip {
+//                        persistenceController.createOrUpdateTrip(trip)
+//                    }
+//                }
 
         }
         

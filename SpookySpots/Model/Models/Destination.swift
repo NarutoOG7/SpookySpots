@@ -34,4 +34,6 @@ struct Destination: Codable, Equatable, Identifiable {
         self.address = address
         self.name = name
     }
+    
+    static let base = Destination(id: "BASE", lat: 39.5501, lon: -105.7821, address: "", name: "BASE")
 }

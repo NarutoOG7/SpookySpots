@@ -21,15 +21,13 @@ struct ExploreByMap: View {
     @ObservedObject var locationStore = LocationStore.instance
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
-    
-    @ObservedObject var mapVM = MapVM.instance
-    
-//    let map = MapViewUI(mapIsForExplore: true)
+        
+    let map = MapViewUI(mapIsForExplore: true)
     
     var body: some View {
         
         ZStack {
-            mapVM.map
+            map
                 .ignoresSafeArea()
             VStack {
                 SearchBar()
@@ -54,12 +52,12 @@ struct ExploreByMap: View {
                 .padding()
             
         }
-//
-//        .onAppear {
-//            GeoFireManager.instance.startLocationListener(region: map.getRegion())
-//        } .onDisappear {
-//            GeoFireManager.instance.endLocationListener()
-//        }
+
+        .onAppear {
+            GeoFireManager.instance.startLocationListener(region: map.getRegion())
+        } .onDisappear {
+            GeoFireManager.instance.endLocationListener()
+        }
         
         .navigationTitle("Map")
         .navigationBarHidden(true)
@@ -226,7 +224,7 @@ extension ExploreByMap {
     }
     
     func currentLocationPressed() {
-        mapVM.map.setCurrentLocationRegion()
+        map.setCurrentLocationRegion()
     }
 
 }

@@ -69,4 +69,25 @@ class RoutePolyline: MKPolyline, Identifiable {
     var endLocation: Destination?
     var pts: [Route.Point]?
     var routeID: String?
+    
+    func setPointCoordinates(_ rt: MKRoute) {
+        pointsFromUnsafePointer(rt: rt) { points in
+            self.pts = points
+        }
+    }
+    
+    func pointsFromUnsafePointer(rt: MKRoute, completion: @escaping([Route.Point]) -> (Void)) {
+        var index = 0
+        var points = [Route.Point]()
+        for pt in UnsafeBufferPointer(start: rt.polyline.points(),
+                                      count: rt.polyline.pointCount) {
+
+            let point = Route.Point(index: index,
+                                    latitude: pt.coordinate.latitude,
+                                    longitude: pt.coordinate.longitude)
+            index += 1
+            points.append(point)
+        }
+        completion(points)
+    }
 }

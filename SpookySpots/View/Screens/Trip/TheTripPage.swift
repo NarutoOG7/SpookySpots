@@ -7,23 +7,16 @@
 
 import SwiftUI
 
-class MapVM: ObservableObject {
-    static let instance = MapVM()
-    @Published var map = MapViewUI(mapIsForExplore: true)
-}
-
 struct TheTripPage: View {
     
     let weenyWitch = K.Colors.WeenyWitch.self
-    
-    @State var tripTitleInput = ""
-    
+        
     @State var isShowingMoreSteps = false
     
     @State var isShowingEditSheet = false
     
     @State var destinations: [Destination] = []
-    
+        
     @ObservedObject var tripLogic = TripLogic.instance
     
     private var map = MapViewUI(mapIsForExplore: false)
@@ -33,9 +26,9 @@ struct TheTripPage: View {
             map
                 .ignoresSafeArea()
                 .environmentObject(TripLogic.instance)
-            
+
             if let currentTrip = tripLogic.currentTrip {
-                if currentTrip.isNavigating {
+                if currentTrip.tripState == .navigating {
                 currentLocationButton
                 routeStepHelper
                 
@@ -55,15 +48,14 @@ struct TheTripPage: View {
         
         .onAppear {
             UITableView.appearance().backgroundColor = .clear
-            self.destinations = []
-            self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
-            tripLogic.currentTrip?.destinations.forEach({ self.destinations.append($0) })
-            self.destinations.append(tripLogic.currentTrip?.endLocation ?? Destination())
-            self.tripTitleInput = tripLogic.currentTrip?.name ?? ""
-        }
-
-        .onDisappear {
-            tripLogic.currentTrip?.name = tripTitleInput
+            DispatchQueue.background {
+                
+                
+                self.destinations = []
+                self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
+                tripLogic.currentTrip?.destinations.forEach({ self.destinations.append($0) })
+                self.destinations.append(tripLogic.currentTrip?.endLocation ?? Destination())
+            }
         }
     }
     
@@ -72,7 +64,10 @@ struct TheTripPage: View {
         VStack(alignment: .leading) {
             HStack {
                 VStack(alignment: .leading, spacing: 12) {
-                    destinationTitle
+
+                    if tripLogic.currentTrip?.tripState == .navigating {
+                        destinationTitle
+                    }
                     totalTripDetails
                 }
                 Spacer()
@@ -94,25 +89,10 @@ struct TheTripPage: View {
     }
     
     var destinationTitle: some View {
-        UserInputCellWithIcon(input: $tripTitleInput,
-                              primaryColor: weenyWitch.lightest,
-                              accentColor: weenyWitch.light,
-                              icon: nil,
-                              placeholderText: "Name Your Trip",
-                              errorMessage: "",
-                              shouldShowErrorMessage: .constant(false),
-                              isSecured: .constant(false),
-                              hasDivider: false,
-                              boldText: true)
-        .padding(.top, -40)
-        .padding(.leading, -15)
-        .onSubmit {
-            tripLogic.currentTrip?.name = tripTitleInput
+        Text(tripLogic.currentTrip?.nextDestination?.name ?? "")
+                .foregroundColor(weenyWitch.lightest)
+
         }
-//        TextField("Trip A*", text: $tripTitleInput)
-//            .foregroundColor(weenyWitch.lightest)
-//            .font(.system(size: 22, weight: .medium))
-    }
     
     private var totalTripDetails: some View {
         DurationDistanceString(time: tripLogic.totalTripDurationAsTime,
@@ -126,15 +106,20 @@ struct TheTripPage: View {
     //MARK: - Buttons
     
     private var huntButton: some View {
-        Button(action: huntTapped) {
-            Text("HUNT")
-                .foregroundColor(weenyWitch.orange)
+        let isFinished = tripLogic.currentTrip?.tripState == .finished
+        return Button(action: huntTapped) {
+            Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "")
+                .foregroundColor(
+                    isFinished ? .gray : weenyWitch.orange)
                 .padding()
                 .overlay(
                 RoundedRectangle(cornerRadius: 20)
-                    .stroke(weenyWitch.orange, lineWidth: 4)
+                    .stroke(
+                        isFinished ? .gray : weenyWitch.orange,
+                        lineWidth: 4)
                 )
         }
+        .disabled(isFinished)
     }
     
     private var currentLocationButton: some View {
@@ -159,7 +144,7 @@ struct TheTripPage: View {
     
     private func huntTapped() {
         // Start Navigation
-        if tripLogic.currentTrip?.isNavigating ?? false {
+        if tripLogic.currentTrip?.tripState == .navigating {
             tripLogic.endDirections()
         } else {
             tripLogic.startTrip()
@@ -181,6 +166,7 @@ struct TheTripPage_Previews: PreviewProvider {
 
 //MARK: - Navigation
 extension TheTripPage {
+    
     private var routeStepHelper: some View {
         VStack {
             VStack {
@@ -194,7 +180,7 @@ extension TheTripPage {
             //            .padding(.top, 100)
             .padding()
             .padding(.top, 20)
-            .background(.black)
+            .background(weenyWitch.brown)
             .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
             Spacer()
             
@@ -202,34 +188,36 @@ extension TheTripPage {
         //        .padding(.top, 75)
     }
     private var currentStep: some View {
+        let orderedSteps = tripLogic.currentTrip?
+            .remainingSteps
+            .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? []
         
-        Button {
+        return Button {
             self.isShowingMoreSteps.toggle()
-            
         } label: {
-            
-            DirectionsLabel(txt: tripLogic.currentTrip?.remainingSteps.first?.instructions ?? "", isShowingMore: $isShowingMoreSteps)
+            DirectionsLabel(txt: orderedSteps.first?.instructions ?? "", isShowingMore: $isShowingMoreSteps)
         }
         .onAppear {
-            if let first = tripLogic.currentTrip?.remainingSteps.first {
+            if let first = orderedSteps.first {
                 if first.instructions == "" {
-                    tripLogic.currentTrip?.remainingSteps.removeFirst()
+                    tripLogic.currentTrip?.remainingSteps.removeAll(where: { $0 == first })
                 }
             }
         }
     }
     
     private var allRemainingSteps: some View {
-        List(tripLogic.currentTrip?
+        let orderedSteps = tripLogic.currentTrip?
             .remainingSteps
-            .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? [],
-             id: \.self) { step in
+            .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? []
+        return List(orderedSteps,
+                    id: \.self) { step in
             
             
             //        ForEach(tripLogic.steps, id: \.self) { step in
             //            VStack(alignment: .leading) {
             //        if !tripLogic.completedSteps.contains(where: { $0 == step }) {
-            if step != tripLogic.currentTrip?.remainingSteps.first {
+            if step != orderedSteps.first {
             if step.instructions != "" {
                 Text(step.instructions ?? "")
                     .foregroundColor(.white)

@@ -30,8 +30,8 @@
             filePath = "SpookySpots/Model/Models/TripLogic.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "601"
-            endingLineNumber = "601"
+            startingLineNumber = "547"
+            endingLineNumber = "547"
             landmarkName = "makeDirectionsRequest(start:end:withCompletion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -48,7 +48,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "374"
             endingLineNumber = "374"
-            landmarkName = "createOrUpdateTrip(_:)"
+            landmarkName = "createOrUpdateTrip(_:context:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -64,7 +64,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "379"
             endingLineNumber = "379"
-            landmarkName = "createOrUpdateTrip(_:)"
+            landmarkName = "createOrUpdateTrip(_:context:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -78,8 +78,8 @@
             filePath = "SpookySpots/Model/Models/Trip.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "321"
-            endingLineNumber = "321"
+            startingLineNumber = "352"
+            endingLineNumber = "352"
             landmarkName = "getSpecificRouteMatching(name:distance:duration:start:end:withCompletion:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -142,10 +142,10 @@
             filePath = "SpookySpots/Model/Models/Trip.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
-            landmarkName = "routes"
-            landmarkType = "24">
+            startingLineNumber = "86"
+            endingLineNumber = "86"
+            landmarkName = "init(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

@@ -95,7 +95,6 @@ struct DestinationsList: View {
             if let newFirst = destinations.first,
                let newLast = destinations.last {
             let newTrip = Trip(id: oldTrip.id,
-                               name: oldTrip.name,
                                userID: oldTrip.userID,
                                isActive: oldTrip.isActive,
                                destinations: destinations,
@@ -105,7 +104,7 @@ struct DestinationsList: View {
                                remainingSteps: oldTrip.remainingSteps,
                                completedStepCount: Int16(oldTrip.completedStepCount),
                                totalStepCount: Int16(oldTrip.totalStepCount),
-                               isNavigating: oldTrip.isNavigating)
+                               tripState: oldTrip.tripState)
             tripLogic.currentTrip = newTrip
             }
         }

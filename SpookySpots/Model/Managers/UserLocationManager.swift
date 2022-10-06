@@ -156,6 +156,7 @@ extension UserLocationManager: CLLocationManagerDelegate {
             tripLogic.currentTrip?.remainingDestinations.removeFirst()
             tripLogic.currentTrip?.nextDestination = tripLogic.currentTrip?.remainingDestinations.first
             locationManager?.monitoredRegions.forEach({ locationManager?.stopMonitoring(for: $0) })
+            tripLogic.currentTrip?.tripState = .paused
         }
     }
     }
