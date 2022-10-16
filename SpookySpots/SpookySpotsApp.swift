@@ -44,7 +44,12 @@ struct SpookySpotsApp: App {
                 
             case .background:
                 print("Scene is in background")
-                persistenceController.save()
+//                persistenceController.save(persistenceController.backgroundContext)
+//                persistenceController.save(persistenceController.backgroundContext) { error in
+//                    if let error = error {
+//                        print(error.localizedDescription)
+//                    }
+//                }
             case .inactive:
                 print("Scene is inactive")
             case .active:

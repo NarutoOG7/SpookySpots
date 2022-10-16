@@ -95,10 +95,21 @@ struct TheTripPage: View {
         }
     
     private var totalTripDetails: some View {
-        DurationDistanceString(time: tripLogic.totalTripDurationAsTime,
-                               distanceString: tripLogic.totalTripDistanceAsLocalUnitString)
+        DurationDistanceString(
+            time:
+                tripLogic.totalTripDurationAsTime,
+            distanceString:
+                tripLogic.totalTripDistanceAsLocalUnitString)
         .foregroundColor(weenyWitch.lightest)
 
+    }
+    
+    private var tripLegDetails: some View {
+        DurationDistanceString(
+            time:
+                tripLogic.currentTrip.currentRoute?.travelTime,
+            distanceString:
+                tripLogic.currentTrip.currentRoute?.distance)
     }
     
  
@@ -108,7 +119,7 @@ struct TheTripPage: View {
     private var huntButton: some View {
         let isFinished = tripLogic.currentTrip?.tripState == .finished
         return Button(action: huntTapped) {
-            Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "")
+            Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "HUNT")
                 .foregroundColor(
                     isFinished ? .gray : weenyWitch.orange)
                 .padding()
@@ -180,7 +191,7 @@ extension TheTripPage {
             //            .padding(.top, 100)
             .padding()
             .padding(.top, 20)
-            .background(weenyWitch.brown)
+            .background(weenyWitch.black)
             .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
             Spacer()
             

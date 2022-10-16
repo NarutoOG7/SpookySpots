@@ -159,6 +159,10 @@ extension UserLocationManager: CLLocationManagerDelegate {
             tripLogic.currentTrip?.tripState = .paused
         }
     }
+        if let currentTrip = tripLogic.currentTrip {
+        PersistenceController.shared.createOrUpdateTrip(currentTrip)
+//        tripLogic.saveCurrentTripOnBackground()
+        }
     }
     
     

@@ -179,13 +179,14 @@ class TripLogic: ObservableObject {
                     self.steps.append(first.steps.first ?? Route.Step())
                 }
                 self.setCenterOnRoute()
-                
-                DispatchQueue.main.async {
-                    
-                    let persist = PersistenceController.shared
-                    let context = persist.container.viewContext
-                    persist.createOrUpdateTrip(newValue, context: context)
-                }
+                PersistenceController.shared.createOrUpdateTrip(newValue)
+//                DispatchQueue.main.async {
+//
+//                    let persist = PersistenceController.shared
+//                    let context = persist.container.viewContext
+//                    persist.createOrUpdateTrip(newValue, context: context)
+//                }
+//                self.saveCurrentTrip()
             }
         }
     }
@@ -249,21 +250,32 @@ class TripLogic: ObservableObject {
                 
         if userStore.isSignedIn || userStore.isGuest {
                         
-            self.currentTrip = PersistenceController.shared.activeTrip()
             
-            if let trip = currentTrip {
-       
-                mapRegion = MKCoordinateRegion(center:
-                                                CLLocationCoordinate2D(
-                                                    latitude: trip.startLocation.lat,
-                                                    longitude: trip.startLocation.lon),
-                                               span: MapDetails.defaultSpan)
-                
+            fetchTrip()
+            
+            self.mapRegion = MKCoordinateRegion(center:
+                                                    CLLocationCoordinate2D(
+                                                        latitude: currentTrip?.startLocation.lat ?? 0,
+                                                        longitude: currentTrip?.startLocation.lon ?? 0),
+                                                span: MapDetails.defaultSpan)
+
+
+            
+        }
+    }
+    
+    func fetchTrip() {
+        PersistenceController.shared.activeTrip { trip in
+
+            if let trip = trip {
+                self.currentTrip = trip
             } else {
-                resetTrip()
-                mapRegion = MapDetails.defaultRegion
+                self.resetTrip()
+                self.mapRegion = MapDetails.defaultRegion
             }
             
+        } onError: { err in
+            // banner error saying troubles fetching trip? Or no error messsage at all if its just not a trip there
         }
     }
     
@@ -325,6 +337,7 @@ class TripLogic: ObservableObject {
         if let rtIndice = self.currentTrip?.routes.firstIndex(where: { $0.collectionID == selectedAlternate?.collectionID }),
            let alt = selectedAlternate {
             self.currentTrip?.routes[rtIndice] = alt
+//            self.saveCurrentTripOnBackground()
         }
     }
     
@@ -414,6 +427,7 @@ class TripLogic: ObservableObject {
             }
             self.destinations.append(destination)
 //            self.locationStore.activeTripLocations.append(destination)
+//            self.saveCurrentTripOnBackground()
         }
     }
     
@@ -423,6 +437,8 @@ class TripLogic: ObservableObject {
 //        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
         self.destinations.removeAll(where: { $0.name == location.location.name })
         self.currentTrip?.routes.removeAll(where: { $0.id == "\(location.location.id)" })
+//        self.saveCurrentTripOnBackground()
+
     }
     
     
@@ -434,6 +450,8 @@ class TripLogic: ObservableObject {
         if currentTrip?.routes.indices.contains(index) ?? false {
             self.currentTrip?.routes.remove(at: index)
         }
+//        self.saveCurrentTripOnBackground()
+
     }
     
     //MARK: - Distance
@@ -473,14 +491,14 @@ class TripLogic: ObservableObject {
     
     func getHighlightedRouteTravelTimeAsDigitalString() -> String? {
         if let travelTime = currentRoute?.travelTime {
-            return formatTime(time: travelTime)
+            return Time().formatTime(time: travelTime)
         }
         return nil
     }
     
     func getHighlightedRouteTravelTimeAsTime() -> Time? {
         if let travelTime = currentRoute?.travelTime {
-            let time = secondsToHoursMinutes(travelTime)
+            let time = Time().secondsToHoursMinutes(travelTime)
             //            self.currentRouteTravelTime = time
             return time
         }
@@ -488,18 +506,7 @@ class TripLogic: ObservableObject {
     }
     
     
-    func secondsToHoursMinutes(_ seconds: Double) -> Time {
-        let hours = Int(seconds) / 3600
-        let minutes = (Int(seconds) % 3600) / 60
-        return Time(hours: hours, minutes: minutes)
-    }
-    
-    func formatTime(time: Double) -> String? {
-        let dateFormatter = DateComponentsFormatter()
-        dateFormatter.allowedUnits = [.hour, .minute]
-        return dateFormatter.string(from: time)
-    }
-    
+
     
     //MARK: - Map
     
@@ -529,6 +536,10 @@ class TripLogic: ObservableObject {
                     var newRoute = route
                     newRoute.tripPosition = self.currentTrip?.routes.count
                     self.currentTrip?.routes.append(newRoute)
+                    DispatchQueue.background {
+                        
+//                        self.saveCurrentTripOnBackground()
+                    }
                 }
             }
         }
@@ -728,6 +739,8 @@ class TripLogic: ObservableObject {
 //                    }
 //                }
 //            }
+                
+//                self.saveCurrentTripOnBackground()
             
         }
         
@@ -748,6 +761,19 @@ class TripLogic: ObservableObject {
         self.currentTrip?.tripState = .finished
     }
     
+    
+    //MARK: - Save Core Data
+    
+//    func saveCurrentTripOnBackground() {
+//        if let currentTrip = currentTrip {
+//            
+//        let persistController = PersistenceController.shared
+//            persistController.container.performBackgroundTask { context in
+//                
+//                persistController.createOrUpdateTrip(currentTrip, context: context)
+//            }
+//        }
+//    }
 }
 
 extension Array where Element == CLLocationCoordinate2D {

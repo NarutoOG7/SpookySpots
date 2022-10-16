@@ -22,6 +22,12 @@ struct Route: Identifiable, Equatable {
     var tripPosition: Int?
 //    var polyline: MKPolyline?
     var polyline: RoutePolyline?
+
+    var time: Time {
+        get {
+            return Time().secondsToHoursMinutes(travelTime)
+        }
+    }
     
     //MARK: - Init from Code
     init(id: String = "",
@@ -42,6 +48,7 @@ struct Route: Identifiable, Equatable {
         self.altPosition = altPosition
         self.tripPosition = tripPosition
     }
+
     
     //MARK: - Step
     struct Step: Equatable, Hashable {

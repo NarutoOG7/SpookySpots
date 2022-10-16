@@ -31,7 +31,6 @@ struct MapViewUI: UIViewRepresentable {
         mapView.delegate = context.coordinator
         
 //        addCorrectOverlays()
-        DispatchQueue.background {
             
         if mapIsForExplore {
             mapView.addAnnotations(geoFireManager.gfOnMapLocations)
@@ -44,7 +43,7 @@ struct MapViewUI: UIViewRepresentable {
             addAlternateRoutes(to: mapView)
             addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
         }
-        }
+        
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
         mapView.addGestureRecognizer(mapTap)
@@ -59,8 +58,7 @@ struct MapViewUI: UIViewRepresentable {
 //            mapView.setRegion(tripLogic.mapRegion, animated: true)
 //        }
 //        addCorrectOverlays()
-        DispatchQueue.background {
-        
+
         if mapIsForExplore {
             mapView.addAnnotations(geoFireManager.gfOnMapLocations)
             mapView.region = exploreVM.searchRegion
@@ -71,7 +69,7 @@ struct MapViewUI: UIViewRepresentable {
             addStartAndEndLocations(to: mapView)
             addAlternateRoutes(to: mapView)
             addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
-        }
+        
         }
 ////        //self.configureTileOverlay()
     }
@@ -138,6 +136,7 @@ struct MapViewUI: UIViewRepresentable {
         if let routes = tripLogic.currentTrip?.routes {
             for route in routes {
                 if let polyline = route.polyline {
+
                     view.addOverlay(polyline)
                 }
             }

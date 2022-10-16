@@ -23,6 +23,9 @@ struct Trip: Equatable, Identifiable {
             self.assignRemainingSteps()
         }
     }
+    
+    var currentRoute: Route
+    
     var remainingSteps: [Route.Step]
     var completedStepCount: Int16
     var totalStepCount: Int16
@@ -42,6 +45,7 @@ struct Trip: Equatable, Identifiable {
          startLocation: Destination = Destination(),
          endLocation: Destination = Destination(),
          routes: [Route] = [],
+         currentRoute: Route,
          remainingSteps: [Route.Step],
          completedStepCount: Int16,
          totalStepCount: Int16,
@@ -54,6 +58,7 @@ struct Trip: Equatable, Identifiable {
         self.startLocation = startLocation
         self.endLocation = endLocation
         self.routes = routes
+        self.currentRoute = currentRoute
         self.remainingSteps = remainingSteps
         self.completedStepCount = completedStepCount
         self.totalStepCount = totalStepCount
@@ -62,7 +67,7 @@ struct Trip: Equatable, Identifiable {
     
     //MARK: - Init From CoreDataTrip
     init(_ cdTrip: CDTrip) {
-        
+                
         var destinations: [Destination] = []
         if let cdDests = cdTrip.destinations?.allObjects as? [CDDestination] {
             for cdDest in cdDests {
@@ -127,6 +132,11 @@ struct Trip: Equatable, Identifiable {
                                    name: cdNextDest.name ?? "")
         }
         
+        var currentRoute = Route()
+        if let cdCurrentRoute = cdTrip.currentRoute {
+            currentRoute = Route(id: <#T##String#>, steps: <#T##[Route.Step]#>, travelTime: <#T##Double#>, distance: <#T##Double#>, collectionID: <#T##String#>, polyline: <#T##RoutePolyline?#>, altPosition: <#T##Int#>, tripPosition: <#T##Int?#>)
+        }
+        
         var recentCompletedDest = Destination()
         if let cdRecentCompleteDest = cdTrip.recentlyCompletedDestination {
             recentCompletedDest = Destination(id: cdRecentCompleteDest.id ?? "",
@@ -164,7 +174,6 @@ struct Trip: Equatable, Identifiable {
                             let point = Route.Point(index: Int(cdPoint.index),
                                                     latitude: cdPoint.latitude,
                                                     longitude: cdPoint.longitude)
-                            print(point.index)
                             points.append(point)
                             
                             let coordinate = CLLocationCoordinate2D(
@@ -257,13 +266,29 @@ struct Trip: Equatable, Identifiable {
         self.completedStepCount = cdTrip.completedStepCount
         self.totalStepCount = cdTrip.totalStepCount
         
-        let state = TripState.building.stateForString(cdTrip.tripState ?? "")
+        let state = stateForString(cdTrip.tripState ?? "")
         self.tripState = state
         
         self.completedDestinations = completedDests
         self.remainingDestinations = remainingDests
         self.nextDestination = nextDest
         self.recentlyCompletedDestination = recentCompletedDest
+        
+        
+        func stateForString(_ string: String) -> TripState {
+            switch string {
+            case "building":
+                return .building
+            case "navigating":
+                return .navigating
+            case "paused":
+                return .paused
+            case "finished":
+                return .finished
+            default:
+                return .building
+            }
+        }
         
     }
     
@@ -277,6 +302,8 @@ struct Trip: Equatable, Identifiable {
         self.remainingSteps = steps
     }
     
+    
+
     
     //MARK: - Equatable
     static func == (lhs: Trip, rhs: Trip) -> Bool {
@@ -296,21 +323,6 @@ enum TripState: String {
     case navigating
     case paused
     case finished
- 
-    func stateForString(_ string: String) -> TripState {
-        switch string {
-        case "building":
-            return .building
-        case "navigating":
-            return .navigating
-        case "paused":
-            return .paused
-        case "finished":
-            return .finished
-        default:
-            return .building
-        }
-    }
     
     func buttonTitle() -> String {
         switch self {
