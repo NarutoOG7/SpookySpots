@@ -21,14 +21,19 @@ struct NavigationHelper: View {
     }
     
     private var destinationTitle: some View {
-        Text(tripLogic.currentTrip?.nextDestination?.name ?? "")
-            .foregroundColor(weenyWitch.lightest)
+        let trip = tripLogic.currentTrip
+        let nextDestination = trip?.destinations[trip?.nextDestinationIndex ?? 0]
+            
+        return Text(nextDestination?.name ?? "")
+                .foregroundColor(weenyWitch.lightest)
     }
     
     private var durationAndDistance: some View {
         DurationDistanceString(
-            time: tripLogic.currentRouteTravelTime ?? Time(),
-            distanceString: tripLogic.currentRouteDistanceString ?? "")
+            travelTime: tripLogic.currentRoute?.travelTime ?? 0,
+            distanceInMeters: tripLogic.currentRoute?.distance ?? 0,
+            isShortened: true,
+            asStack: false)
         .foregroundColor(weenyWitch.lightest)
     }
 }

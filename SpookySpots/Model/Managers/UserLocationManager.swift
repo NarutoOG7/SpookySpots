@@ -149,12 +149,10 @@ extension UserLocationManager: CLLocationManagerDelegate {
             tripLogic.currentTrip?.completedStepCount = 0
             tripLogic.currentTrip?.totalStepCount = 0
 //            tripLogic.completedSteps = []
-            if let completedDestination = tripLogic.currentTrip?.nextDestination {
-                tripLogic.currentTrip?.completedDestinations.append(completedDestination)
-                
-            }
-            tripLogic.currentTrip?.remainingDestinations.removeFirst()
-            tripLogic.currentTrip?.nextDestination = tripLogic.currentTrip?.remainingDestinations.first
+            tripLogic.currentTrip?.completedDestinationsIndices.append(tripLogic.currentTrip?.nextDestinationIndex ?? 0)
+            
+            tripLogic.currentTrip?.remainingDestinationsIndices.removeFirst()
+            tripLogic.currentTrip?.nextDestinationIndex = tripLogic.currentTrip?.remainingDestinationsIndices.first ?? 0
             locationManager?.monitoredRegions.forEach({ locationManager?.stopMonitoring(for: $0) })
             tripLogic.currentTrip?.tripState = .paused
         }

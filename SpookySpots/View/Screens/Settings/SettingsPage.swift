@@ -57,6 +57,7 @@ struct SettingsPage: View {
                 }                    .listRowSeparator(.hidden)
                     .listRowBackground(K.Colors.WeenyWitch.black)
             }
+            .modifier(ListBackgroundModifier())
             .frame(height: 120)
             .listStyle(.plain)
         }
@@ -86,6 +87,7 @@ struct SettingsPage: View {
                 }.listRowSeparator(.hidden)
                     .listRowBackground(K.Colors.WeenyWitch.black)
             }
+            .modifier(ListBackgroundModifier())
             .frame(height: 50)
             .listStyle(.plain)
         }

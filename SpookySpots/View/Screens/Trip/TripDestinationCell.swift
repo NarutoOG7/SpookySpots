@@ -29,6 +29,7 @@ struct TripDestinationCell: View {
         HStack {
             self.image()
                 .resizable()
+                .foregroundColor(colors.light)
             
                 .frame(width: isCompleted ? 30 : 60, height: isCompleted ? 30 : 60)
                 .padding(.horizontal, isCompleted ? 15 : 0)
@@ -64,7 +65,6 @@ struct TripDestinationCell: View {
                     .fontWeight(.light)
             }
             .frame(height: 60)
-            
         }
     }
     
@@ -126,5 +126,7 @@ struct TripDestinationCell_Previews: PreviewProvider {
             .listRowSeparator(.hidden)
 
         }
+        .modifier(ListBackgroundModifier())
+
     }
 }

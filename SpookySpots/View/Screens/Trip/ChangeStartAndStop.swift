@@ -121,6 +121,8 @@ struct ChangeStartAndStop: View {
                             Text(location.itemDisplayName())
                         })
                     }
+                    .modifier(ListBackgroundModifier())
+
                 }
 
             }
@@ -169,8 +171,20 @@ struct ChangeStartAndStop: View {
         let endName = endInput == "" ? tripLogic.currentTrip?.endLocation.name : endInput
             
             
-            var startDest = Destination(id: "\(TripDetails.startingLocationID)", lat: 0, lon: 0, address: "", name: startName ?? "")
-            var endDest = Destination(id: "\(TripDetails.endLocationID)", lat: 0, lon: 0, address: "", name: endName ?? "")
+            var startDest = Destination(
+                id: "\(TripDetails.startingLocationID)",
+                lat: 0,
+                lon: 0,
+                address: "",
+                name: startName ?? "",
+                index: 0)
+            var endDest = Destination(
+                id: "\(TripDetails.endLocationID)",
+                lat: 0,
+                lon: 0,
+                address: "",
+                name: endName ?? "",
+                index: 0)
             
             if let currentLocation = userStore.currentLocation {
                 if startName == "Current Location" {
@@ -199,7 +213,6 @@ struct ChangeStartAndStop: View {
             
             let newTrip = Trip(id: UUID().uuidString,
                                userID: userStore.user.id,
-                               isActive: true,
                                destinations: trip?.destinations ?? [],
                                startLocation: startDest,
                                endLocation: endDest,
@@ -208,22 +221,9 @@ struct ChangeStartAndStop: View {
                                completedStepCount: trip?.completedStepCount ?? 0,
                                totalStepCount: trip?.totalStepCount ?? 0,
                                tripState: .building)
-//            newTrip.startLocation = newStartingLocation
-//            newTrip.endLocation = newEndingLocation
+
             tripLogic.currentTrip = newTrip
-    
-            
-            let newStartAnno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: startDest.lat, longitude: startDest.lon), locationID: startDest.id, title: startDest.name)
-            let newEndAnno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: endDest.lat, longitude: endDest.lon), locationID: endDest.id, title: endDest.name)
-            
-//            tripLogic.destAnnotations = []
-//            tripLogic.destAnnotations.append(newStartAnno)
-//            for dest in newTrip.destinations {
-//                let anno = LocationAnnotationModel(coordinate: CLLocationCoordinate2D(latitude: dest.lat, longitude: dest.lon), locationID: dest.id, title: dest.name)
-//                tripLogic.destAnnotations.append(anno)
-//            }
-//            tripLogic.destAnnotations.append(newEndAnno)
-//            
+
             tripLogic.isShowingSheetForStartOrStop = false
             tripPageVM.isShowingChangeOfStartAndStop = false
         } else {

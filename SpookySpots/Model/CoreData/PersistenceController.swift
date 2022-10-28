@@ -27,8 +27,8 @@ struct PersistenceController {
         
         self.mainQueueContext = container.viewContext
         self.backgroundContext = container.newBackgroundContext()
-//        deleteAll()
-//        clearDatabase()
+        deleteAll()
+        clearDatabase()
     }
     
     public func clearDatabase() {
@@ -140,35 +140,32 @@ struct PersistenceController {
                         destContext.lat = dest.lat
                         destContext.name = dest.name
                         destContext.address = dest.address
-                        destContext.trip = newTrip
                         newTrip.addToDestinations(destContext)
                     }
                     
                     
-                    let startContext = CDStartPoint(context: context)
+                    let startContext = CDDestination(context: context)
                     let tripStart = trip.startLocation
                     startContext.lat = tripStart.lat
                     startContext.lon = tripStart.lon
                     startContext.id = tripStart.id
                     startContext.name = tripStart.name
                     startContext.address = tripStart.address
-                    startContext.trip = newTrip
-                    
+
                     newTrip.startPoint = startContext
                     
-                    let endContext = CDEndPoint(context: context)
+                    let endContext = CDDestination(context: context)
                     let tripEnd = trip.endLocation
                     endContext.id = tripEnd.id
                     endContext.name = tripEnd.name
                     endContext.address = tripEnd.address
                     endContext.lat = tripEnd.lat
                     endContext.lon = tripEnd.lon
-                    endContext.trip = newTrip
                     
                     newTrip.endPoint = endContext
                     
                     for remainingStep in trip.remainingSteps {
-                        let remStepContext = CDRemainingStep(context: context)
+                        let remStepContext = CDStep(context: context)
                         remStepContext.id = remainingStep.id ?? 0
                         remStepContext.instructions = remainingStep.instructions
                         remStepContext.longitude = remainingStep.longitude ?? 0
@@ -176,56 +173,17 @@ struct PersistenceController {
                         remStepContext.distance = remainingStep.distanceInMeters ?? 0
                         newTrip.addToRemainingSteps(remStepContext)
                     }
-                    
-                    for remainingDest in trip.remainingDestinations {
-                        let remainingContext = CDRemainingDest(context: context)
-                        remainingContext.id = remainingDest.id
-                        remainingContext.lon = remainingDest.lon
-                        remainingContext.lat = remainingDest.lat
-                        remainingContext.name = remainingDest.name
-                        remainingContext.address = remainingDest.address
-                        remainingContext.trip = newTrip
-                        newTrip.addToRemainingDestinations(remainingContext)
-                    }
-                    
-                    for completedDest in trip.completedDestinations {
-                        let completedContext = CDCompletedDest(context: context)
-                        completedContext.id = completedDest.id
-                        completedContext.lon = completedDest.lon
-                        completedContext.lat = completedDest.lat
-                        completedContext.name = completedDest.name
-                        completedContext.address = completedDest.address
-                        completedContext.trip = newTrip
-                        newTrip.addToCompletedDestinations(completedContext)
-                    }
-                    
-                    let nextDestContext = CDNextDestination(context: context)
-                    let nextDest = trip.nextDestination
-                    nextDestContext.id = nextDest?.id
-                    nextDestContext.lon = nextDest?.lon ?? 0
-                    nextDestContext.lat = nextDest?.lat ?? 0
-                    nextDestContext.name = nextDest?.name
-                    nextDestContext.address = nextDest?.address
-                    nextDestContext.trip = newTrip
-                    newTrip.nextDestination = nextDestContext
-                    
-                    
-                    let recentCompleteDestContext = CDRecentCompleteDestination(context: context)
-                    let recentCompleteDest = trip.nextDestination
-                    recentCompleteDestContext.id = recentCompleteDest?.id
-                    recentCompleteDestContext.lon = recentCompleteDest?.lon ?? 0
-                    recentCompleteDestContext.lat = recentCompleteDest?.lat ?? 0
-                    recentCompleteDestContext.name = recentCompleteDest?.name
-                    recentCompleteDestContext.address = recentCompleteDest?.address
-                    recentCompleteDestContext.trip = newTrip
-                    newTrip.recentlyCompletedDestination = recentCompleteDestContext
-                    
+                       
                     newTrip.id = trip.id
-                    newTrip.isActive = trip.isActive
                     newTrip.userID = UserStore.instance.user.id
                     newTrip.completedStepCount = trip.completedStepCount
                     newTrip.totalStepCount = trip.totalStepCount
                     newTrip.tripState = trip.tripState.rawValue
+                    
+                    newTrip.recentlyCompletedDestinationIndex = Int16(trip.recentlyCompletedDestinationIndex ?? 0)
+                    newTrip.currentRouteIndex = Int16(trip.currentRouteIndex ?? 0)
+                    newTrip.remainingDestinationsIndices = NSSet(array: trip.remainingDestinationsIndices)
+                    newTrip.completedDestinationsIndices = NSSet(array: trip.completedDestinationsIndices)
                     
                 } else {
                     // update
@@ -235,9 +193,8 @@ struct PersistenceController {
                         tripToUpdate.removeFromDestinations(tripToUpdate.destinations ?? [])
                         tripToUpdate.removeFromRoutes(tripToUpdate.routes ?? [])
                         tripToUpdate.removeFromRemainingSteps(tripToUpdate.remainingSteps ?? [])
-                        tripToUpdate.removeFromCompletedDestinations(tripToUpdate.completedDestinations ?? [])
+   
                         
-                        print(tripToUpdate.routes?.count)
                         for route in trip.routes {
                             let routeContext = CDRoute(context: context)
                             
@@ -288,35 +245,32 @@ struct PersistenceController {
                             destContext.lat = dest.lat
                             destContext.name = dest.name
                             destContext.address = dest.address
-                            destContext.trip = tripToUpdate
                             tripToUpdate.addToDestinations(destContext)
                             //            cdDestinations.append(destContext)
                         }
                         
                         //        var cdEndPoints: [CDDestination] = []
                         
-                        let startContext = CDStartPoint(context: context)
+                        let startContext = CDDestination(context: context)
                         let tripStart = trip.startLocation
                         startContext.lat = tripStart.lat
                         startContext.lon = tripStart.lon
                         startContext.id = tripStart.id
                         startContext.name = tripStart.name
                         startContext.address = tripStart.address
-                        startContext.trip = tripToUpdate
                         tripToUpdate.startPoint = startContext
                         
-                        let endContext = CDEndPoint(context: context)
+                        let endContext = CDDestination(context: context)
                         let tripEnd = trip.endLocation
                         endContext.id = tripEnd.id
                         endContext.name = tripEnd.name
                         endContext.address = tripEnd.address
                         endContext.lat = tripEnd.lat
                         endContext.lon = tripEnd.lon
-                        endContext.trip = tripToUpdate
                         tripToUpdate.endPoint = endContext
                         
                         for remainingStep in trip.remainingSteps {
-                            let remStepContext = CDRemainingStep(context: context)
+                            let remStepContext = CDStep(context: context)
                             remStepContext.id = remainingStep.id ?? 0
                             remStepContext.instructions = remainingStep.instructions
                             remStepContext.longitude = remainingStep.longitude ?? 0
@@ -325,54 +279,15 @@ struct PersistenceController {
                             tripToUpdate.addToRemainingSteps(remStepContext)
                         }
                         
-                        for remainingDest in trip.remainingDestinations {
-                            let remainingDestContext = CDRemainingDest(context: context)
-                            remainingDestContext.id = remainingDest.id
-                            remainingDestContext.lon = remainingDest.lon
-                            remainingDestContext.lat = remainingDest.lat
-                            remainingDestContext.name = remainingDest.name
-                            remainingDestContext.address = remainingDest.address
-                            remainingDestContext.trip = tripToUpdate
-                            tripToUpdate.addToRemainingDestinations(remainingDestContext)
-                        }
-                        
-                        for completedDest in trip.completedDestinations {
-                            let completedContext = CDCompletedDest(context: context)
-                            completedContext.id = completedDest.id
-                            completedContext.lon = completedDest.lon
-                            completedContext.lat = completedDest.lat
-                            completedContext.name = completedDest.name
-                            completedContext.address = completedDest.address
-                            completedContext.trip = tripToUpdate
-                            tripToUpdate.addToCompletedDestinations(completedContext)
-                        }
-                        
-                        let nextDestContext = CDNextDestination(context: context)
-                        let nextDest = trip.nextDestination
-                        nextDestContext.id = nextDest?.id
-                        nextDestContext.lon = nextDest?.lon ?? 0
-                        nextDestContext.lat = nextDest?.lat ?? 0
-                        nextDestContext.name = nextDest?.name
-                        nextDestContext.address = nextDest?.address
-                        nextDestContext.trip = tripToUpdate
-                        tripToUpdate.nextDestination = nextDestContext
-                        
-                        
-                        let recentCompleteDestContext = CDRecentCompleteDestination(context: context)
-                        let recentCompleteDest = trip.nextDestination
-                        recentCompleteDestContext.id = recentCompleteDest?.id
-                        recentCompleteDestContext.lon = recentCompleteDest?.lon ?? 0
-                        recentCompleteDestContext.lat = recentCompleteDest?.lat ?? 0
-                        recentCompleteDestContext.name = recentCompleteDest?.name
-                        recentCompleteDestContext.address = recentCompleteDest?.address
-                        recentCompleteDestContext.trip = tripToUpdate
-                        tripToUpdate.recentlyCompletedDestination = recentCompleteDestContext
-                        
-                        
                         tripToUpdate.completedStepCount = trip.completedStepCount
                         tripToUpdate.totalStepCount = trip.totalStepCount
                         tripToUpdate.tripState = trip.tripState.rawValue
-                    }
+                    
+                        tripToUpdate.recentlyCompletedDestinationIndex = Int16(trip.recentlyCompletedDestinationIndex ?? 0)
+                        tripToUpdate.currentRouteIndex = Int16(trip.currentRouteIndex ?? 0)
+                        tripToUpdate.remainingDestinationsIndices = NSSet(array: trip.remainingDestinationsIndices)
+                        tripToUpdate.completedDestinationsIndices = NSSet(array: trip.completedDestinationsIndices)
+                                            }
                     
                     
                 }

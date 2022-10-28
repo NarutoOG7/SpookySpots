@@ -86,6 +86,7 @@ struct ManageReviews: View {
                 }
                 .onDelete(perform: delete)
             }
+             .modifier(ListBackgroundModifier())
                 .listStyle(.insetGrouped)
             
     }

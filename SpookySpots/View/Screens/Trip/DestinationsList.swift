@@ -15,6 +15,7 @@ struct DestinationsList: View {
     var accentColor: Color
 
     
+    
     @ObservedObject var tripLogic = TripLogic.instance
     
     var body: some View {
@@ -23,19 +24,26 @@ struct DestinationsList: View {
             forEachDestination
             endCell
         }
+        .modifier(ListBackgroundModifier())
         .padding(.leading, 0)
         .padding(.trailing, 20)
         .listStyle(.plain)
+        
+        .onAppear {
+            UITableView.appearance().backgroundColor = UIColor.clear
+        }
     }
     
     private var startCell: some View {
         let currentTrip = tripLogic.currentTrip
         let startLocation = currentTrip?.startLocation
+        let isCurrent = currentTrip?.nextDestinationIndex == 0
+        let isCompleted = (currentTrip?.nextDestinationIndex ?? 0) > 0
         return TripDestinationCell(
             mainText: startLocation?.name ?? "",
             subText: startLocation?.address ?? "",
-            isCurrent: tripLogic.currentTrip?.recentlyCompletedDestination?.name == startLocation?.name,
-            isCompleted: tripLogic.currentTrip?.completedDestinations.contains(startLocation ?? Destination()) ?? false,
+            isCurrent: isCurrent,
+            isCompleted: isCompleted,
             isLast: false,
             mainColor: mainColor,
             accentColor: accentColor,
@@ -48,12 +56,13 @@ struct DestinationsList: View {
     private var forEachDestination: some View {
         let currentTrip = tripLogic.currentTrip
         let endLocation = currentTrip?.endLocation
-        return ForEach(tripLogic.currentTrip?.destinations ?? []) { destination in
+        let destinations = tripLogic.currentTrip?.destinations.sorted(by: { $0.index < $1.index })
+        return ForEach(destinations ?? []) { destination in
             TripDestinationCell(
                 mainText: destination.name,
                 subText: destination.address,
-                isCurrent: tripLogic.currentTrip?.recentlyCompletedDestination == destination,
-                isCompleted: tripLogic.currentTrip?.completedDestinations.contains(destination) ?? false,
+                isCurrent: tripLogic.currentTrip?.nextDestinationIndex == destination.index,
+                isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(destination.index) ?? false,
                 isLast: endLocation == destination,
                 mainColor: mainColor,
                 accentColor: accentColor)
@@ -72,7 +81,7 @@ struct DestinationsList: View {
             mainText: endLocation?.name ?? "",
             subText: endLocation?.address ?? "",
             isCurrent: false,
-            isCompleted: tripLogic.currentTrip?.completedDestinations.contains(endLocation ?? Destination()) ?? false,
+            isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(endLocation?.index ?? 0) ?? false,
             isLast: true,
             mainColor: mainColor,
             accentColor: accentColor,
@@ -96,7 +105,6 @@ struct DestinationsList: View {
                let newLast = destinations.last {
             let newTrip = Trip(id: oldTrip.id,
                                userID: oldTrip.userID,
-                               isActive: oldTrip.isActive,
                                destinations: destinations,
                                startLocation: newFirst,
                                endLocation: newLast,

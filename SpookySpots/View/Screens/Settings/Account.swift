@@ -31,6 +31,8 @@ struct Account: View {
                     .listRowSeparator(.hidden)
                     .listRowBackground(K.Colors.WeenyWitch.black)
             }
+            .modifier(ListBackgroundModifier())
+
             .listStyle(.plain)
             
             .frame(height: 160)

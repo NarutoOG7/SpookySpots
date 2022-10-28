@@ -72,11 +72,11 @@ class TripLogic: ObservableObject {
     
     @ObservedObject var navigationLogic = NavigationLogic.instance
     
-    @Published var destinations: [Destination] = [] {
-        didSet {
-            self.getRoutes()
-        }
-    }
+//    @Published var destinations: [Destination] = [] {
+//        didSet {
+//            self.getRoutes()
+//        }
+//    }
 
     @Published var currentRoute: Route? {
         willSet {
@@ -144,7 +144,7 @@ class TripLogic: ObservableObject {
             var duration: Double = 0
             for route in self.currentTrip?.routes ?? [] {
                 duration += route.travelTime
-                let time = secondsToHoursMinutes(duration)
+                let time = Time().secondsToHoursMinutes(duration)
                 totalTime = time
             }
             return totalTime
@@ -289,16 +289,17 @@ class TripLogic: ObservableObject {
                                        lat: currentLoc.coordinate.latitude,
                                        lon: currentLoc.coordinate.longitude,
                                        address: address.streetCityState(),
-                                       name: "Current Location")
+                                       name: "Current Location",
+                                       index: 0)
                 
                let endLoc = Destination(id: UUID().uuidString,
                                      lat: currentLoc.coordinate.latitude,
                                      lon: currentLoc.coordinate.longitude,
                                      address: address.streetCityState(),
-                                     name: "Current Location")
+                                     name: "Current Location",
+                                     index: 0)
                 var trip = Trip(id: UUID().uuidString,
                                 userID: self.userStore.user.id,
-                                isActive: true,
                                 destinations: [],
                                 startLocation: startLoc,
                                 endLocation: endLoc,
@@ -307,8 +308,8 @@ class TripLogic: ObservableObject {
                                 completedStepCount: 0,
                                 totalStepCount: 0,
                                 tripState: .building)
-                trip.recentlyCompletedDestination = startLoc
-                trip.nextDestination = endLoc
+                trip.recentlyCompletedDestinationIndex = 0
+                trip.nextDestinationIndex = 0
                 
                 self.currentTrip = trip
             }
@@ -415,17 +416,19 @@ class TripLogic: ObservableObject {
         
         firebaseManager.getCoordinatesFromAddress(address: location.location.address?.geoCodeAddress() ?? "") { cloc in
             
+            let index = (self.currentTrip?.destinations.count ?? 0) + 1
+            
             let destination = Destination(
                 id: "\(location.location.id)",
                 lat: cloc.coordinate.latitude,
                 lon: cloc.coordinate.longitude,
                 address: location.location.address?.streetCityState() ?? Address().streetCityState(),
-                name: location.location.name)
+                name: location.location.name,
+                index: index)
             if let currentTrip = self.currentTrip {
                 
                 self.currentTrip?.destinations.append(destination)
             }
-            self.destinations.append(destination)
 //            self.locationStore.activeTripLocations.append(destination)
 //            self.saveCurrentTripOnBackground()
         }
@@ -435,9 +438,12 @@ class TripLogic: ObservableObject {
         objectWillChange.send()
         self.currentTrip?.destinations.removeAll(where: { $0.name == location.location.name })
 //        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
-        self.destinations.removeAll(where: { $0.name == location.location.name })
         self.currentTrip?.routes.removeAll(where: { $0.id == "\(location.location.id)" })
 //        self.saveCurrentTripOnBackground()
+        
+        for route in self.currentTrip?.routes.filter({ $0.collectionID == "\(location.location.id)" }) ?? [] {
+            self.currentTrip?.routes.removeAll(where: { $0 == route })
+        }
 
     }
     
@@ -446,7 +452,6 @@ class TripLogic: ObservableObject {
         objectWillChange.send()
         self.currentTrip?.destinations.remove(at: index)
 //        self.locationStore.activeTripLocations.remove(at: index)
-        self.destinations.remove(at: index)
         if currentTrip?.routes.indices.contains(index) ?? false {
             self.currentTrip?.routes.remove(at: index)
         }
@@ -528,7 +533,7 @@ class TripLogic: ObservableObject {
     
     //MARK: -  Routes
     
-    private func getRoutes() {
+    func getRoutes() {
         self.currentTrip?.routes = []
         self.routesForDestinations { success in
             if success {
@@ -727,10 +732,10 @@ class TripLogic: ObservableObject {
 //        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
         if let first = self.currentTrip?.routes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
-            self.currentTrip?.nextDestination = currentTrip?.destinations.first
+//            self.currentTrip?.nextDestinationIndex = 1
 //                self.highlightedPolyline = self.tripRoutes.first?.polyline
         self.routeIsHighlighted = true
-            self.currentTrip?.recentlyCompletedDestination = currentTrip?.startLocation
+            self.currentTrip?.recentlyCompletedDestinationIndex = 0
             
 //            DispatchQueue.background {
 //                for route in self.currentTrip?.routes ?? [] {

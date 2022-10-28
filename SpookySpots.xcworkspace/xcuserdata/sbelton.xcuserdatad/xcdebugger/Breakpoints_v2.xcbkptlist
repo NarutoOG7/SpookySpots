@@ -30,8 +30,8 @@
             filePath = "SpookySpots/Model/Models/Trip.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "364"
-            endingLineNumber = "364"
+            startingLineNumber = "321"
+            endingLineNumber = "321"
             landmarkName = "getSpecificRouteMatching(name:distance:duration:start:end:withCompletion:)"
             landmarkType = "9">
          </BreakpointContent>
@@ -81,22 +81,6 @@
             startingLineNumber = "523"
             endingLineNumber = "523"
             landmarkName = "searchForLocationInFullDatabase(text:withCompletion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "4986FF3E-7EEA-44FD-B1A1-7760F20AE892"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SpookySpots/Model/Models/Trip.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
-            landmarkName = "init(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -158,8 +142,8 @@
             filePath = "SpookySpots/Model/Models/TripLogic.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "684"
-            endingLineNumber = "684"
+            startingLineNumber = "689"
+            endingLineNumber = "689"
             landmarkName = "getReturnHome(withCompletion:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -174,8 +158,8 @@
             filePath = "SpookySpots/Model/CoreData/PersistenceController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "408"
-            endingLineNumber = "408"
+            startingLineNumber = "323"
+            endingLineNumber = "323"
             landmarkName = "activeTrip(completion:onError:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,8 +174,8 @@
             filePath = "SpookySpots/Model/CoreData/PersistenceController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "387"
-            endingLineNumber = "387"
+            startingLineNumber = "302"
+            endingLineNumber = "302"
             landmarkName = "createOrUpdateTrip(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -206,8 +190,8 @@
             filePath = "SpookySpots/Model/CoreData/PersistenceController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "382"
-            endingLineNumber = "382"
+            startingLineNumber = "297"
+            endingLineNumber = "297"
             landmarkName = "createOrUpdateTrip(_:)"
             landmarkType = "7">
          </BreakpointContent>

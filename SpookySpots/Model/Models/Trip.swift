@@ -14,8 +14,21 @@ struct Trip: Equatable, Identifiable {
     
     var id: String
     var userID: String
-    var isActive: Bool
-    var destinations: [Destination]
+    var destinations: [Destination] {
+        willSet {
+            var newDests: [Destination] = []
+            for var dest in newValue {
+                if let index = destinations.firstIndex(of: dest) {
+                    dest.index = index
+                    newDests.append(dest)
+                }
+            }
+            self.routes = []
+            DispatchQueue.main.async {
+                TripLogic.instance.getRoutes()
+            }
+        }
+    }
     var startLocation: Destination
     var endLocation: Destination
     var routes: [Route] {
@@ -24,28 +37,51 @@ struct Trip: Equatable, Identifiable {
         }
     }
     
-    var currentRoute: Route
     
     var remainingSteps: [Route.Step]
     var completedStepCount: Int16
     var totalStepCount: Int16
     var tripState: TripState
     
-    var nextDestination: Destination?
-    var recentlyCompletedDestination: Destination?
-    var completedDestinations: [Destination] = []
-    var remainingDestinations: [Destination] = []
+    var nextDestinationIndex: Int?
+    var recentlyCompletedDestinationIndex: Int?
+    var currentRouteIndex: Int?
+    var completedDestinationsIndices: [Int] = []
+    var remainingDestinationsIndices: [Int] = []
+    
+    
+    var totalTimeInSeconds: Double {
+        get {
+            var time: Double = 0
+            for route in routes {
+                time += route.travelTime
+            }
+            return time
+        }
+    }
+    
+    var totalDistanceInMeters: Double {
+        get {
+            var distance: Double = 0
+            for route in routes {
+                distance += route.distance
+            }
+            return distance
+        }
+    }
+    
+    func deleteOldRoutePolylines(oldRoutes: [Route], from mapView: MKMapView) {
+        
+    }
     
      
     //MARK: - Init from Code
     init(id: String = "",
          userID: String = "",
-         isActive: Bool = true,
          destinations: [Destination] = [],
          startLocation: Destination = Destination(),
          endLocation: Destination = Destination(),
          routes: [Route] = [],
-         currentRoute: Route,
          remainingSteps: [Route.Step],
          completedStepCount: Int16,
          totalStepCount: Int16,
@@ -53,12 +89,10 @@ struct Trip: Equatable, Identifiable {
         
         self.id = id
         self.userID = userID
-        self.isActive = isActive
         self.destinations = destinations
         self.startLocation = startLocation
         self.endLocation = endLocation
         self.routes = routes
-        self.currentRoute = currentRoute
         self.remainingSteps = remainingSteps
         self.completedStepCount = completedStepCount
         self.totalStepCount = totalStepCount
@@ -75,43 +109,20 @@ struct Trip: Equatable, Identifiable {
                                               lat: cdDest.lat,
                                               lon: cdDest.lon,
                                               address: cdDest.address ?? "",
-                                              name: cdDest.name ?? "")
+                                              name: cdDest.name ?? "",
+                                              index: Int(cdDest.index))
                 destinations.append(destination)
             }
         }
-        
-        var remainingDests: [Destination] = []
-        if let cdRemainingDests = cdTrip.remainingDestinations?.allObjects as? [CDDestination] {
-            for cdDest in cdRemainingDests {
-                let remainingDest = Destination(id: cdDest.id ?? "",
-                                                lat: cdDest.lat,
-                                                lon: cdDest.lon,
-                                                address: cdDest.address ?? "",
-                                                name: cdDest.name ?? "")
-                remainingDests.append(remainingDest)
-            }
-        }
-        
-        var completedDests: [Destination] = []
-        if let cdCompletedDests = cdTrip.completedDestinations?.allObjects as? [CDDestination] {
-            for cdDest in cdCompletedDests {
-                let completedDest = Destination(id: cdDest.id ?? "",
-                                                lat: cdDest.lat,
-                                                lon: cdDest.lon,
-                                                address: cdDest.address ?? "",
-                                                name: cdDest.name ?? "")
-                completedDests.append(completedDest)
-            }
-        }
-        
-        
+
         var start = Destination()
         if let cdStart = cdTrip.startPoint {
             start = Destination(id: cdStart.id ?? "",
                                 lat: cdStart.lat,
                                 lon: cdStart.lon,
                                 address: cdStart.address ?? "",
-                                name: cdStart.name ?? "")
+                                name: cdStart.name ?? "",
+                                index: Int(cdStart.index))
         }
         
         var end = Destination()
@@ -120,36 +131,15 @@ struct Trip: Equatable, Identifiable {
                               lat: cdEnd.lat,
                               lon: cdEnd.lon,
                               address: cdEnd.address ?? "",
-                              name: cdEnd.name ?? "")
-        }
-
-        var nextDest = Destination()
-        if let cdNextDest = cdTrip.nextDestination {
-            nextDest = Destination(id: cdNextDest.id ?? "",
-                                   lat: cdNextDest.lat,
-                                   lon: cdNextDest.lon,
-                                   address: cdNextDest.address ?? "",
-                                   name: cdNextDest.name ?? "")
-        }
-        
-        var currentRoute = Route()
-        if let cdCurrentRoute = cdTrip.currentRoute {
-            currentRoute = Route(id: <#T##String#>, steps: <#T##[Route.Step]#>, travelTime: <#T##Double#>, distance: <#T##Double#>, collectionID: <#T##String#>, polyline: <#T##RoutePolyline?#>, altPosition: <#T##Int#>, tripPosition: <#T##Int?#>)
-        }
-        
-        var recentCompletedDest = Destination()
-        if let cdRecentCompleteDest = cdTrip.recentlyCompletedDestination {
-            recentCompletedDest = Destination(id: cdRecentCompleteDest.id ?? "",
-                                              lat: cdRecentCompleteDest.lat,
-                                              lon: cdRecentCompleteDest.lon,
-                                              address: cdRecentCompleteDest.address ?? "",
-                                              name: cdRecentCompleteDest.name ?? "")
+                              name: cdEnd.name ?? "",
+                              index: Int(cdEnd.index))
         }
         
         var routes: [Route] = []
         if let cdRoutes = cdTrip.routes?.allObjects as? [CDRoute] {
             for cdRoute in cdRoutes {
                 
+                let routeID = cdRoute.id ?? ""
 
                 var steps = [Route.Step]()
                 if let cdSteps = cdRoute.steps?.allObjects as? [CDStep] {
@@ -164,7 +154,6 @@ struct Trip: Equatable, Identifiable {
                 }
                 
                 
-                let routeID = cdRoute.id ?? ""
                 
                 if let cdPolyline = cdRoute.polyline {
                     var points = [Route.Point]()
@@ -210,40 +199,8 @@ struct Trip: Equatable, Identifiable {
             }
         }
         
-//        var routes: [Route] = []
-//        if let cdRoutes = cdTrip.routes?.allObjects as? [CDRoute] {
-//            for cdRoute in cdRoutes {
-//                if let cdMKRoute = cdRoute.mkRoute {
-//                    var mkRoute = MKRoute()
-//
-//                    switch cdRoute.tripPosition {
-//                    case 0:
-//                        if let end = destinations.first {
-//                        getSpecificRouteMatching(name: cdMKRoute.name ?? "", distance: cdMKRoute.distance, duration: cdMKRoute.expectedTravelTime, start: start, end: end, withCompletion: { route in
-//                            mkRoute = route
-//                        })
-//                        }
-//                    default:
-//                        let start = destinations[Int(cdRoute.tripPosition) - 1]
-//                        let end = destinations[Int(cdRoute.tripPosition)]
-//                        getSpecificRouteMatching(name: cdMKRoute.name ?? "", distance: cdMKRoute.distance, duration: cdMKRoute.expectedTravelTime, start: start, end: end) { route in
-//                            mkRoute = route
-//                        }
-//                    }
-//
-//                    let route = Route(id: cdRoute.id ?? "",
-//                                      rt: MKRoute(),
-//                                      collectionID: cdRoute.collectionID ?? "",
-//                                      polyline: RoutePolyline(),
-//                                      altPosition: 0,
-//                                      tripPosition: Int(cdRoute.tripPosition) )
-//                    routes.append(route)
-//                }
-//            }
-//        }
-        
         var remainigSteps: [Route.Step] = []
-        if let cdRemainigSteps = cdTrip.remainingSteps?.allObjects as? [CDRemainingStep] {
+        if let cdRemainigSteps = cdTrip.remainingSteps?.allObjects as? [CDStep] {
             for cdStep in cdRemainigSteps {
                 let step = Route.Step(id: cdStep.id,
                                       distanceInMeters: cdStep.distance,
@@ -254,10 +211,10 @@ struct Trip: Equatable, Identifiable {
             }
         }
         
-
+        print(routes.count)
+        
         self.id = cdTrip.id ?? ""
         self.userID = cdTrip.userID ?? ""
-        self.isActive = cdTrip.isActive
         self.destinations = destinations
         self.startLocation = start
         self.endLocation = end
@@ -269,11 +226,11 @@ struct Trip: Equatable, Identifiable {
         let state = stateForString(cdTrip.tripState ?? "")
         self.tripState = state
         
-        self.completedDestinations = completedDests
-        self.remainingDestinations = remainingDests
-        self.nextDestination = nextDest
-        self.recentlyCompletedDestination = recentCompletedDest
-        
+        self.completedDestinationsIndices = cdTrip.completedDestinationsIndices as? [Int] ?? []
+        self.remainingDestinationsIndices = cdTrip.remainingDestinationsIndices as? [Int] ?? []
+        self.nextDestinationIndex = Int(cdTrip.nextDestinationIndex)
+        self.recentlyCompletedDestinationIndex = Int(cdTrip.recentlyCompletedDestinationIndex)
+        self.currentRouteIndex = Int(cdTrip.currentRouteIndex)
         
         func stateForString(_ string: String) -> TripState {
             switch string {

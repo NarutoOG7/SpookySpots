@@ -84,6 +84,7 @@ struct DatabaseView: View {
                 .foregroundColor(weenyWitch.lightest)
 
         }
+        .modifier(ListBackgroundModifier())
         .lineLimit(self.showingMoreFailedLocations ? .none : 4)
     }
     

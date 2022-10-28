@@ -32,10 +32,6 @@ struct SearchBar: View {
 
         .background(background)
         
-        .onAppear {
-            UITableView.appearance().backgroundColor = .clear
-        }
-        
     }
     
     //MARK: - SubViews
@@ -72,6 +68,7 @@ struct SearchBar: View {
         }
             
         }
+        .modifier(ListBackgroundModifier())
         .frame(height: listHasNoItems ? 0 : listHeight)
         .listStyle(.inset)
     }

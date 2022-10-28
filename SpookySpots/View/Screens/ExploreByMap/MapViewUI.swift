@@ -18,6 +18,9 @@ struct MapViewUI: UIViewRepresentable {
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var geoFireManager = GeoFireManager.instance
     
+    @State var mappedPolylines: [RoutePolyline] = []
+    @State var mappedAltPolylines: [RoutePolyline] = []
+    
     let mapView = MKMapView()
     
     var mapIsForExplore: Bool = true
@@ -25,7 +28,7 @@ struct MapViewUI: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
         
         mapView.setRegion(exploreVM.searchRegion, animated: true)
-        mapView.mapType = .standard
+        mapView.mapType = .satellite
         mapView.isRotateEnabled = false
         mapView.isPitchEnabled = false
         mapView.delegate = context.coordinator
@@ -96,9 +99,7 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func addRoute(to view: MKMapView) {
-//        if !view.overlays.isEmpty {
-//            view.removeOverlays(view.overlays)
-//        }
+
         addRoutePolylineFromTrip(to: view)
     }
     
@@ -124,24 +125,31 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func addAlternateRoutes(to view: MKMapView) {
+        view.removeOverlays(self.mappedAltPolylines)
+        self.mappedAltPolylines.removeAll()
         for route in tripLogic.alternates {
             if let polyline = route.polyline {
                 view.addOverlay(polyline)
+                self.mappedAltPolylines.append(polyline)
             }
         }
     }
     
     func addRoutePolylineFromTrip(to view: MKMapView) {
-        
+        view.removeOverlays(self.mappedPolylines)
+        self.mappedPolylines.removeAll()
+
         if let routes = tripLogic.currentTrip?.routes {
             for route in routes {
                 if let polyline = route.polyline {
 
                     view.addOverlay(polyline)
+                    self.mappedPolylines.append(polyline)
                 }
             }
         }
     }
+
     
     func makeCoordinator() -> MapCoordinator {
         .init(mapIsForExplore: mapIsForExplore)
