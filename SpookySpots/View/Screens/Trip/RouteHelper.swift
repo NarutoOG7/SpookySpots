@@ -156,30 +156,31 @@ struct ColorBar: View {
 struct DirectionsLabel: View {
 
     let txt: String
-
+    let geo: GeometryProxy
+    
     @Binding var isShowingMore: Bool
 
     private let speechSynthesizer = AVSpeechSynthesizer()
+    
+    let weenyWitch = K.Colors.WeenyWitch.self
 
     var body: some View {
-
-        Text(txt)
-            .foregroundColor(.white)
-            .frame(height: 75, alignment: .bottom)
-            .frame(maxWidth: UIScreen.main.bounds.width - 60)
-            .padding()
-            .overlay(alignment: .bottomTrailing) {
-                Image(systemName: isShowingMore ? "arrow.up" : "arrow.down")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-            }
-
-
-            .onAppear {
-                let speechUtterance = AVSpeechUtterance(string: txt)
+            Text(txt)
+                .foregroundColor(weenyWitch.lightest)
+                .frame(maxWidth: geo.size.width - 60)
+                .padding()
+                .overlay(alignment: .bottomTrailing) {
+                    Image(systemName: isShowingMore ? "arrow.up" : "arrow.down")
+                        .font(.headline)
+                        .foregroundColor(weenyWitch.orange)
+                        .padding()
+                }
+            
+                .onAppear {
+                    let speechUtterance = AVSpeechUtterance(string: txt)
                     speechSynthesizer.speak(speechUtterance)
-            }
+                }
+        
     }
 }
 

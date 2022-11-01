@@ -13,6 +13,7 @@ struct SlideOverCard<Content: View> : View {
     @Binding var canSlide: Bool
     var color: Color
     var handleColor: Color
+    var screenSize: CGFloat
     
     var content: () -> Content
     var body: some View {
@@ -31,23 +32,24 @@ struct SlideOverCard<Content: View> : View {
                 Spacer()
             
         }
-        .frame(width: UIScreen.main.bounds.width, height: 1000)
+        .frame(width: UIScreen.main.bounds.width, height: screenSize + 300)
         .background(color)
         .cornerRadius(10)
-        .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.13), radius: 10)
-        .offset(y: self.position.rawValue + self.dragState.translation.height)
+        .shadow(color: .white.opacity(0.13), radius: 10)
+//        .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.13), radius: 10)
+        .offset(y: self.position.size(from: screenSize) + self.dragState.translation.height)
         .animation(.interpolatingSpring(stiffness: 300, damping: 30), value: dragState.isDragging)
         .gesture(canSlide ? drag : nil)
     }
     
     private func onDragEnded(drag: DragGesture.Value) {
         let verticalDirection = drag.predictedEndLocation.y - drag.location.y
-        let cardTopEdgeLocation = self.position.rawValue + drag.translation.height
+        let cardTopEdgeLocation = self.position.size(from: screenSize) + drag.translation.height
         let positionAbove: CardPosition
         let positionBelow: CardPosition
         let closestPosition: CardPosition
         
-        if cardTopEdgeLocation <= CardPosition.middle.rawValue {
+        if cardTopEdgeLocation <= CardPosition.middle.size(from: screenSize) {
             positionAbove = .top
             positionBelow = .middle
         } else {
@@ -55,7 +57,7 @@ struct SlideOverCard<Content: View> : View {
             positionBelow = .bottom
         }
         
-        if (cardTopEdgeLocation - positionAbove.rawValue) < (positionBelow.rawValue - cardTopEdgeLocation) {
+        if (cardTopEdgeLocation - positionAbove.size(from: screenSize)) < (positionBelow.size(from: screenSize) - cardTopEdgeLocation) {
             closestPosition = positionAbove
         } else {
             closestPosition = positionBelow
@@ -72,20 +74,30 @@ struct SlideOverCard<Content: View> : View {
     
     //MARK: - Card Position
     enum CardPosition: CGFloat {
-        case bottom = 750
-        case middle = 500
-        case top = 100
+        case bottom, middle, top
+        
+        func size(from screenSize: CGFloat) -> CGFloat {
+            switch self {
+                
+            case .bottom:
+                return screenSize / 1.2
+            case .middle:
+                return screenSize / 2.5
+            case .top:
+                return screenSize / 25
+            }
+        }
     }
 }
 
 struct SlideOverCard_Previews: PreviewProvider {
     static var previews: some View {
-        SlideOverCard(canSlide: .constant(true), color: Color.black, handleColor: .white) {
+        SlideOverCard(canSlide: .constant(true), color: Color.black, handleColor: .white, screenSize: 900) {
             VStack {
                 Text("Hello")
                     .foregroundColor(Color.white)
                 Text("My name is Spencer.")
-                Text("I have all the money I will ever need.")
+                Text("There is water boiling on the stove.")
             }
         }
     }

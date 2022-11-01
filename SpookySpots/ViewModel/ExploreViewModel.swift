@@ -30,6 +30,7 @@ class ExploreViewModel: ObservableObject {
     }
     @Published var highlightedAnnotation: LocationAnnotationModel? 
     @Published var showingLocationList = false
+
         
     @ObservedObject var geoFireManager = GeoFireManager.instance
     @ObservedObject var locationStore = LocationStore.instance

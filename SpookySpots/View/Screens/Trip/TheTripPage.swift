@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct TheTripPage: View {
     
@@ -18,51 +19,52 @@ struct TheTripPage: View {
     @State var destinations: [Destination] = []
     
     @ObservedObject var tripLogic = TripLogic.instance
+    @ObservedObject var userStore = UserStore.instance
         
     private var map = MapViewUI(mapIsForExplore: false)
     
     var body: some View {
         
-        
-        ZStack {
-            map
-                .environmentObject(TripLogic.instance)
+        GeometryReader { geo in
             
-            if let currentTrip = tripLogic.currentTrip {
-                if currentTrip.tripState == .navigating {
-                    ZStack {
+            ZStack {
+                map
+                    .ignoresSafeArea()
+                    .environmentObject(TripLogic.instance)
+                
+                if let currentTrip = tripLogic.currentTrip {
+                    if currentTrip.tripState == .navigating {
                         currentLocationButton
                         VStack {
-                            routeStepHelper
+                            routeStepHelper(geo)
                             Spacer()
                         }
-                        .position(x: 0, y: 0)
-
+                        
+                    } else if tripLogic.routeIsHighlighted {
+                        RouteHelper()
+                            .padding(.top, 40)
                     }
-                } else if tripLogic.routeIsHighlighted {
-                    RouteHelper()
-                        .padding(.top, 40)
+                }
+                SlideOverCard(position: .middle, canSlide: .constant(true), color: weenyWitch.black, handleColor: weenyWitch.orange, screenSize: geo.size.height) { () -> AnyView in
+                    if tripLogic.currentTrip?.destinations == [] {
+                        return AnyView(emptyTripView)
+                    } else {
+                        return AnyView(trip)
+                    }
                 }
             }
-            SlideOverCard(position: .middle, canSlide: .constant(true), color: weenyWitch.black, handleColor: weenyWitch.orange) { () -> AnyView in
-                if tripLogic.currentTrip?.destinations == [] {
-                    return AnyView(emptyTripView)
-                } else {
-                    return AnyView(trip)
+            
+            
+            .onAppear {
+                
+                DispatchQueue.background {
+                    
+                    
+                    self.destinations = []
+                    self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
+                    tripLogic.currentTrip?.destinations.forEach({ self.destinations.append($0) })
+                    self.destinations.append(tripLogic.currentTrip?.endLocation ?? Destination())
                 }
-            }
-        }
-        .edgesIgnoringSafeArea([])
-
-        .onAppear {
-
-            DispatchQueue.background {
-                
-                
-                self.destinations = []
-                self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
-                tripLogic.currentTrip?.destinations.forEach({ self.destinations.append($0) })
-                self.destinations.append(tripLogic.currentTrip?.endLocation ?? Destination())
             }
         }
     }
@@ -100,13 +102,9 @@ struct TheTripPage: View {
     
     
     private var destinationTitle: some View {
-        //        if tripLogic.currentTrip?.destinations.indices.contains(tripLogic.currentTrip?.nextDestinationIndex ?? 0) ?? false {
         let nextDestination = tripLogic.currentTrip?.destinations[tripLogic.currentTrip?.nextDestinationIndex ?? 0]
         return AnyView(Text(nextDestination?.name ?? "")
             .foregroundColor(weenyWitch.lightest))
-        //        } else {
-        //            return AnyView(EmptyView())
-        //        }
     }
     
     private var totalTripDetails: some View {
@@ -120,13 +118,19 @@ struct TheTripPage: View {
     
     private var tripLegDetails: some View {
         let trip = tripLogic.currentTrip
-        let currentRoute = trip?.routes[trip?.currentRouteIndex ?? 0]
-        return  DurationDistanceString(
-            travelTime: currentRoute?.travelTime ?? 0,
-            distanceInMeters: currentRoute?.distance ?? 0,
-            isShortened: false,
-            asStack: false)
-        .foregroundColor(weenyWitch.lightest)
+        let index = trip?.currentRouteIndex ?? 0
+        if trip?.routes.indices.contains(index) ?? false,
+           let currentRoute = trip?.routes[index] {
+            return  AnyView(
+                DurationDistanceString(
+                    travelTime: currentRoute.travelTime,
+                    distanceInMeters: currentRoute.distance,
+                    isShortened: false,
+                    asStack: false)
+                .foregroundColor(weenyWitch.lightest))
+        } else {
+            return AnyView(EmptyView())
+        }
     }
     
     
@@ -167,7 +171,8 @@ struct TheTripPage: View {
             Spacer()
         }
         .padding(. horizontal, 10)
-        .padding(.top, 180)
+        .padding(.top, 100)
+//        .padding(.top, 180)
     }
     
     //MARK: - Methods
@@ -178,11 +183,12 @@ struct TheTripPage: View {
             tripLogic.endDirections()
         } else {
             tripLogic.startTrip()
+            map.setCurrentLocationRegion()
+
         }
     }
     
     private func currentLocationPressed() {
-        // map . set currentLocation Region
         map.setCurrentLocationRegion()
     }
     
@@ -197,40 +203,39 @@ struct TheTripPage_Previews: PreviewProvider {
 //MARK: - Navigation
 extension TheTripPage {
     
-    private var routeStepHelper: some View {
+    private func routeStepHelper(_ geo: GeometryProxy) -> some View {
         
-        return GeometryReader { geo in
-            VStack {
-                
-                
-                currentStep
-                if isShowingMoreSteps {
-                    list
-                        .frame(maxHeight: 500)
-                }
-                
+        return VStack {
+            currentStep(geo)
+            if isShowingMoreSteps {
+                list
+                    .frame(maxHeight: geo.size.height / 2)
+
             }
-            //            .padding(.top, 100)'
-            .frame(width: UIScreen.main.bounds.width)
-            .padding()
-            //            .padding(.top, 20)
-            .background(weenyWitch.black)
-            .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
-            .padding(.top, geo.size.height * 0.15)
         }
-    
-        //        .padding(.top, 75)
+        .frame(width: UIScreen.main.bounds.width)
+        .background(weenyWitch.black)
+        .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
     }
-    private var currentStep: some View {
+    
+    private func currentStep(_ geo: GeometryProxy) -> some View {
         let orderedSteps = tripLogic.currentTrip?
             .remainingSteps
             .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? []
         
+        let firstStepWithText = orderedSteps.first(where: { $0.instructions != "" })
+        
         return Button {
             self.isShowingMoreSteps.toggle()
         } label: {
-            DirectionsLabel(txt: orderedSteps.first?.instructions ?? "", isShowingMore: $isShowingMoreSteps)
+            DirectionsLabel(
+                txt: firstStepWithText?.instructions ?? "",
+                geo: geo,
+                isShowingMore: $isShowingMoreSteps)
+            
         }
+        .padding()
+        
         .onAppear {
             if let first = orderedSteps.first {
                 if first.instructions == "" {
@@ -240,16 +245,6 @@ extension TheTripPage {
         }
     }
     
-//    private var allRemainingSteps: some View {
-//        if #available(iOS 16.0, *) {
-//            return list
-//                        .scrollContentBackground(.hidden)
-//        } else {
-//            // Fallback on earlier versions
-//            return list
-//        }
-//    }
-    
     private var list: some View {
         let orderedSteps = tripLogic.currentTrip?
             .remainingSteps
@@ -257,20 +252,16 @@ extension TheTripPage {
        return List(orderedSteps,
                     id: \.self) { step in
             
-            
-            //        ForEach(tripLogic.steps, id: \.self) { step in
-            //            VStack(alignment: .leading) {
-            //        if !tripLogic.completedSteps.contains(where: { $0 == step }) {
             if step != orderedSteps.first {
                 if step.instructions != "" {
                     Text(step.instructions ?? "")
-//                        .foregroundColor(.white)
-                        .listRowBackground(Color.red)
-                    //                }
+                        .foregroundColor(weenyWitch.light)
+                        .listRowBackground(Color.clear)
                 }
             }
         }
                     .modifier(ListBackgroundModifier())
+                    .padding(.top, -35)
     }
 }
 
@@ -282,7 +273,6 @@ struct ListBackgroundModifier: ViewModifier {
         if #available(iOS 16.0, *) {
             content
                 .scrollContentBackground(.hidden)
-//                .background(.red)
         } else {
             content
             

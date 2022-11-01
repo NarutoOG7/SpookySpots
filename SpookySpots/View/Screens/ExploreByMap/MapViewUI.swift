@@ -62,6 +62,9 @@ struct MapViewUI: UIViewRepresentable {
 //        }
 //        addCorrectOverlays()
 
+        mapView.setRegion(exploreVM.searchRegion, animated: true)
+
+        
         if mapIsForExplore {
             mapView.addAnnotations(geoFireManager.gfOnMapLocations)
             mapView.region = exploreVM.searchRegion
@@ -161,9 +164,12 @@ struct MapViewUI: UIViewRepresentable {
     
     func setCurrentLocationRegion() {
         if UserLocationManager.instance.locationServEnabled,
-           let currentLoc = UserStore.instance.currentLocation {
-            mapView.setRegion(MKCoordinateRegion(center: currentLoc.coordinate, span: MapDetails.defaultSpan), animated: true)
-            exploreVM.searchRegion = mapView.region
+           let startLoc = tripLogic.currentTrip?.startLocation {
+            DispatchQueue.main.async {
+                let coordinates = CLLocationCoordinate2D(latitude: startLoc.lat, longitude: startLoc.lon)
+                let span =  MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                self.exploreVM.searchRegion = MKCoordinateRegion(center: coordinates, span: span)
+            }
         }
     }
     

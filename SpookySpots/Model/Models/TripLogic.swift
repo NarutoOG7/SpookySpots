@@ -225,7 +225,6 @@ class TripLogic: ObservableObject {
     @Published var coreDataTrip: CDTrip?
     
     
-    
 //    @Published var moc: NSManagedObjectContext?
     
     
@@ -233,6 +232,8 @@ class TripLogic: ObservableObject {
     @ObservedObject var userLocManager = UserLocationManager.instance
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var firebaseManager = FirebaseManager.instance
+    @ObservedObject var exploreVM = ExploreViewModel.instance
+
 //    @ObservedObject var coreDataManager = CoreDataManager.instance
     
 //    @Environment(\.managedObjectContext) var moc
@@ -724,11 +725,11 @@ class TripLogic: ObservableObject {
     func startTrip() {
         
         self.currentTrip?.tripState = .navigating
-        
-        if let currentLoc = userStore.currentLocation {
-            self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-        }
-        
+                
+//        if let currentLoc = userStore.currentLocation {
+//            self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+//        }
+//
 //        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
         if let first = self.currentTrip?.routes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first

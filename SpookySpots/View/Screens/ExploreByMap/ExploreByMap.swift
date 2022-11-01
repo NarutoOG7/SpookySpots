@@ -19,9 +19,8 @@ struct ExploreByMap: View {
     @State private var shouldNavigate = false
             
     @ObservedObject var locationStore = LocationStore.instance
-    
     @ObservedObject var exploreVM = ExploreViewModel.instance
-        
+            
     let map = MapViewUI(mapIsForExplore: true)
     
     var body: some View {
