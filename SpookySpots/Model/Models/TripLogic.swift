@@ -207,7 +207,17 @@ class TripLogic: ObservableObject {
     @Published var alternates: [Route] = []
     @Published var selectedAlternate: Route? {
         didSet {
-            self.alternateRouteState = .selected
+//            if let newValue = newValue {
+                self.alternateRouteState = .selected
+                
+//                for route in currentTrip?.routes ?? [] {
+//                    if route.collectionID == newValue.collectionID {
+//                        currentTrip?.routes.removeAll(where: { $0 == route })
+//                    }
+//                }
+//
+//                currentTrip?.routes.append(newValue)
+//            }
         }
     }
     
@@ -336,10 +346,16 @@ class TripLogic: ObservableObject {
     }
     
     func alternateSelectedForNextPhase() {
-        if let rtIndice = self.currentTrip?.routes.firstIndex(where: { $0.collectionID == selectedAlternate?.collectionID }),
-           let alt = selectedAlternate {
-            self.currentTrip?.routes[rtIndice] = alt
-//            self.saveCurrentTripOnBackground()
+        
+        if let selectedAlternate = selectedAlternate {
+            
+            for route in currentTrip?.routes ?? [] {
+                if route.collectionID == selectedAlternate.collectionID {
+                    currentTrip?.routes.removeAll(where: { $0 == route })
+                }
+            }
+            currentTrip?.routes.append(selectedAlternate)
+            
         }
     }
     
@@ -355,6 +371,7 @@ class TripLogic: ObservableObject {
         case .selected:
             alternateSelectedForNextPhase()
             alternates = []
+            selectedAlternate = nil
             alternateRouteState = .inactive
         }
     }

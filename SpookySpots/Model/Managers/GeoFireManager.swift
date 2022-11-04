@@ -74,7 +74,7 @@ class GeoFireManager: ObservableObject {
 //            self.firebaseManager.getSelectHotel(key) { locModel in
             self.firebaseManager.getHotelWithReviews(key) { locModel in
                 
-                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: "👻")
+                let anno = LocationAnnotationModel(coordinate: loc.coordinate, locationID: key, title: locModel.location.name)
                 
                 if !self.gfOnMapLocations.contains(where: { $0.id == key }) {
                     self.gfOnMapLocations.append(anno)

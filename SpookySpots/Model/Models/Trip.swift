@@ -258,8 +258,6 @@ struct Trip: Equatable, Identifiable {
         }
         self.remainingSteps = steps
     }
-    
-    
 
     
     //MARK: - Equatable

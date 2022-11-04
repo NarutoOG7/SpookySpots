@@ -21,15 +21,18 @@ struct TheTripPage: View {
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var userStore = UserStore.instance
         
-    private var map = MapViewUI(mapIsForExplore: false)
+//     @State private var map = MapViewUI(mappedPolylines: .constant([]), mappedAltPolylines: .constant([]))
+    
+    private let map = MapViewUI(mapIsForExplore: false)
     
     var body: some View {
         
         GeometryReader { geo in
             
             ZStack {
+
                 map
-                    .ignoresSafeArea()
+                .ignoresSafeArea()
                     .environmentObject(TripLogic.instance)
                 
                 if let currentTrip = tripLogic.currentTrip {
@@ -54,9 +57,8 @@ struct TheTripPage: View {
                 }
             }
             
-            
+
             .onAppear {
-                
                 DispatchQueue.background {
                     
                     
@@ -68,7 +70,6 @@ struct TheTripPage: View {
             }
         }
     }
-    
     
     private var trip: some View {
         VStack(alignment: .leading) {
@@ -183,13 +184,13 @@ struct TheTripPage: View {
             tripLogic.endDirections()
         } else {
             tripLogic.startTrip()
-            map.setCurrentLocationRegion()
+//            map.setCurrentLocationRegion()
 
         }
     }
     
     private func currentLocationPressed() {
-        map.setCurrentLocationRegion()
+//        map.setCurrentLocationRegion()
     }
     
 }

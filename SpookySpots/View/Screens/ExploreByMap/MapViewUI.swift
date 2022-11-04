@@ -9,21 +9,31 @@ import SwiftUI
 import MapKit
 import MapKitGoogleStyler
 
+//class MapVM: ObservableObject {
+//    
+//    @Published var mappedPolylines: [RoutePolyline]
+//    @Published var mappedAltPolylines: [RoutePolyline]
+//
+//    init(mapppedPolys: [RoutePolyline], mappedAltPolys: [RoutePolyline]) {
+//        self.mappedPolylines = mapppedPolys
+//        self.mappedAltPolylines = mappedAltPolys
+//    }
+//}
+
 
 struct MapViewUI: UIViewRepresentable {
         
+    @State var shouldCenterOnCurrentLocation = true
+    
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var geoFireManager = GeoFireManager.instance
+     
+    var mapView = MKMapView()
     
-    @State var mappedPolylines: [RoutePolyline] = []
-    @State var mappedAltPolylines: [RoutePolyline] = []
-    
-    let mapView = MKMapView()
-    
-    var mapIsForExplore: Bool = true
+    var mapIsForExplore: Bool
     
     func makeUIView(context: Context) -> MKMapView {
         
@@ -33,19 +43,19 @@ struct MapViewUI: UIViewRepresentable {
         mapView.isPitchEnabled = false
         mapView.delegate = context.coordinator
         
-//        addCorrectOverlays()
+        addCorrectOverlays(to: mapView)
             
-        if mapIsForExplore {
-            mapView.addAnnotations(geoFireManager.gfOnMapLocations)
-            mapView.region = exploreVM.searchRegion
-            addCurrentLocation(to: mapView)
-        } else {
-            addRoute(to: mapView)
-            addPlacemarks(to: mapView)
-            addStartAndEndLocations(to: mapView)
-            addAlternateRoutes(to: mapView)
-            addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
-        }
+//        if mapIsForExplore {
+//            mapView.addAnnotations(geoFireManager.gfOnMapLocations)
+//            mapView.region = exploreVM.searchRegion
+//            addCurrentLocation(to: mapView)
+//        } else {
+//            addRoute(to: mapView)
+//            addPlacemarks(to: mapView)
+//            addStartAndEndLocations(to: mapView)
+//            addAlternateRoutes(to: mapView)
+//            addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
+//        }
         
         let mapTap = TapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.mapTapped(_:)))
         mapTap.map = mapView
@@ -57,31 +67,34 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func updateUIView(_ mapView: MKMapView, context: Context) {
-//        if tripLogic.currentTrip?.tripState == .navigating {
-//            mapView.setRegion(tripLogic.mapRegion, animated: true)
+
+        updateRegion(mapView)
+        
+        addCorrectOverlays(to: mapView)
+        
+//        if mapIsForExplore {
+//            mapView.addAnnotations(geoFireManager.gfOnMapLocations)
+//            mapView.region = exploreVM.searchRegion
+//            addCurrentLocation(to: mapView)
+//        } else {
+//            addRoute(to: mapView)
+//            addPlacemarks(to: mapView)
+//            addStartAndEndLocations(to: mapView)
+//            addAlternateRoutes(to: mapView)
+//            addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
+//
 //        }
-//        addCorrectOverlays()
-
-        mapView.setRegion(exploreVM.searchRegion, animated: true)
-
-        
-        if mapIsForExplore {
-            mapView.addAnnotations(geoFireManager.gfOnMapLocations)
-            mapView.region = exploreVM.searchRegion
-            addCurrentLocation(to: mapView)
-        } else {
-            addRoute(to: mapView)
-            addPlacemarks(to: mapView)
-            addStartAndEndLocations(to: mapView)
-            addAlternateRoutes(to: mapView)
-            addGeoFenceCirclesForTurnByTurnNavigation(to: mapView)
-        
-        }
-////        //self.configureTileOverlay()
     }
     
-    func addCorrectOverlays() {
+    func updateRegion(_ mapView: MKMapView) {
+        if shouldCenterOnCurrentLocation {
+            mapView.setRegion(exploreVM.searchRegion, animated: true)
+        }
+    }
+    
+    func addCorrectOverlays(to mapView: MKMapView) {
         if mapIsForExplore {
+            
             mapView.addAnnotations(geoFireManager.gfOnMapLocations)
             mapView.region = exploreVM.searchRegion
             addCurrentLocation(to: mapView)
@@ -102,8 +115,7 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func addRoute(to view: MKMapView) {
-
-        addRoutePolylineFromTrip(to: view)
+            addRoutePolylineFromTrip(to: view)
     }
     
     func addStartAndEndLocations(to view: MKMapView) {
@@ -116,6 +128,7 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func addPlacemarks(to view: MKMapView) {
+        view.removeAnnotations(view.annotations)
         if let trip = tripLogic.currentTrip {
             for destination in trip.destinations {
                 if let index = trip.destinations.firstIndex(where: { $0.id == destination.id }) {
@@ -128,26 +141,34 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     func addAlternateRoutes(to view: MKMapView) {
-        view.removeOverlays(self.mappedAltPolylines)
-        self.mappedAltPolylines.removeAll()
+        for overlay in view.overlays {
+            if overlay is RoutePolyline {
+                for route in tripLogic.currentTrip?.routes ?? [] {
+                    if route.collectionID == tripLogic.alternates.first?.collectionID {
+                        view.removeOverlay(overlay)
+                    }
+                }
+            }
+        }
         for route in tripLogic.alternates {
             if let polyline = route.polyline {
                 view.addOverlay(polyline)
-                self.mappedAltPolylines.append(polyline)
             }
         }
     }
     
     func addRoutePolylineFromTrip(to view: MKMapView) {
-        view.removeOverlays(self.mappedPolylines)
-        self.mappedPolylines.removeAll()
-
+        for overlay in view.overlays {
+            if overlay is RoutePolyline {
+                view.removeOverlay(overlay)
+            }
+            
+        }
+        
         if let routes = tripLogic.currentTrip?.routes {
             for route in routes {
                 if let polyline = route.polyline {
-
                     view.addOverlay(polyline)
-                    self.mappedPolylines.append(polyline)
                 }
             }
         }
@@ -155,7 +176,7 @@ struct MapViewUI: UIViewRepresentable {
 
     
     func makeCoordinator() -> MapCoordinator {
-        .init(mapIsForExplore: mapIsForExplore)
+        .init(mapIsForExplore: mapIsForExplore, parent: self)
     }
     
     func getRegion() -> MKCoordinateRegion {
@@ -195,9 +216,12 @@ struct MapViewUI: UIViewRepresentable {
         @ObservedObject var tripLogic = TripLogic.instance
         
         var mapIsForExplore: Bool
-        
-        init(mapIsForExplore: Bool) {
+        var parent: MapViewUI
+                
+        init(mapIsForExplore: Bool, parent: MapViewUI) {
             self.mapIsForExplore = mapIsForExplore
+            self.parent = parent
+//            self.shouldUpdateView = shouldUpdateView
         }
         
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -209,11 +233,12 @@ struct MapViewUI: UIViewRepresentable {
                 if mapIsForExplore {
 
                     let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "SpookySpot") as? MKMarkerAnnotationView ?? MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "Spooky Spot")
-                    annotationView.canShowCallout = false
+                    annotationView.canShowCallout = true
                     annotationView.clusteringIdentifier = "cluster"
                     annotationView.markerTintColor = UIColor(K.Colors.WeenyWitch.black)
-                    annotationView.titleVisibility = .hidden
-                    //                annotationView.glyphText = "👻"
+                    annotationView.largeContentTitle = "Spooky Spot"
+                    annotationView.titleVisibility = exploreVM.searchRegion.span.latitudeDelta <= 0.02 ? .visible : .hidden
+
                     annotationView.glyphImage = UIImage(named: "Ghost")
                     
                     return annotationView
@@ -286,7 +311,13 @@ struct MapViewUI: UIViewRepresentable {
                     == locAnnotation.id }) {
                     exploreVM.displayedLocation = loc
                 }
-            default: break
+                
+            case let cluster as MKClusterAnnotation:
+                let coordinate = cluster.coordinate
+                let span = MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+                let newRegion = MKCoordinateRegion(center: coordinate, span: span)
+                exploreVM.searchRegion = newRegion
+            default: return
             }
         }
         
@@ -300,11 +331,11 @@ struct MapViewUI: UIViewRepresentable {
                         mapView.selectAnnotation(locAnno, animated: true)
                     }
                     
-                default: break
+                default: return
                 }
             }
         }
-        
+                        
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
             switch overlay {
             case let tileOverlay as MKTileOverlay:
@@ -316,7 +347,7 @@ struct MapViewUI: UIViewRepresentable {
     //                renderer.alpha = 0.5
                     return renderer
                 
-            case let routeOverlay as RoutePolyline:
+            case _ as RoutePolyline:
                 
                 guard let overlay = overlay as? RoutePolyline else {
                     return MKOverlayRenderer(overlay: overlay)
@@ -376,72 +407,67 @@ struct MapViewUI: UIViewRepresentable {
             }
         }
         
-        //        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        //                // This is the final step. This code can be copied and pasted into your project
-        //                // without thinking on it so much. It simply instantiates a MKTileOverlayRenderer
-        //                // for displaying the tile overlay.
-        //                if let tileOverlay = overlay as? MKTileOverlay {
-        //                    return MKTileOverlayRenderer(tileOverlay: tileOverlay)
-        //                } else {
-        //                    return MKOverlayRenderer(overlay: overlay)
-        //                }
-        //        }
-        
-        
         @objc func mapTapped(_ tap: TapGestureRecognizer) {
             
             if (tap.state == .recognized) && !(tripLogic.currentTrip?.tripState == .navigating) {
                 
                 if let map = tap.map {
                     
-                    let touchPT: CGPoint = tap.location(in: map)
-                    let coord: CLLocationCoordinate2D = map.convert(touchPT, toCoordinateFrom: map)
-                    let maxMeters: Double = meters(fromPixel: 22, at: touchPT, map: map)
-                    
-                    var nearestDistance: Float = MAXFLOAT
-                    var nearestPoly: RoutePolyline? = nil
-                    
-                    for overlay: MKOverlay in map.overlays {
+                    if !mapIsForExplore {
                         
-                        if let polyline = overlay as? RoutePolyline {
-                            let distance: Float = Float(distanceOf(pt: MKMapPoint(coord), toPoly: polyline))
+                        let touchPT: CGPoint = tap.location(in: map)
+                        let coord: CLLocationCoordinate2D = map.convert(touchPT, toCoordinateFrom: map)
+                        let maxMeters: Double = meters(fromPixel: 22, at: touchPT, map: map)
+                        
+                        var nearestDistance: Float = MAXFLOAT
+                        var nearestPoly: RoutePolyline? = nil
+                        
+                        for overlay: MKOverlay in map.overlays {
                             
-                            if distance < nearestDistance {
-                                nearestDistance = distance
-                                nearestPoly = polyline
+                            if let polyline = overlay as? RoutePolyline {
+                                let distance: Float = Float(distanceOf(pt: MKMapPoint(coord), toPoly: polyline))
+                                
+                                if distance < nearestDistance {
+                                    nearestDistance = distance
+                                    nearestPoly = polyline
+                                }
                             }
                         }
-                    }
-                    
-                    if Double(nearestDistance) <= maxMeters,
-                       let nearestPoly = nearestPoly {
                         
-                        // PolyLine Touched
-                        print("PolyLine Touched")
-                        
-                        if tripLogic.alternatesAreOnBoard() {
+                        if Double(nearestDistance) <= maxMeters,
+                           let nearestPoly = nearestPoly {
                             
-                            tripLogic.selectedAlternate = tripLogic.alternates.first(where: { $0.id == nearestPoly.routeID })
+                            // PolyLine Touched
+                            handlePolylineTap(nearestPoly)
+                            
+                        } else {
+                            // No Polyline
+                            self.parent.shouldCenterOnCurrentLocation = true
+                            tripLogic.currentRoute = nil
+                            tripLogic.routeIsHighlighted = false
                         }
-                        
-                        tripLogic.routeIsHighlighted = true
-                        tripLogic.currentRoute = tripLogic.currentTrip?.routes.first(where: { $0.id == nearestPoly.routeID })
-                        //                        tripLogic.currentRoute = tripLogic.allRoutes.first(where: { $0 == nearestPoly.route })
-                        //                        tripLogic.currentRoute = tripLogic.tripRoutes.first(where: { $0.polyline == nearestPoly })
-                        
-                        
-                        //                        withAnimation(.easeInOut) {
-                        //                        DispatchQueue.main.async {
-                        //                            self.tripLogic.mapRegion = coordinateRegion
-                        //                        }
-                        //                            map.setCenter(center, animated: true)
-                        //                            map.setRegion(coordinateRegion, animated: true)
-                        //                        }
-                    } else {
-                        tripLogic.currentRoute = nil
-                        tripLogic.routeIsHighlighted = false
                     }
                 }
+            }
+            
+            func handlePolylineTap(_ nearestPoly: RoutePolyline) {
+                print("PolyLine Touched")
+                
+                if tripLogic.alternatesAreOnBoard() {
+                    
+                    tripLogic.selectedAlternate = tripLogic.alternates.first(where: { $0.id == nearestPoly.routeID })
+                    tripLogic.currentRoute = tripLogic.selectedAlternate
+                } else {
+                    
+                    tripLogic.currentRoute = tripLogic.currentTrip?.routes.first(where: { $0.id == nearestPoly.routeID })
+                }
+                
+                tripLogic.routeIsHighlighted = true
+                self.parent.shouldCenterOnCurrentLocation = false
+            }
+            
+            func handleExplorePageLocationTap() {
+                
             }
         }
         
@@ -493,6 +519,8 @@ struct MapViewUI: UIViewRepresentable {
         }
         
     }
+    
+
     //MARK: - MapKit Style
     
     func configureTileOverlay() {
@@ -514,6 +542,7 @@ struct MapViewUI: UIViewRepresentable {
     }
     
     
+
 }
 
 class TapGestureRecognizer: UITapGestureRecognizer {
