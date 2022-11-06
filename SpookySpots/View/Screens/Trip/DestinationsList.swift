@@ -14,7 +14,7 @@ struct DestinationsList: View {
     var mainColor: Color
     var accentColor: Color
 
-    
+    @State var listIndex = 1
     
     @ObservedObject var tripLogic = TripLogic.instance
     
@@ -39,6 +39,7 @@ struct DestinationsList: View {
         let startLocation = currentTrip?.startLocation
         let isCurrent = currentTrip?.nextDestinationIndex == 0
         let isCompleted = (currentTrip?.nextDestinationIndex ?? 0) > 0
+
         return TripDestinationCell(
             mainText: startLocation?.name ?? "",
             subText: startLocation?.address ?? "",
@@ -56,13 +57,15 @@ struct DestinationsList: View {
     private var forEachDestination: some View {
         let currentTrip = tripLogic.currentTrip
         let endLocation = currentTrip?.endLocation
-        let destinations = tripLogic.currentTrip?.destinations.sorted(by: { $0.index < $1.index })
+        let destinations = tripLogic.currentTrip?.destinations.sorted(by: { $0.position < $1.position })
+
         return ForEach(destinations ?? []) { destination in
+            let isCurrent = tripLogic.currentTrip?.nextDestinationIndex == destination.position
             TripDestinationCell(
                 mainText: destination.name,
                 subText: destination.address,
-                isCurrent: tripLogic.currentTrip?.nextDestinationIndex == destination.index,
-                isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(destination.index) ?? false,
+                isCurrent: isCurrent,
+                isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(destination.position) ?? false,
                 isLast: endLocation == destination,
                 mainColor: mainColor,
                 accentColor: accentColor)
@@ -81,7 +84,7 @@ struct DestinationsList: View {
             mainText: endLocation?.name ?? "",
             subText: endLocation?.address ?? "",
             isCurrent: false,
-            isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(endLocation?.index ?? 0) ?? false,
+            isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(endLocation?.position ?? 0) ?? false,
             isLast: true,
             mainColor: mainColor,
             accentColor: accentColor,

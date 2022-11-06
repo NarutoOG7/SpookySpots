@@ -227,9 +227,7 @@ class TripLogic: ObservableObject {
     @Published var alternateRouteState: AlternateRouteState = .inactive
     
     @Published var allRoutes: [Route] = []
-    
-    @Published var shouldShowAlertForClearingTrip = false
-    
+        
     @Published var isShowingSheetForStartOrStop = false
     
     @Published var coreDataTrip: CDTrip?
@@ -301,14 +299,14 @@ class TripLogic: ObservableObject {
                                        lon: currentLoc.coordinate.longitude,
                                        address: address.streetCityState(),
                                        name: "Current Location",
-                                       index: 0)
+                                       position: 0)
                 
                let endLoc = Destination(id: UUID().uuidString,
                                      lat: currentLoc.coordinate.latitude,
                                      lon: currentLoc.coordinate.longitude,
                                      address: address.streetCityState(),
                                      name: "Current Location",
-                                     index: 0)
+                                     position: 0)
                 var trip = Trip(id: UUID().uuidString,
                                 userID: self.userStore.user.id,
                                 destinations: [],
@@ -323,6 +321,8 @@ class TripLogic: ObservableObject {
                 trip.nextDestinationIndex = 0
                 
                 self.currentTrip = trip
+                self.routeIsHighlighted = false
+                self.currentRoute = nil
             }
         }
     }
@@ -442,7 +442,7 @@ class TripLogic: ObservableObject {
                 lon: cloc.coordinate.longitude,
                 address: location.location.address?.streetCityState() ?? Address().streetCityState(),
                 name: location.location.name,
-                index: index)
+                position: index)
             if let currentTrip = self.currentTrip {
                 
                 self.currentTrip?.destinations.append(destination)
@@ -742,46 +742,34 @@ class TripLogic: ObservableObject {
     func startTrip() {
         
         self.currentTrip?.tripState = .navigating
-                
-//        if let currentLoc = userStore.currentLocation {
-//            self.mapRegion = MKCoordinateRegion(center: currentLoc.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-//        }
-//
-//        let sortedTripRoutes = self.tripRoutes.sorted(by: { $0.tripPosition ?? 0 < $1.tripPosition ?? 1 })
+        
         if let first = self.currentTrip?.routes.first(where: { $0.tripPosition == 0 }) {
         self.currentRoute = first
-//            self.currentTrip?.nextDestinationIndex = 1
-//                self.highlightedPolyline = self.tripRoutes.first?.polyline
+
         self.routeIsHighlighted = true
-            self.currentTrip?.recentlyCompletedDestinationIndex = 0
-            
-//            DispatchQueue.background {
-//                for route in self.currentTrip?.routes ?? [] {
-//                    for step in route.steps.sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) {
-//                        self.currentTrip?.remainingSteps.append(step)
-//                    }
-//                }
-//            }
-                
-//                self.saveCurrentTripOnBackground()
+//            self.currentTrip?.recentlyCompletedDestinationIndex = 0
             
         }
         
     }
     
     func pauseDirections() {
-        
+        self.currentTrip?.tripState = .paused
+        self.endDirections()
     }
     
     func resumeDirections() {
+        self.currentTrip?.tripState = .navigating
         
+        if let route = self.currentTrip?.routes.first(where: { $0.tripPosition == self.currentTrip?.currentRouteIndex }) {
+            self.currentRoute = route
+            self.routeIsHighlighted = true
+        }
     }
     
     func endDirections() {
         self.currentRoute = nil
         self.routeIsHighlighted = false
-        self.shouldShowAlertForClearingTrip = true
-        self.currentTrip?.tripState = .finished
     }
     
     

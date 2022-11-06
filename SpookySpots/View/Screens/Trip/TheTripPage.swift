@@ -18,6 +18,9 @@ struct TheTripPage: View {
     
     @State var destinations: [Destination] = []
     
+    @State var shouldShowResetAlert = false
+    @State var shouldShowResetButton = false
+    
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var userStore = UserStore.instance
         
@@ -56,8 +59,15 @@ struct TheTripPage: View {
                     }
                 }
             }
+            .alert("Reset Trip", isPresented: $shouldShowResetAlert, actions: {
+                Button("RESET", role: .destructive, action: resetConfirmedTapped)
+                Button("Leave Alone", role: .cancel, action: resetCanceledTapped)
+            }, message: {
+                Text("Would you like to reset your trip by removing all destinations and routes?")
+            })
             
-
+            
+            
             .onAppear {
                 DispatchQueue.background {
                     
@@ -72,7 +82,9 @@ struct TheTripPage: View {
     }
     
     private var trip: some View {
-        VStack(alignment: .leading) {
+        let routesEmpty = tripLogic.currentTrip?.routes.isEmpty ?? true
+        let shouldShowHuntButton = !destinationsAreComplete() || !routesEmpty
+        return VStack(alignment: .leading) {
             HStack {
                 VStack(alignment: .leading, spacing: 12) {
                     
@@ -84,7 +96,12 @@ struct TheTripPage: View {
                     }
                 }
                 Spacer()
-                huntButton
+                if shouldShowHuntButton {
+                    huntButton
+                }
+                if shouldShowResetButton {
+                    resetButton
+                }
             }
             .padding(.horizontal, 30)
             DestinationsList(destinations: $destinations,
@@ -139,22 +156,32 @@ struct TheTripPage: View {
     //MARK: - Buttons
     
     private var huntButton: some View {
-        let isFinished = tripLogic.currentTrip?.tripState == .finished
-        let isHidden = tripLogic.currentTrip?.routes.isEmpty ?? true
-        return Button(action: huntTapped) {
+        
+         Button(action: huntLogic) {
             Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "HUNT")
-                .foregroundColor(
-                    isFinished ? .gray : weenyWitch.orange)
+                .foregroundColor(weenyWitch.orange)
                 .padding()
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(
-                            isFinished ? .gray : weenyWitch.orange,
+                        .stroke(weenyWitch.orange,
+                                lineWidth: 4)
+                )
+        }
+    }
+    
+    private var resetButton: some View {
+        Button {
+            self.shouldShowResetAlert = true
+        } label: {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .foregroundColor(weenyWitch.orange)
+                .padding()
+                .overlay(
+                    Circle()
+                        .stroke(weenyWitch.orange,
                             lineWidth: 4)
                 )
         }
-        .disabled(isFinished || isHidden)
-        .opacity(isHidden ? 0 : 1)
     }
     
     private var currentLocationButton: some View {
@@ -178,19 +205,54 @@ struct TheTripPage: View {
     
     //MARK: - Methods
     
-    private func huntTapped() {
-        // Start Navigation
-        if tripLogic.currentTrip?.tripState == .navigating {
-            tripLogic.endDirections()
-        } else {
+    private func huntLogic() {
+        switch tripLogic.currentTrip?.tripState {
+            
+        case .building:
+            // Hunt Tapped
             tripLogic.startTrip()
-//            map.setCurrentLocationRegion()
+            
+        case .navigating:
+            // End Tapped
+            self.endTapped()
+            
+        case .paused:
+            // Resume Tapped
+            tripLogic.resumeDirections()
+            self.shouldShowResetButton = false
 
+        default: return
+            
+            // could do away with .finished here. and just say that the trip state is back to building ??? what about reset when all destinations are complete? what if they want to reset even without all complete? Is it easy enough to just remove locations from trip? would be if it was slide to remove and dragGesture to move becasue they are in a list like apple maps new destinations feature
         }
     }
     
+    private func endTapped() {
+        if self.destinationsAreComplete() {
+            tripLogic.currentTrip?.tripState = .finished
+            self.shouldShowResetAlert = true
+        } else {
+            tripLogic.pauseDirections()
+        }
+        self.shouldShowResetButton = true
+    }
+    
+    
     private func currentLocationPressed() {
 //        map.setCurrentLocationRegion()
+    }
+    
+    private func resetConfirmedTapped() {
+        tripLogic.resetTrip()
+        self.shouldShowResetButton = false
+    }
+    
+    private func resetCanceledTapped() {
+        tripLogic.currentTrip?.tripState = .paused
+    }
+    
+    private func destinationsAreComplete() -> Bool {
+        tripLogic.currentTrip?.completedDestinationsIndices.count ?? 0 >= tripLogic.currentTrip?.destinations.count ?? 0
     }
     
 }
@@ -206,11 +268,17 @@ extension TheTripPage {
     
     private func routeStepHelper(_ geo: GeometryProxy) -> some View {
         
+        let maxFrameSize = geo.size.height / 2
+        let fittedSize = CGFloat(tripLogic.currentTrip?.remainingSteps.count ?? 0) * 40
+        let fittedIsSmallerThanMax = fittedSize < maxFrameSize
+        let frameSize = fittedIsSmallerThanMax ? fittedSize : maxFrameSize
+        
         return VStack {
             currentStep(geo)
             if isShowingMoreSteps {
                 list
-                    .frame(maxHeight: geo.size.height / 2)
+                    .frame(height: frameSize)
+//                    .frame(maxHeight: geo.size.height / 2)
 
             }
         }

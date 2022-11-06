@@ -16,13 +16,13 @@ struct Trip: Equatable, Identifiable {
     var userID: String
     var destinations: [Destination] {
         willSet {
-            var newDests: [Destination] = []
-            for var dest in newValue {
-                if let index = destinations.firstIndex(of: dest) {
-                    dest.index = index
-                    newDests.append(dest)
-                }
-            }
+//            var newDests: [Destination] = []
+//            for var dest in newValue {
+//                if let index = destinations.firstIndex(of: dest) {
+//                    dest.index = index + 1
+//                    newDests.append(dest)
+//                }
+//            }
             self.routes = []
             DispatchQueue.main.async {
                 TripLogic.instance.getRoutes()
@@ -69,11 +69,6 @@ struct Trip: Equatable, Identifiable {
             return distance
         }
     }
-    
-    func deleteOldRoutePolylines(oldRoutes: [Route], from mapView: MKMapView) {
-        
-    }
-    
      
     //MARK: - Init from Code
     init(id: String = "",
@@ -105,12 +100,13 @@ struct Trip: Equatable, Identifiable {
         var destinations: [Destination] = []
         if let cdDests = cdTrip.destinations?.allObjects as? [CDDestination] {
             for cdDest in cdDests {
+                print(cdDest.position)
                 let destination = Destination(id: cdDest.id ?? "",
                                               lat: cdDest.lat,
                                               lon: cdDest.lon,
                                               address: cdDest.address ?? "",
                                               name: cdDest.name ?? "",
-                                              index: Int(cdDest.index))
+                                              position: Int(cdDest.position))
                 destinations.append(destination)
             }
         }
@@ -122,7 +118,7 @@ struct Trip: Equatable, Identifiable {
                                 lon: cdStart.lon,
                                 address: cdStart.address ?? "",
                                 name: cdStart.name ?? "",
-                                index: Int(cdStart.index))
+                                position: Int(cdStart.position))
         }
         
         var end = Destination()
@@ -132,7 +128,7 @@ struct Trip: Equatable, Identifiable {
                               lon: cdEnd.lon,
                               address: cdEnd.address ?? "",
                               name: cdEnd.name ?? "",
-                              index: Int(cdEnd.index))
+                              position: Int(cdEnd.position))
         }
         
         var routes: [Route] = []
@@ -281,12 +277,16 @@ enum TripState: String {
     
     func buttonTitle() -> String {
         switch self {
-        case .building,
-                .paused:
+            
+        case .building:
             return "HUNT"
-        case .navigating,
-                .finished:
+            
+        case .paused, .finished:
+            return "Resume"
+            
+        case .navigating:
             return "END"
+
         }
     }
 }

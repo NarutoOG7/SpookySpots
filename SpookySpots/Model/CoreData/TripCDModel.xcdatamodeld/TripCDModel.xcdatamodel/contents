@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="20086" systemVersion="21E258" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CDDestination" representedClassName="CDDestination" syncable="YES" codeGenerationType="class">
         <attribute name="address" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="String"/>
-        <attribute name="index" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="lat" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="lon" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="position" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="completedDestination" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDTrip"/>
         <relationship name="destinations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDTrip" inverseName="destinations" inverseEntity="CDTrip"/>
         <relationship name="endPoint" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDTrip" inverseName="endPoint" inverseEntity="CDTrip"/>
@@ -63,12 +63,4 @@
         <relationship name="routes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDRoute" inverseName="trip" inverseEntity="CDRoute"/>
         <relationship name="startPoint" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDestination" inverseName="startPoint" inverseEntity="CDDestination"/>
     </entity>
-    <elements>
-        <element name="CDDestination" positionX="-63" positionY="-18" width="128" height="209"/>
-        <element name="CDPoint" positionX="-9" positionY="108" width="128" height="89"/>
-        <element name="CDPolyline" positionX="36" positionY="162" width="128" height="74"/>
-        <element name="CDRoute" positionX="-54" positionY="-9" width="128" height="164"/>
-        <element name="CDStep" positionX="18" positionY="153" width="128" height="134"/>
-        <element name="CDTrip" positionX="-18" positionY="27" width="128" height="269"/>
-    </elements>
 </model>

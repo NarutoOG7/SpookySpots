@@ -27,8 +27,8 @@ struct PersistenceController {
         
         self.mainQueueContext = container.viewContext
         self.backgroundContext = container.newBackgroundContext()
-        deleteAll()
-        clearDatabase()
+//        deleteAll()
+//        clearDatabase()
     }
     
     public func clearDatabase() {
@@ -140,6 +140,7 @@ struct PersistenceController {
                         destContext.lat = dest.lat
                         destContext.name = dest.name
                         destContext.address = dest.address
+                        destContext.position = Int16(dest.position)
                         newTrip.addToDestinations(destContext)
                     }
                     
@@ -181,6 +182,7 @@ struct PersistenceController {
                     newTrip.tripState = trip.tripState.rawValue
                     
                     newTrip.recentlyCompletedDestinationIndex = Int16(trip.recentlyCompletedDestinationIndex ?? 0)
+                    newTrip.nextDestinationIndex = Int16(trip.nextDestinationIndex ?? 0)
                     newTrip.currentRouteIndex = Int16(trip.currentRouteIndex ?? 0)
                     newTrip.remainingDestinationsIndices = NSSet(array: trip.remainingDestinationsIndices)
                     newTrip.completedDestinationsIndices = NSSet(array: trip.completedDestinationsIndices)
@@ -245,6 +247,7 @@ struct PersistenceController {
                             destContext.lat = dest.lat
                             destContext.name = dest.name
                             destContext.address = dest.address
+                            destContext.position = Int16(dest.position)
                             tripToUpdate.addToDestinations(destContext)
                             //            cdDestinations.append(destContext)
                         }
@@ -284,6 +287,7 @@ struct PersistenceController {
                         tripToUpdate.tripState = trip.tripState.rawValue
                     
                         tripToUpdate.recentlyCompletedDestinationIndex = Int16(trip.recentlyCompletedDestinationIndex ?? 0)
+                        tripToUpdate.nextDestinationIndex = Int16(trip.nextDestinationIndex ?? 0)
                         tripToUpdate.currentRouteIndex = Int16(trip.currentRouteIndex ?? 0)
                         tripToUpdate.remainingDestinationsIndices = NSSet(array: trip.remainingDestinationsIndices)
                         tripToUpdate.completedDestinationsIndices = NSSet(array: trip.completedDestinationsIndices)

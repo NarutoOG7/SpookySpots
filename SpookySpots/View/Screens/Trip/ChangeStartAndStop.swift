@@ -177,14 +177,14 @@ struct ChangeStartAndStop: View {
                 lon: 0,
                 address: "",
                 name: startName ?? "",
-                index: 0)
+                position: 0)
             var endDest = Destination(
                 id: "\(TripDetails.endLocationID)",
                 lat: 0,
                 lon: 0,
                 address: "",
                 name: endName ?? "",
-                index: 0)
+                position: 0)
             
             if let currentLocation = userStore.currentLocation {
                 if startName == "Current Location" {
