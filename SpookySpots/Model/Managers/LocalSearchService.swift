@@ -5,7 +5,7 @@
 //  Created by Spencer Belton on 3/24/22.
 //
 
-import Foundation
+import SwiftUI
 import Combine
 import MapKit
 import Contacts
@@ -15,8 +15,8 @@ class LocalSearchService: ObservableObject {
     
     @Published var locationsList: [MKMapItem] = []
     
-//    let localSearchPublisher = Pas
-    
+    @ObservedObject var errorManager = ErrorManager.instance
+        
     func performSearch(from text: String, withCompletion completion: @escaping ((_ item: MKMapItem) -> (Void))) {
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = text
@@ -28,12 +28,13 @@ class LocalSearchService: ObservableObject {
         search.start { (response, error) in
             if let error = error {
                 print(error.localizedDescription)
+                self.errorManager.message = "Failed to fetch your stored trip. Please try again or contact support."
+                self.errorManager.shouldDisplay = true
             }
             guard let response = response else { return }
             
             for item in response.mapItems {
                 
-//                let result = SearchResult(id: UUID(), mapItem: item)
                 completion(item)
                 
             }
@@ -41,21 +42,3 @@ class LocalSearchService: ObservableObject {
     }
 }
 
-//struct SearchResult: Identifiable {
-//    var id: UUID
-//    var mapItem: MKMapItem
-//
-//    func itemDisplayName() -> String {
-//        if let name = mapItem.name,
-//        let city = mapItem.placemark.postalAddress?.city,
-//        let state = mapItem.placemark.postalAddress?.state {
-//        return "\(name) ・ \(city), \(state)"
-//        }
-//        return ""
-//    }
-//}
-
- 
-extension MKMapItem: Identifiable {
-    
-}

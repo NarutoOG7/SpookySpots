@@ -313,3 +313,5 @@ extension CNPostalAddress {
         "\(self.street), \(self.city), \(self.state)"
     }
 }
+
+extension MKMapItem: Identifiable {}

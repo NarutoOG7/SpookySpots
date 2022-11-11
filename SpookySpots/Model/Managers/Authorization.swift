@@ -35,7 +35,6 @@ class Authorization {
     
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var locationStore = LocationStore.instance
-//    @ObservedObject var errorBannerManager = ErrorBannerManager.instance
     
     let auth = Auth.auth()
     
@@ -172,6 +171,7 @@ class Authorization {
                 if let error = error {
                     print(error.localizedDescription)
                     // handle error
+                    onError(.failedToSaveUser)
                 }
                 // handle success
                 self.userStore.user.name = name

@@ -296,37 +296,7 @@ enum TripState: String {
     }
 }
 
-//MARK: - DirectionsRequest to get specific Route upon init
-private func getSpecificRouteMatching(name: String, distance: Double, duration: Double, start: Destination, end: Destination,
-                                   withCompletion completion: @escaping(MKRoute) -> (Void)) {
-    let request = MKDirections.Request()
-    request.transportType = .automobile
-    request.requestsAlternateRoutes = true
-    
-    let mapItemA = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: start.lat, longitude: start.lon))
-    let mapItemB = MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: end.lat, longitude: end.lon))
-    
-    request.source = MKMapItem(placemark: mapItemA)
-    request.destination = MKMapItem(placemark: mapItemB)
-    
-    let directions = MKDirections(request: request)
-    directions.calculate { response, error in
-        if let error = error {
-            print(error.localizedDescription)
-        }
-        guard let response = response else { return }
 
-        for rt in response.routes.prefix(3) {
-            if rt.name == name &&
-                rt.distance == CLLocationDistance(distance) &&
-                rt.expectedTravelTime == TimeInterval(duration) {
-        
-                                        completion(rt)
-            }
-        }
-        
-    }
-}
 
 //MARK: - Init From Firebase ? Future ?
 /*

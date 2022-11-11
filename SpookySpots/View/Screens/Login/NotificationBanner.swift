@@ -15,6 +15,8 @@ struct NotificationBanner: View {
     @Binding var message: String
     @Binding var isVisible: Bool
     
+    @ObservedObject var errorManager = ErrorManager.instance
+    
     var body: some View {
         GeometryReader { geo in
             if isVisible {
@@ -32,9 +34,10 @@ struct NotificationBanner: View {
                             isVisible = false
                         }
                 )
-                .task {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                         self.isVisible = false
+                        self.errorManager.shouldDisplay = false
                     }
                 }
                 .offset(y: -(geo.size.height / 5))

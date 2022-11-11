@@ -24,6 +24,7 @@ class FirebaseManager: ObservableObject {
     
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var errorManager = ErrorManager.instance
     
     @Published var favoriteLocations: [FavoriteLocation] = []
     
@@ -125,22 +126,6 @@ class FirebaseManager: ObservableObject {
             }
         }
     }
-    
-    //    func isLocationFavorited(_ locData: LocationData, withCompletion completion: @escaping(_ result: Bool) -> Void) {
-    //        let db = Firestore.firestore()
-    //        db.collection("Favorites")
-    //            .whereField("locationID", isEqualTo: locData.id)
-    //            .whereField("userID", isEqualTo: UserStore.instance.user.user.id)
-    //
-    //            .getDocuments { snapshot, error in
-    //                if let error = error {
-    //                    print(error.localizedDescription)
-    //                } else {
-    //                    completion(true)
-    //                }
-    //            }
-    //    }
-    
  
     func getTrendingLocations() {
         
@@ -211,7 +196,10 @@ class FirebaseManager: ObservableObject {
             .whereField("userID", isEqualTo: UserStore.instance.user.id)
             .getDocuments { snapshot, error in
                 if let error = error {
+                    
                     print(error.localizedDescription)
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 } else if let snapshot = snapshot {
                     for doc in snapshot.documents {
                         let dict = doc.data()
@@ -238,6 +226,8 @@ class FirebaseManager: ObservableObject {
         ]) { error in
             if let error = error {
                 print(error.localizedDescription)
+                self.errorManager.message = "Check your network connection and try again."
+                self.errorManager.shouldDisplay = true
                 completion?(false)
             } else {
                 completion?(true)
@@ -253,6 +243,8 @@ class FirebaseManager: ObservableObject {
             .delete() { err in
                 if let err = err {
                     print("Error removing favorite: \(err)")
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 } else {
                     print("Favorite successfully removed!")
                 }
@@ -288,6 +280,8 @@ class FirebaseManager: ObservableObject {
             .delete() { err in
                 if let err = err {
                     print("Error removing review: \(err)")
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                     completion(err)
                 } else {
                     print("Review successfully removed!")
@@ -327,6 +321,8 @@ class FirebaseManager: ObservableObject {
             .getDocuments { snapshot, error in
                 if let error = error {
                     print(error.localizedDescription)
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 } else if let snapshot = snapshot {
                     var reviews: [ReviewModel] = []
                     for doc in snapshot.documents {
@@ -347,6 +343,8 @@ class FirebaseManager: ObservableObject {
             .getDocuments { snapshot, error in
                 if let error = error {
                     print(error.localizedDescription)
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 } else if let snapshot = snapshot {
                     for doc in snapshot.documents {
                         let dict = doc.data()
@@ -368,6 +366,8 @@ class FirebaseManager: ObservableObject {
             .getDocuments { querySnapshot, error in
                 if let error = error {
                     print("Error getting reviews: \(error.localizedDescription)")
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 } else {
                     if let snapshot = querySnapshot {
                         for doc in snapshot.documents {
@@ -388,6 +388,8 @@ class FirebaseManager: ObservableObject {
             uploadImageToFirebaseStorage(image, imageName: imageName) { error in
                 if let error = error {
                     print("Error saving image to firebase.: \(error)")
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 }
             }
         }
@@ -447,6 +449,8 @@ class FirebaseManager: ObservableObject {
         storageRef.downloadURL { url, error in
             if let error = error {
                 print(error.localizedDescription)
+                self.errorManager.message = "Check your network connection and try again."
+                self.errorManager.shouldDisplay = true
             }
             guard let url = url else { return }
             completion(url)
@@ -466,6 +470,9 @@ class FirebaseManager: ObservableObject {
                 
                 if let err = err {
                     print("Error getting documents: \(err)")
+                    
+                    self.errorManager.message = "Check your network connection and try again."
+                    self.errorManager.shouldDisplay = true
                 } else {
                     
                     if let snapshot = querySnapshot {
@@ -493,6 +500,8 @@ class FirebaseManager: ObservableObject {
             .getDocuments() { (querySnapshot, err) in
                if let err = err {
                    print("Error getting documents: \(err)")
+                   self.errorManager.message = "Check your network connection and try again."
+                   self.errorManager.shouldDisplay = true
                } else {
                    
                    if let snapshot = querySnapshot {
@@ -507,40 +516,6 @@ class FirebaseManager: ObservableObject {
            }
        }
     
-    func searchForLocationInFullDatabase(text: String, withCompletion completion: @escaping(LocationModel) -> Void) {
-        let ref = Database.database().reference().child("Haunted Hotels")
-        
-        ref.queryOrdered(byChild: "name")
-        ref.queryLimited(toFirst: 10)
-        ref.queryStarting(atValue: text, childKey: "name")
-        ref.queryEnding(atValue: text, childKey: "name")
-//        ref.getData { error, snapshot in
-        
-        ref.observeSingleEvent(of: .value) { snapshot in
-
-//            if let data = snapshot..value as? [String : AnyObject] {
-            if snapshot.hasChildren() {
-                print("has children")
-                print(snapshot.value)
-            }
-//            } else {
-//
-//                let locData = LocationData(data: data)
-//
-//                var imageURLS: [URL] = []
-//                self.getLocationImages(locID: "\(locData.id)") { fsImage in
-//                    if let url = URL(string: "\(fsImage.imageURL)") {
-//                        imageURLS.append(url)
-//                    }
-//                }
-//
-//                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
-//
-//                completion(locModel)
-//
-//            }
-        }
-    }
     
     
     //MARK: - Queries
@@ -560,6 +535,8 @@ class FirebaseManager: ObservableObject {
                 let loc = placemarks.first?.location
             else {
                 // handle no location found
+                self.errorManager.message = "No location found."
+                self.errorManager.shouldDisplay = true
                 print("error on forward geocoding.. getting coordinates from location address: \(address)")
                 return
             }
@@ -579,6 +556,9 @@ class FirebaseManager: ObservableObject {
                 let location = placemarks.first
             else {
                 // Handle error
+                
+                self.errorManager.message = "Could not get address from these coordinates."
+                self.errorManager.shouldDisplay = true
                 return
             }
             if let buildingNumber = location.subThoroughfare,
@@ -600,80 +580,3 @@ class FirebaseManager: ObservableObject {
     }
 }
 
-
-//MARK: - Image Load From URL
-extension Image {
-    func data(url: URL?) -> Self {
-        if let url = url,
-           let data = try? Data(contentsOf: url) {
-            return Image(uiImage: UIImage(data: data)!)
-                .resizable()
-        }
-        return self
-            .resizable()
-    }
-}
-
-
-//MARK: Consecutive Sequence /// for allowing points to be able to be used in for loop
-public struct ConsecutiveSequence<T: IteratorProtocol>: IteratorProtocol, Sequence {
-    private var base: T
-    private var index: Int
-    private var previous: T.Element?
-    
-    init(_ base: T) {
-        self.base = base
-        self.index = 0
-    }
-    
-    public typealias Element = (T.Element, T.Element)
-    
-    public mutating func next() -> Element? {
-        guard let first = previous ?? base.next(), let second = base.next() else {
-            return nil
-        }
-        
-        previous = second
-        
-        return (first, second)
-    }
-}
-
-extension Sequence {
-    public func makeConsecutiveIterator() -> ConsecutiveSequence<Self.Iterator> {
-        return ConsecutiveSequence(self.makeIterator())
-    }
-}
-
-
-//MARK: - Decode Data
-
-struct Dict {
-    let key: String
-    let value: Any
-}
-func decodeDataToObject<Dict: Codable>(data : Data?) -> Dict? {
-    
-    if let dt = data {
-        do {
-            
-            return try JSONDecoder().decode(Dict.self, from: dt)
-            
-        }  catch let DecodingError.dataCorrupted(context) {
-            print(context)
-        } catch let DecodingError.keyNotFound(key, context) {
-            print("Key '\(key)' not found:", context.debugDescription)
-            print("codingPath:", context.codingPath)
-        } catch let DecodingError.valueNotFound(value, context) {
-            print("Value '\(value)' not found:", context.debugDescription)
-            print("codingPath:", context.codingPath)
-        } catch let DecodingError.typeMismatch(type, context)  {
-            print("Type '\(type)' mismatch:", context.debugDescription)
-            print("codingPath:", context.codingPath)
-        } catch {
-            print("error: ", error)
-        }
-    }
-    
-    return nil
-}

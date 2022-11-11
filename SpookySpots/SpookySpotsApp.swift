@@ -30,33 +30,7 @@ struct SpookySpotsApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(locationStore)
                 .environmentObject(network)
-//                .onDisappear {
-//                    if let trip = TripLogic.instance.currentTrip {
-//                        persistenceController.createOrUpdateTrip(trip)
-//                    }
-//                }
 
-        }
-        
-        
-        .onChange(of: scenePhase) { newScenePhase in
-            switch newScenePhase {
-                
-            case .background:
-                print("Scene is in background")
-//                persistenceController.save(persistenceController.backgroundContext)
-//                persistenceController.save(persistenceController.backgroundContext) { error in
-//                    if let error = error {
-//                        print(error.localizedDescription)
-//                    }
-//                }
-            case .inactive:
-                print("Scene is inactive")
-            case .active:
-                print("Scene is active")
-            @unknown default:
-                print("Apple changed something.")
-            }
         }
     }
 }

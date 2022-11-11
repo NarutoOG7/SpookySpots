@@ -5,6 +5,7 @@
 //  Created by Spencer Belton on 8/7/22.
 //
 
+import SwiftUI
 import CoreData
 import MapKit
 
@@ -16,6 +17,8 @@ struct PersistenceController {
     
     let mainQueueContext: NSManagedObjectContext
     let backgroundContext: NSManagedObjectContext
+    
+    @ObservedObject var errorManager = ErrorManager.instance
     
     init() {
         container = NSPersistentContainer(name: "TripCDModel")
@@ -46,7 +49,6 @@ struct PersistenceController {
     
     func save(_ context: NSManagedObjectContext, completion: @escaping (Error?) -> () = {_ in}) {
         
-//        if context.hasChanges {
             context.perform {
                 
             
@@ -56,7 +58,6 @@ struct PersistenceController {
             } catch {
                 completion(error)
             }
-//            }
         }
     }
     
@@ -69,7 +70,6 @@ struct PersistenceController {
     func deleteAll(completion: @escaping (Error?) -> () = {_ in}) {
         
         do {
-//            let context = container.viewContext
             
             let context = backgroundContext
             
@@ -87,7 +87,6 @@ struct PersistenceController {
     
     func createOrUpdateTrip(_ trip: Trip) {
         
-//        container.performBackgroundTask { context in
         
         let context = backgroundContext
         context.perform {
@@ -189,7 +188,6 @@ struct PersistenceController {
                     
                 } else {
                     // update
-                    //                let trips = try request.execute()
                     let trips = try context.fetch(request)
                     if let tripToUpdate = trips.first {
                         tripToUpdate.removeFromDestinations(tripToUpdate.destinations ?? [])
@@ -249,10 +247,8 @@ struct PersistenceController {
                             destContext.address = dest.address
                             destContext.position = Int16(dest.position)
                             tripToUpdate.addToDestinations(destContext)
-                            //            cdDestinations.append(destContext)
                         }
                         
-                        //        var cdEndPoints: [CDDestination] = []
                         
                         let startContext = CDDestination(context: context)
                         let tripStart = trip.startLocation
@@ -299,23 +295,25 @@ struct PersistenceController {
                 self.save(context) { error in
                     if let error = error {
                         print("Error saving to core data: \(error.localizedDescription)")
+                        self.errorManager.message = "Failed to save your trip. Please try again or contact support."
+                        self.errorManager.shouldDisplay = true
                     }
                 }
                 
             } catch {
                 print("Error saving context \(error)")
+                self.errorManager.message = "Failed to save your trip. Please try again or contact support."
+                self.errorManager.shouldDisplay = true
             }
         }
     }
     
     
     func activeTrip(completion: @escaping(Trip?) -> Void, onError: @escaping(Error) -> Void) {
-//        container.performBackgroundTask { context in
             let context = backgroundContext
         
         do {
             let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
-//            let trips = try container.viewContext.fetch(request)
             let trips = try context.fetch(request)
             
             if let cdTrip = trips.last {
@@ -325,6 +323,8 @@ struct PersistenceController {
             }
         } catch {
             print("Error fetching request: \(error)")
+            self.errorManager.message = "Failed to fetch your stored trip. Please try again or contact support."
+            self.errorManager.shouldDisplay = true
             onError(error)
         }
     }

@@ -12,26 +12,48 @@ struct ContentView: View {
     @State var showSplash = true
         
     @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var errorManager = ErrorManager.instance
     
     var body: some View {
-        ZStack {
-            if userStore.isSignedIn {
-                TabBarSetup()
-            } else {
-                CreativeSignInUp()
+        GeometryReader { geo in
+            ZStack {
+                if userStore.isSignedIn {
+                    TabBarSetup()
+                } else {
+                    CreativeSignInUp()
+                }
+                
+                splashScreen
+                
+                errorBanner
+                    .offset(y: geo.size.height / 9)
+                
             }
-            SplashScreen()
-              .opacity(showSplash ? 1 : 0)
-   
-              .task {
-                  DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    withAnimation() {
-                      self.showSplash = false
-                    }
-                  }
-              }
         }
         
+    }
+    
+    private var splashScreen: some View {
+        SplashScreen()
+          .opacity(showSplash ? 1 : 0)
+
+          .task {
+              DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation() {
+                  self.showSplash = false
+                }
+              }
+          }
+    }
+    
+    private var errorBanner: some View {
+        let weenyWitch = K.Colors.WeenyWitch.self
+        return NotificationBanner(
+            color: weenyWitch.orange,
+            messageColor: weenyWitch.black,
+            message: $errorManager.message,
+            isVisible: $errorManager.shouldDisplay)
+
     }
 }
 

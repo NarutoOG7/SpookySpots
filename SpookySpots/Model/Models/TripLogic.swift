@@ -234,6 +234,7 @@ class TripLogic: ObservableObject {
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var firebaseManager = FirebaseManager.instance
     @ObservedObject var exploreVM = ExploreViewModel.instance
+    @ObservedObject var errorManager = ErrorManager.instance
 
 //    @ObservedObject var coreDataManager = CoreDataManager.instance
     
@@ -381,40 +382,8 @@ class TripLogic: ObservableObject {
         self.selectedAlternate = alternates.first(where: { $0.altPosition == position })
         self.currentRoute = self.selectedAlternate
         
-        var trip = self.currentTrip
     }
     
-    //MARK: - Core Data
-//    
-//    func setUp(_ moc: NSManagedObjectContext) {
-//        self.moc = moc
-//    }
-    
-//
-//    func saveTripToCoreData() {
-//
-//        if let currentTrip = currentTrip {
-//
-//            let cdRoutes = NSSet(array: currentTrip.routes)
-//            let cdEndPoints = NSSet(array: [currentTrip.startLocation, currentTrip.endLocation])
-//            let cdDestinations = NSSet(array: currentTrip.destinations)
-//
-//
-//        let cdTrip = CDTrip(context: moc)
-//            cdTrip.id = currentTrip.id
-//            cdTrip.endPoints = cdEndPoints
-//            cdTrip.routes = cdRoutes
-//            cdTrip.destinations = cdDestinations
-//            cdTrip.isActive = currentTrip.isActive
-//
-//        do {
-//            try moc.save()
-//        } catch {
-//            print(error.localizedDescription)
-//        }
-//        }
-//    }
-
     
     //MARK: - Destinations
     
@@ -436,21 +405,16 @@ class TripLogic: ObservableObject {
                 address: location.location.address?.streetCityState() ?? Address().streetCityState(),
                 name: location.location.name,
                 position: index)
-            if let currentTrip = self.currentTrip {
                 
                 self.currentTrip?.destinations.append(destination)
-            }
-//            self.locationStore.activeTripLocations.append(destination)
-//            self.saveCurrentTripOnBackground()
+
         }
     }
     
     func removeDestination(_ location: LocationModel) {
         objectWillChange.send()
         self.currentTrip?.destinations.removeAll(where: { $0.name == location.location.name })
-//        self.locationStore.activeTripLocations.removeAll(where: { $0.name == location.location.name })
         self.currentTrip?.routes.removeAll(where: { $0.id == "\(location.location.id)" })
-//        self.saveCurrentTripOnBackground()
         
         for route in self.currentTrip?.routes.filter({ $0.collectionID == "\(location.location.id)" }) ?? [] {
             self.currentTrip?.routes.removeAll(where: { $0 == route })
@@ -462,11 +426,9 @@ class TripLogic: ObservableObject {
     func removeDestination(atIndex index: Int) {
         objectWillChange.send()
         self.currentTrip?.destinations.remove(at: index)
-//        self.locationStore.activeTripLocations.remove(at: index)
         if currentTrip?.routes.indices.contains(index) ?? false {
             self.currentTrip?.routes.remove(at: index)
         }
-//        self.saveCurrentTripOnBackground()
 
     }
     
@@ -576,7 +538,10 @@ class TripLogic: ObservableObject {
         let directions = MKDirections(request: request)
         directions.calculate { response, error in
             if let error = error {
+                
                 print(error.localizedDescription)
+                self.errorManager.message = "Failed to fetch routes. Check your connection and try again."
+                self.errorManager.shouldDisplay = true
             }
             if let response = response {
             
@@ -675,7 +640,6 @@ class TripLogic: ObservableObject {
             
             makeDirectionsRequest(start: start, end: end) { routes in
                 if let first = routes.first {
-
                     
                     completion(first)
                     
