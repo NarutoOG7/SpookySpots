@@ -48,6 +48,7 @@ struct LocationReviewView: View {
                 description
                 anonymousOption
                 submitButton
+                    .padding(.top, 35)
             }
             .padding()
             .navigationTitle(location.location.name)
@@ -132,9 +133,9 @@ struct LocationReviewView: View {
     }
     //MARK: - Error Banner
     private var firebaseErrorBanner: some View {
-        
+
             NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
-            .onAppear {
+            .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     self.shouldShowFirebaseError = false
                 }
@@ -159,6 +160,8 @@ struct LocationReviewView: View {
     
     private func submitTapped() {
         
+        let errorMessages = K.ErrorMessages.Review.self
+        
         checkRequiredFieldsAndAssignErrorMessagesAsNeeded()
         
         if requisiteFieldsAreFilled() {
@@ -176,9 +179,8 @@ struct LocationReviewView: View {
             if self.review != nil && isUpdated() {
                 firebaseManager.updateReviewInFirestore(rev, forID: self.review?.id ?? rev.id) { error in
                     if let error = error {
-                        self.firebaseErrorMessage = "There was an error updating the review. Please check your connection and try again."
+                        self.firebaseErrorMessage = error.rawValue
                         self.shouldShowFirebaseError = true
-                        print("Error updating review : \(error)")
                     }
                     self.location.reviews.append(rev)
                     LocationStore.instance.switchNewLocationIntoAllBucketsIfExists(location)
@@ -187,8 +189,7 @@ struct LocationReviewView: View {
             } else {
                 firebaseManager.addReviewToFirestoreBucket(rev, location: location.location) { error in
                     if let error = error {
-                        print("Error saving review: \(error)")
-                        self.firebaseErrorMessage = "There was an error saving your review. Please check your connection and try again."
+                        self.firebaseErrorMessage = error.rawValue
                         self.shouldShowFirebaseError = true
                     }
                     self.location.reviews.append(rev)
@@ -238,7 +239,6 @@ struct LocationReviewView_Previews: PreviewProvider {
 }
 
 
-
 struct UserInputCellWithIcon: View {
     
     @Binding var input: String
@@ -252,7 +252,6 @@ struct UserInputCellWithIcon: View {
     //        let iconColor: Color
     //        let textColor: Color
     //        let placeholderColor: Color
-    
     let icon: Image?
     let placeholderText: String
     
@@ -331,11 +330,5 @@ struct UserInputCellWithIcon: View {
         .padding(.horizontal)
         .padding(.top, 40)
         
-        .onAppear {
-            let textViewAppearance = UITextField.appearance()
-            textViewAppearance.backgroundColor = .clear
-            textViewAppearance.tintColor = UIColor(K.Colors.WeenyWitch.orange)
-            
-        }
     }
 }

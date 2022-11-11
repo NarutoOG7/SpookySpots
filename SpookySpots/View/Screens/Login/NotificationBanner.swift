@@ -16,22 +16,37 @@ struct NotificationBanner: View {
     @Binding var isVisible: Bool
     
     var body: some View {
-        if isVisible {
-        VStack {
-        ZStack {
-            banner
-            messageView
-                .offset(y: 20)
+        GeometryReader { geo in
+            if isVisible {
+                VStack {
+                    ZStack {
+                        banner
+                        messageView
+                            .offset(y: 20)
+                    }
+                    Spacer()
+                }
+                .gesture(
+                    DragGesture()
+                        .onEnded { _ in
+                            isVisible = false
+                        }
+                )
+                .task {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+                        self.isVisible = false
+                    }
+                }
+                .offset(y: -(geo.size.height / 5))
+            
+            }
         }
-            Spacer()
-        }
-        .position(x: 210, y: 50)
-        }
+        
     }
     
     private var banner: some View {
         Rectangle()
-            .frame(width: UIScreen.main.bounds.size.width + 30, height: 125)
+            .frame(width: UIScreen.main.bounds.size.width, height: 125)
             .foregroundColor(color)
     }
     
@@ -44,6 +59,6 @@ struct NotificationBanner: View {
 
 struct NotificationBanner_Previews: PreviewProvider {
     static var previews: some View {
-        NotificationBanner(color: .red, messageColor: .white, message: .constant("You don't belong here"), isVisible: .constant(true))
+        NotificationBanner(color: .red, messageColor: .white, message: .constant("This is going well."), isVisible: .constant(true))
     }
 }

@@ -97,6 +97,17 @@ class ExploreViewModel: ObservableObject {
         }
     }
     
+    func setRegion(destination: Destination) {
+        let center = CLLocationCoordinate2D(latitude: destination.lat, longitude: destination.lon)
+        let region = MKCoordinateRegion(
+            center: center,
+            span: MapDetails.defaultSpan)
+        
+        withAnimation(.easeInOut) {
+            self.searchRegion = region
+        }
+    }
+    
     func showLocation(_ loc: LocationModel) {
         withAnimation(.easeInOut) {
             displayedLocation = loc

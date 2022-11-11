@@ -33,6 +33,8 @@ struct LogIn: View {
     //MARK: - Focused Text Field
     @FocusState private var focusedField: Field?
     
+//    @ObservedObject var errorBannerManager = ErrorBannerManager.instance
+    
     @EnvironmentObject var network: Network
     
     var body: some View {
@@ -60,10 +62,13 @@ struct LogIn: View {
             
             loginButton
         }
+            
+            
         .alert("Email Sent", isPresented: $showingAlertPasswordRest) {
             Button("OK", role: .cancel) { }
         }
-        firebaseErrorBanner
+            firebaseErrorBanner
+    
         }
         .onSubmit {
             switch focusedField {
@@ -77,9 +82,9 @@ struct LogIn: View {
     }
     
     private var firebaseErrorBanner: some View {
-        
+
             NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
-            .onAppear {
+            .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     self.shouldShowFirebaseError = false
                 }
@@ -226,19 +231,19 @@ struct LogIn: View {
                         .unrecognizedEmail,
                         .emailIsBadlyFormatted,
                         .emailInUse:
-                    setErrorMessage(.email, message: error.rawValue)
+                    setErrorMessage(.email, message: error.message())
                      
                 case .incorrectPassword,
                         .insufficientPassword:
-                    setErrorMessage(.password, message: error.rawValue)
+                    setErrorMessage(.password, message: error.message())
                     
                 case .failedToSaveUser,
                         .troubleConnectingToFirebase,
                         .firebaseTrouble:
-                    setErrorMessage(.firebase, message: error.rawValue)
+                    setErrorMessage(.firebase, message: error.message())
                     
                 default:
-                    setErrorMessage(.firebase, message: error.rawValue)
+                    setErrorMessage(.firebase, message: error.message())
                 }
             }
         }

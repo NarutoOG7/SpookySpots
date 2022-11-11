@@ -12,8 +12,7 @@ struct ContentView: View {
     @State var showSplash = true
         
     @ObservedObject var userStore = UserStore.instance
-
-
+    
     var body: some View {
         ZStack {
             if userStore.isSignedIn {
@@ -23,13 +22,14 @@ struct ContentView: View {
             }
             SplashScreen()
               .opacity(showSplash ? 1 : 0)
-              .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                  withAnimation() {
-                    self.showSplash = false
+   
+              .task {
+                  DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation() {
+                      self.showSplash = false
+                    }
                   }
-                }
-            }
+              }
         }
         
     }

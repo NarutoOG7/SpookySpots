@@ -47,11 +47,11 @@ struct AddLocationView: View {
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    init() {
-        let textViewAppearance = UITextView.appearance()
-          textViewAppearance.backgroundColor = .clear
-        textViewAppearance.tintColor = .orange
-      }
+//    init() {
+//        let textViewAppearance = UITextView.appearance()
+//          textViewAppearance.backgroundColor = .clear
+//        textViewAppearance.tintColor = .orange
+//      }
     
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -247,12 +247,15 @@ struct AddLocationView: View {
     
     var description: some View {
         TextEditor(text: $descriptionInput)
+            .clearTextEditorBackground()
             .placeholder(when: descriptionInput.isEmpty, alignment: .topLeading, placeholder: {
                 Text("Description (optional)")
                     .foregroundColor(weenyWitch.light)
                     .padding(.top, 7)
                     .padding(.leading, 5)
             })
+            .tint(weenyWitch.orange)
+            
             .padding()
             .frame(height: 250)
             .foregroundColor(weenyWitch.orange)
@@ -426,4 +429,22 @@ struct ImagePicker: UIViewControllerRepresentable {
     }
     
 
+}
+
+
+extension TextEditor {
+    
+    func clearTextEditorBackground() -> some View {
+        if #available(iOS 16, *) {
+            return self
+                .scrollContentBackground(.hidden)
+                .background(.clear)
+        } else {
+            return self
+                .onAppear {
+                    UITextView.appearance().backgroundColor = .clear
+                }
+        }
+            
+     }
 }

@@ -23,6 +23,8 @@ struct TripDestinationCell: View {
     private let images = K.Images.Trip.self
     private let colors = K.Colors.WeenyWitch.self
     
+    @ObservedObject var tripPageVM = TripPageVM.instance
+
     @ObservedObject var locationStore = LocationStore.instance
     
     var body: some View {
@@ -41,6 +43,7 @@ struct TripDestinationCell: View {
                 if editable {
                     NavigationLink {
                         ChangeStartAndStop()
+                            
                     } label: {
                         Text(mainText)
                             .foregroundColor(mainColor)

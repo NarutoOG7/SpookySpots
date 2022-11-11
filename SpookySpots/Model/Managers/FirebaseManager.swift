@@ -259,7 +259,7 @@ class FirebaseManager: ObservableObject {
             }
     }
     //MARK: - Reviews
-    func addReviewToFirestoreBucket(_ review: ReviewModel, location: LocationData, withcCompletion completion: @escaping (Error?) -> () = {_ in}) {
+    func addReviewToFirestoreBucket(_ review: ReviewModel, location: LocationData, withcCompletion completion: @escaping (K.ErrorMessages.Review?) -> () = {_ in}) {
         guard let db = db else { return }
         let id = review.title + review.username + review.locationID
         db.collection("Reviews").document(id).setData([
@@ -274,7 +274,7 @@ class FirebaseManager: ObservableObject {
         ]) { error in
             if let error = error {
                 print(error.localizedDescription)
-                completion(error)
+                completion(.savingReview)
             } else {
                 completion(nil)
             }
@@ -296,7 +296,7 @@ class FirebaseManager: ObservableObject {
             }
     }
     
-    func updateReviewInFirestore(_ review: ReviewModel, forID id: String, withCompletion completion: @escaping(Error?) -> () = {_ in}) {
+    func updateReviewInFirestore(_ review: ReviewModel, forID id: String, withCompletion completion: @escaping(K.ErrorMessages.Review?) -> () = {_ in}) {
         guard let db = db else { return }
         db.collection("Reviews").document(id)
             .updateData([
@@ -311,7 +311,7 @@ class FirebaseManager: ObservableObject {
             ], completion: { err in
                 if let err = err {
                     print("Error updating review: \(err)")
-                    completion(err)
+                    completion(.updatingReview)
                 } else {
                     print("Review successfully updated!")
                     completion(nil)

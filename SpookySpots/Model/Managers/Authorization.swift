@@ -10,24 +10,24 @@ import FirebaseAuth
 import FirebaseFirestore
 
 
-enum AuthErrorTypes: String {
-    // Email
-    case unrecognizedEmail = "This email isn't recognized."
-    case incorrectEmail = "Email is invalid."
-    case emailIsBadlyFormatted = "This is not recognized as an email."
-    case emailInUse = "This email is already in use."
-    
-    // Password
-    case incorrectPassword = "Password is incorrect."
-    case insufficientPassword = "Password must be at least 6 characters long."
-    case passwordsDontMatch = "Passwords DO NOT match"
-    
-    // Network
-    case troubleConnectingToFirebase = "There seems to be an issue with the connection to firebase."
-    case failToSignOut = "There was an error signing out of your account. Check your connection and try again."
-    case firebaseTrouble = "There was an issue creating your account."
-    case failedToSaveUser = "There was a problem saving the user"
-}
+//enum AuthErrorTypes: String {
+//    // Email
+//    case unrecognizedEmail = "This email isn't recognized."
+//    case incorrectEmail = "Email is invalid."
+//    case emailIsBadlyFormatted = "This is not recognized as an email."
+//    case emailInUse = "This email is already in use."
+//    
+//    // Password
+//    case incorrectPassword = "Password is incorrect."
+//    case insufficientPassword = "Password must be at least 6 characters long."
+//    case passwordsDontMatch = "Passwords DO NOT match"
+//    
+//    // Network
+//    case troubleConnectingToFirebase = "There seems to be an issue with the connection to firebase."
+//    case failToSignOut = "There was an error signing out of your account. Check your connection and try again."
+//    case firebaseTrouble = "There was an issue creating your account."
+//    case failedToSaveUser = "There was a problem saving the user"
+//}
 
 class Authorization {
     
@@ -35,6 +35,7 @@ class Authorization {
     
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var locationStore = LocationStore.instance
+//    @ObservedObject var errorBannerManager = ErrorBannerManager.instance
     
     let auth = Auth.auth()
     
@@ -47,7 +48,9 @@ class Authorization {
         id == auth.currentUser?.uid
     }
     
-    func signIn(email: String, password: String, error onError: @escaping(AuthErrorTypes) -> Void) {
+    func signIn(email: String, password: String, error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+        
+        let errorMessages = K.ErrorMessages.Auth.self
         
         auth.signIn(withEmail: email, password: password) { authResult, error in
             
@@ -86,8 +89,9 @@ class Authorization {
                     UserDefaults.standard.set(true, forKey: "signedIn")
                     
                     self.saveUserToUserDefaults(user: user) { error in
-                        if let error = error {
-                            print(error.rawValue)
+                        if let _ = error {
+                            onError(.failedToSaveUser)
+//                            self.errorBannerManager.setErrorMessage(error)
                         }
                     }
 
@@ -96,9 +100,8 @@ class Authorization {
         }
     }
     
-    func signUp(userName: String, email: String, password: String, confirmPassword: String, error onError: @escaping(AuthErrorTypes) -> Void) {
-        //Todo: confirm that password and confirm password match
-        
+    func signUp(userName: String, email: String, password: String, confirmPassword: String, error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+                
         if confirmPassword == password {
         
         auth.createUser(withEmail: email, password: password) { (result, error) in
@@ -138,8 +141,9 @@ class Authorization {
                     UserDefaults.standard.set(true, forKey: "signedIn")
                     
                     self.saveUserToUserDefaults(user: user) { error in
-                        if let error = error {
-                            print(error.rawValue)
+                        if let _ = error {
+                            onError(.failedToSaveUser)
+//                            self.errorBannerManager.setErrorMessage(error)
                         }
                     }
 
@@ -149,7 +153,9 @@ class Authorization {
             }
         }
         
-        setCurrentUsersName(userName)
+            setCurrentUsersName(userName) { error in
+                onError(.failedToSaveUser)
+            }
             
         } else {
             onError(.passwordsDontMatch)
@@ -157,7 +163,7 @@ class Authorization {
     }
     
     
-    func setCurrentUsersName(_ name: String) {
+    func setCurrentUsersName(_ name: String, onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
         if let currentUser = auth.currentUser {
             let changeRequest = currentUser.createProfileChangeRequest()
             changeRequest.displayName = name
@@ -170,8 +176,9 @@ class Authorization {
                 // handle success
                 self.userStore.user.name = name
                 self.saveUserToUserDefaults(user: self.userStore.user) { error in
-                    if let error = error {
-                        print(error.rawValue)
+                    if let _ = error {
+                        onError(.failedToSaveUser)
+//                        self.errorBannerManager.setErrorMessage(error)
                     }
                 }
             }
@@ -180,7 +187,7 @@ class Authorization {
     
     
     //MARK: - SignOut
-    func signOut(error onError: @escaping(AuthErrorTypes) -> Void) {
+    func signOut(error onError: @escaping(K.ErrorMessages.Auth) -> Void) {
         do {
             try auth.signOut()
             self.userStore.isSignedIn = false
@@ -188,8 +195,9 @@ class Authorization {
             self.locationStore.favoriteLocations = []
             UserDefaults.standard.set(false, forKey: "signedIn")
             self.saveUserToUserDefaults(user: User()) { error in
-                if let error = error {
-                    print(error.rawValue)
+                if let _ = error {
+                    onError(.failedToSaveUser)
+//                    self.errorBannerManager.setErrorMessage(error)
                 }
             }
         } catch {
@@ -200,7 +208,7 @@ class Authorization {
     }
     
     //MARK: - GuestSignIn
-    func anonymousSignIn(error onError: @escaping(AuthErrorTypes) -> Void) {
+    func anonymousSignIn(error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
         auth.signInAnonymously { result, error in
             if let error = error {
                 print(error.localizedDescription)
@@ -214,8 +222,8 @@ class Authorization {
                     
                 }
                 self.saveUserToUserDefaults(user: User()) { error in
-                    if let error = error {
-                        print(error.rawValue)
+                    if let _ = error {
+                        onError(.failedToSaveUser)
                     }
                 }
             }
@@ -223,7 +231,7 @@ class Authorization {
     }
     
     //MARK: - PasswordReset
-    func passwordReset(email: String, withCompletion completion: @escaping(Bool) -> Void, error onError: @escaping(AuthErrorTypes) -> Void) {
+    func passwordReset(email: String, withCompletion completion: @escaping(Bool) -> Void, error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
         auth.sendPasswordReset(withEmail: email) { error in
             if let error = error {
                 print(error.localizedDescription)
@@ -251,7 +259,7 @@ class Authorization {
                         UserDefaults.standard.set(false, forKey: "signedIn")
                         self.saveUserToUserDefaults(user: User()) { error in
                             if let error = error {
-                                print(error.rawValue)
+                                //
                             }
                         }
                     }
@@ -266,15 +274,14 @@ class Authorization {
     
     //MARK: - Save User To UserDefaults
     
-    func saveUserToUserDefaults(user: User, error onError: @escaping(AuthErrorTypes?) -> Void) {
+    func saveUserToUserDefaults(user: User, error onError: @escaping(String?) -> Void) {
         do {
             let encoder = JSONEncoder()
             let data = try encoder.encode(user)
             
             UserDefaults.standard.set(data, forKey: "user")
         } catch {
-            print(AuthErrorTypes.failedToSaveUser.rawValue)
-            onError(.failedToSaveUser)
+            onError(K.ErrorMessages.Auth.failedToSaveUser.rawValue)
         }
     }
     

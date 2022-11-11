@@ -12,60 +12,66 @@ import AuthenticationServices
 struct CreativeSignInUp: View {
     @State var index = 0
     
-    @State var firebaseError = false
+    @State var firebaseErrorMessage = ""
     
     @State var showingAlertForFirebaseError = false
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     @ObservedObject var userStore = UserStore.instance
+
     
     var body: some View {
         
         GeometryReader { _ in
-            VStack {
-                Spacer()
+            ZStack {
                 
                 VStack {
-                    VStack(spacing: -20) {
-                        logo
-                        
-                        ZStack {
-                            SignUp(index: self.$index)
-                                .zIndex(Double(self.index))
-                            LogIn(index: self.$index)
+                    Spacer()
+                    
+                    VStack {
+                        VStack(spacing: -20) {
+                            logo
+                            
+                            ZStack {
+                                SignUp(index: self.$index)
+                                    .zIndex(Double(self.index))
+                                LogIn(index: self.$index)
+                            }
                         }
+                        HStack(spacing: 15) {
+                            
+                            Rectangle()
+                                .fill(K.Colors.WeenyWitch.light)
+                                .frame(height: 1)
+                            
+                            Text("OR")
+                                .foregroundColor(K.Colors.WeenyWitch.lightest)
+                            
+                            Rectangle()
+                                .fill(K.Colors.WeenyWitch.light)
+                                .frame(height: 1)
+                            
+                        }
+                        .padding(.horizontal, 30)
+                        .padding(.top, 25)
+                        
+                        
+                        //                HStack(spacing: 25) {
+                        //
+                        //                    appleButton
+                        //                    facebookButton
+                        //                    twitterButton
+                        //
+                        //                }
+                        .padding(.top, 30)
+                        //                Spacer()
+                        guest
                     }
-                    HStack(spacing: 15) {
-                        
-                        Rectangle()
-                            .fill(K.Colors.WeenyWitch.light)
-                            .frame(height: 1)
-                        
-                        Text("OR")
-                            .foregroundColor(K.Colors.WeenyWitch.lightest)
-                        
-                        Rectangle()
-                            .fill(K.Colors.WeenyWitch.light)
-                            .frame(height: 1)
-                        
-                    }
-                    .padding(.horizontal, 30)
-                    .padding(.top, 25)
+                    .padding(.vertical)
                     
-                    
-                    //                HStack(spacing: 25) {
-                    //
-                    //                    appleButton
-                    //                    facebookButton
-                    //                    twitterButton
-                    //
-                    //                }
-                    .padding(.top, 30)
-                    //                Spacer()
-                    guest
+                    Spacer()
                 }
-                .padding(.vertical)
-                
-                Spacer()
             }
             .alert("Firebase Error", isPresented: $showingAlertForFirebaseError) {
                 Button("OK", role: .cancel) { }
@@ -123,7 +129,8 @@ struct CreativeSignInUp: View {
     private func continueAsGuestTapped() {
         Authorization.instance.anonymousSignIn { error in
             if error == .troubleConnectingToFirebase {
-                firebaseError = true
+                self.firebaseErrorMessage = error.message()
+                self.showingAlertForFirebaseError = true
             }
             
             DispatchQueue.main.async {

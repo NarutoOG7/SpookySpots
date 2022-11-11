@@ -15,6 +15,8 @@ struct TabBarSetup: View {
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     init() {
         
 
@@ -48,17 +50,25 @@ struct TabBarSetup: View {
             UINavigationBar.appearance().scrollEdgeAppearance = appearance
             
         }
+        
+        
+        let textViewAppearance = UITextField.appearance()
+        textViewAppearance.backgroundColor = .clear
+        textViewAppearance.tintColor = UIColor(K.Colors.WeenyWitch.orange)
 
 
     }
     
     var body: some View {
 //        NavigationView {
+        ZStack {
         TabView(selection: $selection) {
-            exploreTab
-            favoritesTab
-            tripTab
-            settingsTab
+                exploreTab
+                favoritesTab
+                tripTab
+                settingsTab
+            }
+
         }
         .accentColor(K.Colors.WeenyWitch.orange)
         .environmentObject(favoritesLogic)

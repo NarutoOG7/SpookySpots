@@ -21,6 +21,9 @@ struct TheTripPage: View {
     @State var shouldShowResetAlert = false
     @State var shouldShowResetButton = false
     
+    @State var shouldDisplayErrorBanner = false
+    
+    
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var userStore = UserStore.instance
         
@@ -68,7 +71,7 @@ struct TheTripPage: View {
             
             
             
-            .onAppear {
+            .task {
                 DispatchQueue.background {
                     
                     
@@ -239,7 +242,7 @@ struct TheTripPage: View {
     
     
     private func currentLocationPressed() {
-//        map.setCurrentLocationRegion()
+        map.setCurrentLocationRegion()
     }
     
     private func resetConfirmedTapped() {

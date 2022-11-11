@@ -45,7 +45,7 @@ struct DatabaseView: View {
             }.padding()
             Divider()
             allLocationsList
-        }.padding(.vertical)
+        }
     }
     
     var allLocationsList: some View {
@@ -54,8 +54,10 @@ struct DatabaseView: View {
                 Text("\(location.location.id): \(location.location.name)")
                     .foregroundColor(weenyWitch.lightest)
 
-            }.padding(3)
+            }
         }
+        .padding(.horizontal)
+            .padding(.vertical, 3)
     }
     
 

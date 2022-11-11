@@ -16,21 +16,19 @@ struct Trip: Equatable, Identifiable {
     var userID: String
     var destinations: [Destination] {
         willSet {
-//            var newDests: [Destination] = []
-//            for var dest in newValue {
-//                if let index = destinations.firstIndex(of: dest) {
-//                    dest.index = index + 1
-//                    newDests.append(dest)
-//                }
-//            }
-            self.routes = []
-            DispatchQueue.main.async {
-                TripLogic.instance.getRoutes()
-            }
+            getRoutes()
         }
     }
-    var startLocation: Destination
-    var endLocation: Destination
+    var startLocation: Destination {
+        willSet {
+//            getRoutes()
+        }
+    }
+    var endLocation: Destination {
+        willSet {
+//            getRoutes()
+        }
+    }
     var routes: [Route] {
         willSet {
             self.assignRemainingSteps()
@@ -70,6 +68,13 @@ struct Trip: Equatable, Identifiable {
         }
     }
      
+    mutating func getRoutes() {
+        self.routes = []
+        DispatchQueue.main.async {
+            TripLogic.instance.getRoutes()
+        }
+    }
+    
     //MARK: - Init from Code
     init(id: String = "",
          userID: String = "",

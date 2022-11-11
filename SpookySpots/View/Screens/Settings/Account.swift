@@ -48,7 +48,7 @@ struct Account: View {
         .alert("Failed To Sign Out", isPresented: $failSignOutAlertShown) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(AuthErrorTypes.failToSignOut.rawValue)
+            Text(K.ErrorMessages.Auth.failToSignOut.rawValue)
         }
         
         /////MARK: - Password Reset Alert
@@ -59,7 +59,7 @@ struct Account: View {
         .alert("Trouble with Firebase", isPresented: $firebaseErrorAlertShown) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(AuthErrorTypes.firebaseTrouble.rawValue)
+            Text(K.ErrorMessages.Network.firebaseTrouble.rawValue)
         }
     }
     

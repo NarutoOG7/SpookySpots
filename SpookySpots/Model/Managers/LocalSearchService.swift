@@ -13,11 +13,11 @@ import Contacts
 class LocalSearchService: ObservableObject {
     static let instance = LocalSearchService()
     
-    @Published var locationsList: [SearchResult] = []
+    @Published var locationsList: [MKMapItem] = []
     
 //    let localSearchPublisher = Pas
     
-    func performSearch(from text: String, withCompletion completion: @escaping ((_ result: SearchResult) -> (Void))) {
+    func performSearch(from text: String, withCompletion completion: @escaping ((_ item: MKMapItem) -> (Void))) {
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = text
         searchRequest.pointOfInterestFilter = .includingAll
@@ -33,26 +33,29 @@ class LocalSearchService: ObservableObject {
             
             for item in response.mapItems {
                 
-                let result = SearchResult(id: UUID(), mapItem: item)
-                completion(result)
+//                let result = SearchResult(id: UUID(), mapItem: item)
+                completion(item)
                 
             }
         }
     }
 }
 
-struct SearchResult: Identifiable {
-    var id: UUID
-    var mapItem: MKMapItem
-    
-    func itemDisplayName() -> String {
-        if let name = mapItem.name,
-        let city = mapItem.placemark.postalAddress?.city,
-        let state = mapItem.placemark.postalAddress?.state {
-        return "\(name) ・ \(city), \(state)"
-        }
-        return ""
-    }
-}
+//struct SearchResult: Identifiable {
+//    var id: UUID
+//    var mapItem: MKMapItem
+//
+//    func itemDisplayName() -> String {
+//        if let name = mapItem.name,
+//        let city = mapItem.placemark.postalAddress?.city,
+//        let state = mapItem.placemark.postalAddress?.state {
+//        return "\(name) ・ \(city), \(state)"
+//        }
+//        return ""
+//    }
+//}
 
  
+extension MKMapItem: Identifiable {
+    
+}

@@ -18,7 +18,13 @@ struct ProfilePage: View {
     @State var emailInput = ""
     
     @State var deleteAcctAlertShown = false
+    
+    @State private var shouldShowFirebaseError = false
+    @State private var firebaseErrorMessage = ""
 
+    @Environment(\.dismiss) var dismiss
+    
+    let weenyWitch = K.Colors.WeenyWitch.self
     
     var body: some View {
         VStack {
@@ -31,6 +37,7 @@ struct ProfilePage: View {
             deleteAcctButton
             Spacer()
         }
+        .background(weenyWitch.black)
         /////MARK: - Delete Account Confirmation Alert
         .alert("Are You Sure?", isPresented: $deleteAcctAlertShown) {
             Button(role: .destructive, action: confirmDeleteTapped) {
@@ -43,48 +50,45 @@ struct ProfilePage: View {
     }
     
     private var displayName: some View {
-        HStack {
+        HStack(alignment: .center, spacing: 24) {
             Text("Name:")
-                .foregroundColor(Color.gray)
-                .padding(.trailing, 40)
-            VStack {
+                .foregroundColor(weenyWitch.orange)
+             
                 
                 TextField("", text: $displayNameInput)
                     .placeholder(when: displayNameInput.isEmpty) {
                         Text(userStore.user.name)
-                            .foregroundColor(.black)
+                            .foregroundColor(weenyWitch.lightest)
                     }
+                    .foregroundColor(weenyWitch.lightest)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
-                    .font(.title)
+                    .font(.title2)
                     .onChange(of: displayNameInput) { _ in
                         wasEdited = true
                     }
-                Divider().foregroundColor(.gray)
-            }
-        }.padding()
+            
+            }.padding()
     }
     
     private var emailView: some View {
-        HStack {
+        HStack(alignment: .center, spacing: 24) {
             Text("Email:")
-                .foregroundColor(Color.gray)
-                .padding(.trailing, 40)
+                .foregroundColor(weenyWitch.orange)
             
-            VStack {
                 TextField("", text: $emailInput)
                     .placeholder(when: emailInput.isEmpty) {
                         Text(userStore.user.email)
-                            .foregroundColor(.black)
+                            .foregroundColor(weenyWitch.lightest)
                     }
+                    .foregroundColor(weenyWitch.lightest)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
-                    .font(.title)
+                    .font(.title2)
                     .onChange(of: emailInput) { _ in
                         wasEdited = true
                     }
-                Divider().foregroundColor(.gray)
-            }
+            
         }.padding()
     }
     
@@ -93,6 +97,9 @@ struct ProfilePage: View {
     private var saveButton: some View {
         Button(action: saveTapped) {
             Text("SAVE")
+                .foregroundColor(weenyWitch.orange)
+                .padding()
+                .overlay(Capsule().stroke(weenyWitch.orange))
         }.disabled(!wasEdited)
             .padding()
         
@@ -106,7 +113,7 @@ struct ProfilePage: View {
             Text("Delete Account")
                 .font(.callout)
                 .fontWeight(.light)
-                .foregroundColor(Color.gray)
+                .foregroundColor(Color.red.opacity(0.8))
         }.padding(.horizontal)
         }
     }
@@ -114,7 +121,11 @@ struct ProfilePage: View {
     //MARK: - Methods
     
     private func saveTapped() {
-        auth.setCurrentUsersName(displayNameInput)
+        auth.setCurrentUsersName(displayNameInput) { error in
+            self.shouldShowFirebaseError = true
+            self.firebaseErrorMessage = error.message()
+        }
+        self.dismiss.callAsFunction()
     }
     
     
@@ -141,20 +152,3 @@ struct ProfilePage_Previews: PreviewProvider {
     }
 }
 
-
-
-
-//MARK: - TextViewPlaceholderTextColor
-
-extension TextField {
-    func placeholder<Content: View>(
-        when shouldShow: Bool,
-        alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content) -> some View {
-            
-            ZStack(alignment: alignment) {
-                placeholder().opacity(shouldShow ? 1 : 0)
-                self
-            }
-        }
-}

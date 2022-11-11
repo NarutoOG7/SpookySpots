@@ -19,25 +19,23 @@ struct SettingsPage: View {
     
     var auth = Authorization.instance
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     var body: some View {
-//        NavigationView {
             ScrollView {
-            VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 50) {
                 Account()
-                    .padding(.bottom, 20)
+//                    .padding(.bottom, 20)
                 about
                 admin
                 addLocationView
-                    .padding(.top, 50)
             }
-            .
-                padding(.vertical, 30)
+            .padding(.vertical, 30)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(false)
-//        }
         }
-            .background(K.Colors.WeenyWitch.black)
+            .background(weenyWitch.black)
     }
     
     
@@ -46,23 +44,60 @@ struct SettingsPage: View {
         VStack {
             SettingsHeader(settingType: .about)
             List {
-                NavigationLink(destination: RateMyApp()) {
-                    Text("Rate SpookySpots")
-                        .foregroundColor(K.Colors.WeenyWitch.lighter)
-                }.listRowSeparator(.hidden)
-                    .listRowBackground(K.Colors.WeenyWitch.black)
-                NavigationLink(destination: PrivacyPolicyPage()) {
-                    Text("Privacy Policy")
-                        .foregroundColor(K.Colors.WeenyWitch.lighter)
-                }                    .listRowSeparator(.hidden)
-                    .listRowBackground(K.Colors.WeenyWitch.black)
+                // rateApp
+//                    .listRowBackground(weenyWitch.black)
+                privacyPolicy
+                    .listRowBackground(weenyWitch.black)
+                termsOfUse
+                    .listRowBackground(weenyWitch.black)
+
+                    .padding(.bottom)
             }
-            .modifier(ListBackgroundModifier())
-            .frame(height: 120)
             .listStyle(.plain)
+            .frame(minHeight: 80)
+            .modifier(ListBackgroundModifier())
         }
 
     }
+    
+//    private var rateApp: some View {
+//        NavigationLink(destination: RateMyApp()) {
+//            Text("Rate SpookySpots")
+//                .foregroundColor(weenyWitch.lighter)
+//        }.listRowSeparator(.hidden)
+//    }
+    
+    private var privacyPolicy: some View {
+        let view: AnyView
+        if let url = URL(string: "https://pages.flycricket.io/spookyspots/privacy.html") {
+            view = AnyView(
+                Link(destination: url, label: {
+                    Text("Privacy Policy")
+                        .foregroundColor(weenyWitch.lighter)
+                })
+            )
+        } else {
+            view = AnyView(EmptyView())
+        }
+        return view
+    }
+    
+    private var termsOfUse: some View {
+        let view: AnyView
+        if let url = URL(string: "https://pages.flycricket.io/spookyspots/terms.html") {
+            view = AnyView(
+                Link(destination: url, label: {
+                    Text("Terms Of Use")
+                        .foregroundColor(weenyWitch.lighter)
+                })
+            )
+        } else {
+            view = AnyView(EmptyView())
+        }
+        return view
+    }
+    
+
     
     //MARK: - Admin
     
@@ -82,13 +117,13 @@ struct SettingsPage: View {
             List {
                 NavigationLink(destination: DatabaseView()) {
                     Text("Database")
-                        .foregroundColor(K.Colors.WeenyWitch.lighter)
+                        .foregroundColor(weenyWitch.lighter)
                     
                 }.listRowSeparator(.hidden)
-                    .listRowBackground(K.Colors.WeenyWitch.black)
+                    .listRowBackground(weenyWitch.black)
             }
             .modifier(ListBackgroundModifier())
-            .frame(height: 50)
+            .frame(minHeight: 50)
             .listStyle(.plain)
         }
     }
@@ -97,40 +132,28 @@ struct SettingsPage: View {
     private var addLocationView: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Know of any spooky locations not listed that you would like to share?")
-                .foregroundColor(K.Colors.WeenyWitch.light)
+                .foregroundColor(weenyWitch.light)
                 .italic()
             NavigationLink {
                 AddLocationView()
             } label: {
                 Text("Submit basic information")
-                    .foregroundColor(K.Colors.WeenyWitch.orange)
+                    .foregroundColor(weenyWitch.orange)
                     .underline()
             }
 
         }
-        .padding()
+        .padding(.horizontal)
     }
     
 }
-
-
-struct RateMyApp: View {
-    var body: some View {
-        Text("Thanks")
-    }
-}
-
-struct PrivacyPolicyPage: View {
-    var body: some View {
-        Text("Here are the terms and conditions")
-    }
-}
-
 
 //MARK: - Header
 struct SettingsHeader: View {
     
     var settingType: SettingType
+    
+    let weenyWitch = K.Colors.WeenyWitch.self
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -138,14 +161,14 @@ struct SettingsHeader: View {
                 settingType.image
                     .resizable()
                     .frame(width: 20, height: 20)
-                    .foregroundColor(K.Colors.WeenyWitch.orange)
+                    .foregroundColor(weenyWitch.orange)
                 Text(settingType.rawValue.capitalized)
                     .font(.title3)
                     .fontWeight(.semibold)
-                    .foregroundColor(K.Colors.WeenyWitch.lighter)
+                    .foregroundColor(weenyWitch.lighter)
             }.padding(.horizontal)
             Rectangle()
-                .fill(K.Colors.WeenyWitch.orange)
+                .fill(weenyWitch.orange)
                 .frame(height: 1)
                 .padding(.horizontal)
         }

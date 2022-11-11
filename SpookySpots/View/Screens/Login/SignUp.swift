@@ -30,11 +30,12 @@ struct SignUp: View {
     @State var shouldShowPasswordErrorMessage = false
     @State var shouldShowConfirmPasswordError = false
     @State var shouldShowFirebaseError = false
-    
+
     @State var emailErrorMessage = ""
     @State var passwordErrorMessage = ""
     @State var confirmPasswordErrorMessage = ""
     @State var firebaseErrorMessage = ""
+    
     
     @EnvironmentObject var network: Network
     
@@ -156,16 +157,6 @@ struct SignUp: View {
         .focused($focusedField, equals: .confirmPassword)
         .submitLabel(.done)
     }
-
-    private var firebaseErrorBanner: some View {
-        
-            NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                    self.shouldShowFirebaseError = false
-                }
-            }
-    }
     
     //MARK: - Buttons
     
@@ -182,6 +173,16 @@ struct SignUp: View {
         }
         .offset(y: 25)
         .opacity(self.index == 1 ? 1 : 0)
+    }
+    
+    private var firebaseErrorBanner: some View {
+
+            NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
+            .task {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                    self.shouldShowFirebaseError = false
+                }
+            }
     }
     
     //MARK: - Methods
@@ -205,22 +206,20 @@ struct SignUp: View {
                         .unrecognizedEmail,
                         .emailIsBadlyFormatted,
                         .emailInUse:
-                    setErrorMessage(.email, message: error.rawValue)
+                    setErrorMessage(.email, message: error.message())
                      
                 case .incorrectPassword,
                         .insufficientPassword:
-                    setErrorMessage(.password, message: error.rawValue)
+                    setErrorMessage(.password, message: error.message())
                     
                 case .passwordsDontMatch:
-                    setErrorMessage(.confirmPassword, message: error.rawValue)
+                    setErrorMessage(.confirmPassword, message: error.message())
                     
                 case .failedToSaveUser,
                         .troubleConnectingToFirebase,
                         .firebaseTrouble:
-                    setErrorMessage(.firebase, message: error.rawValue)
-                    
-                default:
-                    setErrorMessage(.firebase, message: error.rawValue)
+                    setErrorMessage(.firebase, message: error.message())
+
                 }
             }
         }
