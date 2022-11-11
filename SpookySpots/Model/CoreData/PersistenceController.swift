@@ -30,21 +30,6 @@ struct PersistenceController {
         
         self.mainQueueContext = container.viewContext
         self.backgroundContext = container.newBackgroundContext()
-//        deleteAll()
-//        clearDatabase()
-    }
-    
-    public func clearDatabase() {
-        guard let url = container.persistentStoreDescriptions.first?.url else { return }
-        
-        let persistentStoreCoordinator = container.persistentStoreCoordinator
-
-         do {
-             try persistentStoreCoordinator.destroyPersistentStore(at:url, ofType: NSSQLiteStoreType, options: nil)
-             try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
-         } catch {
-             print("Attempted to clear persistent store: " + error.localizedDescription)
-         }
     }
     
     func save(_ context: NSManagedObjectContext, completion: @escaping (Error?) -> () = {_ in}) {
@@ -67,24 +52,6 @@ struct PersistenceController {
         save(context, completion: completion)
     }
     
-    func deleteAll(completion: @escaping (Error?) -> () = {_ in}) {
-        
-        do {
-            
-            let context = backgroundContext
-            
-            let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
-            let trips = try context.fetch(request)
-            
-            for trip in trips {
-                context.delete(trip)
-            }
-            save(context, completion: completion)
-        } catch {
-            print("Error fetching request: \(error)")
-        }
-    }
-    
     func createOrUpdateTrip(_ trip: Trip) {
         
         
@@ -98,51 +65,6 @@ struct PersistenceController {
                 let numberOfRecords = try context.count(for: request)
                 if numberOfRecords == 0 {
                     let newTrip = CDTrip(context: context)
-                    
-                    for route in trip.routes {
-                        let routeContext = CDRoute(context: context)
-                        routeContext.id = route.id
-                        routeContext.tripPosition = Int16(route.tripPosition ?? 0)
-                        routeContext.collectionID = route.collectionID
-                        routeContext.distanceInMeters = route.distance
-                        routeContext.travelTime = route.travelTime
-                        let polylineContext = CDPolyline(context: context)
-                        routeContext.polyline = polylineContext
-                        if let points = route.polyline?.pts {
-                            for point in points {
-                                let pointContext = CDPoint(context: context)
-                                pointContext.latitude = point.latitude ?? 0
-                                pointContext.longitude = point.longitude ?? 0
-                                pointContext.polyline = polylineContext
-                                polylineContext.addToPoints(pointContext)
-                            }
-                        }
-                        for step in route.steps {
-                            let stepContext = CDStep(context: context)
-                            stepContext.id = step.id ?? 0
-                            stepContext.instructions = step.instructions
-                            stepContext.longitude = step.longitude ?? 0
-                            stepContext.latitude = step.latitude ?? 0
-                            stepContext.distance = step.distanceInMeters ?? 0
-                            stepContext.route = routeContext
-                            routeContext.addToSteps(stepContext)
-                        }
-                        routeContext.trip = newTrip
-                        newTrip.addToRoutes(routeContext)
-                        
-                    }
-                    
-                    for dest in trip.destinations {
-                        let destContext = CDDestination(context: context)
-                        destContext.id = dest.id
-                        destContext.lon = dest.lon
-                        destContext.lat = dest.lat
-                        destContext.name = dest.name
-                        destContext.address = dest.address
-                        destContext.position = Int16(dest.position)
-                        newTrip.addToDestinations(destContext)
-                    }
-                    
                     
                     let startContext = CDDestination(context: context)
                     let tripStart = trip.startLocation
@@ -163,17 +85,7 @@ struct PersistenceController {
                     endContext.lon = tripEnd.lon
                     
                     newTrip.endPoint = endContext
-                    
-                    for remainingStep in trip.remainingSteps {
-                        let remStepContext = CDStep(context: context)
-                        remStepContext.id = remainingStep.id ?? 0
-                        remStepContext.instructions = remainingStep.instructions
-                        remStepContext.longitude = remainingStep.longitude ?? 0
-                        remStepContext.latitude = remainingStep.latitude ?? 0
-                        remStepContext.distance = remainingStep.distanceInMeters ?? 0
-                        newTrip.addToRemainingSteps(remStepContext)
-                    }
-                       
+                     
                     newTrip.id = trip.id
                     newTrip.userID = UserStore.instance.user.id
                     newTrip.completedStepCount = trip.completedStepCount

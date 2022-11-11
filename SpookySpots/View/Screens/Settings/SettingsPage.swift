@@ -29,6 +29,7 @@ struct SettingsPage: View {
                 about
                 admin
                 addLocationView
+                        .padding(.top, -30)
             }
             .padding(.vertical, 30)
             .navigationTitle("Settings")

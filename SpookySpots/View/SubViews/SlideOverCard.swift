@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SlideOverCard<Content: View> : View {
     @GestureState private var dragState = DragState.inactive
-    @State var position = CardPosition.middle
+    @State var position = CardPosition.bottom
     @Binding var canSlide: Bool
     var color: Color
     var handleColor: Color

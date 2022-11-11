@@ -300,7 +300,7 @@ class TripLogic: ObservableObject {
                                      lon: currentLoc.coordinate.longitude,
                                      address: address.streetCityState(),
                                      name: "Current Location",
-                                     position: 0)
+                                     position: 1)
                 var trip = Trip(id: UUID().uuidString,
                                 userID: self.userStore.user.id,
                                 destinations: [],
