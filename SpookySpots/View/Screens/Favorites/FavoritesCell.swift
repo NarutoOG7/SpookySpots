@@ -11,29 +11,28 @@ import SDWebImageSwiftUI
 struct FavoritesCell: View {
     
     var location: LocationModel
-
+    
     @State private var imageURL = URL(string: "")
-
+    
     var body: some View {
+        
         let screenSize = UIScreen.main.bounds.size
-            ZStack {
-                image
-                title
-            }
-            .frame(width: screenSize.width - 20, height: screenSize.height / 3)
-            .onAppear {
-                loadImageFromFirebase()
-            }
         
+        ZStack {
+            image
+            title
+        }
+        .frame(width: screenSize.width - 20, height: screenSize.height / 3)
         
+        .onAppear {
+            loadImageFromFirebase()
+        }
         
     }
     
     private var image: some View {
         WebImage(url: self.imageURL)
             .resizable()
-//            .aspectRatio(0.9, contentMode: .fill)
-//            .frame(width: 240, height: 270)
             .cornerRadius(15)
             .shadow(color: .black, radius: 3, x: 0, y: 1.5)
     }
@@ -50,10 +49,12 @@ struct FavoritesCell: View {
         }
     }
     
-    //MARK: - methods
     private func loadImageFromFirebase()  {
+        
         if let imageString = location.location.imageName {
+            
             FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
+                
                 self.imageURL = url
             }
         }

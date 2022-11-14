@@ -9,12 +9,16 @@ import Foundation
 
 
 enum FieldType {
+    
     case start, end, none
     
     var labelText: String {
+        
         switch self {
+            
         case .start:
             return "start:"
+            
         case .end, .none:
             return "end:  "
         }

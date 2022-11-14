@@ -62,6 +62,9 @@ struct NotificationBanner: View {
 
 struct NotificationBanner_Previews: PreviewProvider {
     static var previews: some View {
-        NotificationBanner(color: .red, messageColor: .white, message: .constant("This is going well."), isVisible: .constant(true))
+        NotificationBanner(color: .red,
+                           messageColor: .white,
+                           message: .constant("This is going well."),
+                           isVisible: .constant(true))
     }
 }

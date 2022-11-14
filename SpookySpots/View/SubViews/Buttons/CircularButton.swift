@@ -29,7 +29,7 @@ struct CircleButton: View {
                                     .foregroundColor(accentColor))
                     .aspectRatio(contentMode: .fit)
                     .frame(width: size.rawValue)
-                    .shadow(color: accentColor, radius: 2, x: 0, y: 1)
+                    .shadow(color: accentColor, radius: 1.35, x: 0, y: 1)
                 image
                     .resizable()
                     .tint(mainColor)

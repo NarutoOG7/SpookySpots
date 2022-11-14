@@ -10,12 +10,15 @@ import SwiftUI
 struct SplashScreen: View {
     
     var body: some View {
-        ZStack {
-            K.Colors.WeenyWitch.black
-                .edgesIgnoringSafeArea(.all)
-            K.Images.logo
-                .padding(.bottom, 110)
+        GeometryReader { geo in
+            ZStack {
+                K.Colors.WeenyWitch.black
+                    .edgesIgnoringSafeArea(.all)
+                K.Images.logo
+                    .frame(height: 313)
+                    .padding(.bottom, (geo.size.height / 2) - 250)
                 
+            }
         }
     }
 

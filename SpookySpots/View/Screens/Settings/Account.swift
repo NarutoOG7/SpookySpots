@@ -18,6 +18,8 @@ struct Account: View {
     
     var auth = Authorization.instance
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     var body: some View {
         VStack {
             SettingsHeader(settingType: .account)
@@ -26,12 +28,12 @@ struct Account: View {
                 manageReviews
                 sendPasswordResetButton
                     .listRowSeparator(.hidden)
-                    .listRowBackground(K.Colors.WeenyWitch.black)
+                    .listRowBackground(weenyWitch.black)
                 signOutButton
                     .listRowSeparator(.hidden)
-                    .listRowBackground(K.Colors.WeenyWitch.black)
+                    .listRowBackground(weenyWitch.black)
             }
-            .modifier(ListBackgroundModifier())
+            .modifier(ClearListBackgroundMod())
 
             .listStyle(.plain)
             
@@ -66,28 +68,28 @@ struct Account: View {
     private var editProfile: some View {
         NavigationLink(destination: ProfilePage()) {
             Text("Edit Profile")
-                .foregroundColor(K.Colors.WeenyWitch.lighter)
+                .foregroundColor(weenyWitch.lighter)
         }
 
             .listRowSeparator(.hidden)
-            .listRowBackground(K.Colors.WeenyWitch.black)
+            .listRowBackground(weenyWitch.black)
     }
     
     private var manageReviews: some View {
         NavigationLink(destination: ManageReviews()) {
             Text("Manage Reviews")
-                .foregroundColor(K.Colors.WeenyWitch.lighter)
+                .foregroundColor(weenyWitch.lighter)
         }
 
             .listRowSeparator(.hidden)
-            .listRowBackground(K.Colors.WeenyWitch.black)
+            .listRowBackground(weenyWitch.black)
     }
     
     //MARK: - Buttons
     private var sendPasswordResetButton: some View {
         Button(action: changePasswordTapped) {
             Text("Change Password")
-                .foregroundColor(K.Colors.WeenyWitch.lighter)
+                .foregroundColor(weenyWitch.lighter)
         }
     }
     
@@ -96,8 +98,7 @@ struct Account: View {
             Text("SIGN OUT")
                 .font(.callout)
                 .fontWeight(.light)
-                .foregroundColor(K.Colors.WeenyWitch.lighter)
-//                .foregroundColor(.red)
+                .foregroundColor(weenyWitch.lighter)
         }
     }
   
@@ -105,12 +106,18 @@ struct Account: View {
     //MARK: - Methods
     
     private func changePasswordTapped() {
+        
         auth.passwordReset(email: userStore.user.email) { result in
+            
             if result == true {
+                
                 self.passwordResetAlertShown = true
             }
+            
         } error: { error in
+            
             if error == .firebaseTrouble {
+                
                 self.firebaseErrorAlertShown = true
             }
         }
@@ -122,10 +129,14 @@ struct Account: View {
     
     
     private func confirmSignOutTapped() {
+        
         auth.signOut { error in
+            
             if error == .failToSignOut {
+                
                 self.failSignOutAlertShown = true
             }
+            
             userStore.user = User()
         }
     }

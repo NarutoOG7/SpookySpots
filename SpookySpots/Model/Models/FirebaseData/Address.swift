@@ -39,7 +39,6 @@ struct Address: Codable, Hashable {
     }
     
     func geoCodeAddress() -> String {
-//        "\(address)"
         address + ", " + city + ", " + state
     }
 }

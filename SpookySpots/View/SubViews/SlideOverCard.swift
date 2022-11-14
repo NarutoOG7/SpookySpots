@@ -8,14 +8,19 @@
 import SwiftUI
 
 struct SlideOverCard<Content: View> : View {
+    
     @GestureState private var dragState = DragState.inactive
+    
     @State var position = CardPosition.bottom
+    
     @Binding var canSlide: Bool
+    
     var color: Color
     var handleColor: Color
     var screenSize: CGFloat
     
     var content: () -> Content
+    
     var body: some View {
         
         let drag = DragGesture()
@@ -36,7 +41,6 @@ struct SlideOverCard<Content: View> : View {
         .background(color)
         .cornerRadius(10)
         .shadow(color: .white.opacity(0.13), radius: 10)
-//        .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.13), radius: 10)
         .offset(y: self.position.size(from: screenSize) + self.dragState.translation.height)
         .animation(.interpolatingSpring(stiffness: 300, damping: 30), value: dragState.isDragging)
         .gesture(canSlide ? drag : nil)
@@ -94,7 +98,7 @@ struct SlideOverCard_Previews: PreviewProvider {
     static var previews: some View {
         SlideOverCard(canSlide: .constant(true), color: Color.black, handleColor: .white, screenSize: 900) {
             VStack {
-                Text("Hello")
+                Text("Hello,")
                     .foregroundColor(Color.white)
                 Text("My name is Spencer.")
                 Text("There is water boiling on the stove.")
@@ -106,6 +110,7 @@ struct SlideOverCard_Previews: PreviewProvider {
 
 //MARK: - Drag State
 enum DragState {
+    
     case inactive
     case dragging(translation: CGSize)
     

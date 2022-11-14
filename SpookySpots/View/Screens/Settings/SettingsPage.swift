@@ -25,7 +25,6 @@ struct SettingsPage: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 50) {
                 Account()
-//                    .padding(.bottom, 20)
                 about
                 admin
                 addLocationView
@@ -45,8 +44,7 @@ struct SettingsPage: View {
         VStack {
             SettingsHeader(settingType: .about)
             List {
-                // rateApp
-//                    .listRowBackground(weenyWitch.black)
+
                 privacyPolicy
                     .listRowBackground(weenyWitch.black)
                 termsOfUse
@@ -56,17 +54,10 @@ struct SettingsPage: View {
             }
             .listStyle(.plain)
             .frame(minHeight: 80)
-            .modifier(ListBackgroundModifier())
+            .modifier(ClearListBackgroundMod())
         }
 
     }
-    
-//    private var rateApp: some View {
-//        NavigationLink(destination: RateMyApp()) {
-//            Text("Rate SpookySpots")
-//                .foregroundColor(weenyWitch.lighter)
-//        }.listRowSeparator(.hidden)
-//    }
     
     private var privacyPolicy: some View {
         let view: AnyView
@@ -123,7 +114,7 @@ struct SettingsPage: View {
                 }.listRowSeparator(.hidden)
                     .listRowBackground(weenyWitch.black)
             }
-            .modifier(ListBackgroundModifier())
+            .modifier(ClearListBackgroundMod())
             .frame(minHeight: 50)
             .listStyle(.plain)
         }
@@ -132,7 +123,7 @@ struct SettingsPage: View {
     //MARK: - Add Location
     private var addLocationView: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Know of any spooky locations not listed that you would like to share?")
+            Text("Know of any spooky locations that you would like to share?")
                 .foregroundColor(weenyWitch.light)
                 .italic()
             NavigationLink {
@@ -149,51 +140,6 @@ struct SettingsPage: View {
     
 }
 
-//MARK: - Header
-struct SettingsHeader: View {
-    
-    var settingType: SettingType
-    
-    let weenyWitch = K.Colors.WeenyWitch.self
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                settingType.image
-                    .resizable()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(weenyWitch.orange)
-                Text(settingType.rawValue.capitalized)
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                    .foregroundColor(weenyWitch.lighter)
-            }.padding(.horizontal)
-            Rectangle()
-                .fill(weenyWitch.orange)
-                .frame(height: 1)
-                .padding(.horizontal)
-        }
-    }
-    
-    enum SettingType: String {
-        case account
-        case about
-        case admin
-        
-        var image: Image {
-            switch self {
-            case .account:
-                return Image(systemName: "person")
-            case .about:
-                return Image(systemName: "gearshape")
-            case .admin:
-                return Image(systemName: "checkerboard.shield")
-            }
-        }
-    }
-}
-
-
 //MARK: - Preview
 struct SettingsPage_Previews: PreviewProvider {
     static var previews: some View {
@@ -201,5 +147,4 @@ struct SettingsPage_Previews: PreviewProvider {
             SettingsPage()
         }
     }
-    
 }

@@ -17,7 +17,7 @@ struct SpookySpotsApp: App {
     
     @StateObject var locationStore = LocationStore.instance
     
-    @StateObject var network = Network()
+    @StateObject var network = NetworkManager()
             
     @Environment(\.scenePhase) var scenePhase
         

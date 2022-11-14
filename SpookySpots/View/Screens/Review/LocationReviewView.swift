@@ -38,7 +38,7 @@ struct LocationReviewView: View {
     
     var body: some View {
         ZStack {
-            K.Colors.WeenyWitch.black
+            weenyWitch.black
                 .edgesIgnoringSafeArea(.vertical)
         
             VStack(spacing: 20) {
@@ -74,34 +74,35 @@ struct LocationReviewView: View {
     private var title: some View {
         UserInputCellWithIcon(
             input: $titleInput,
+            shouldShowErrorMessage: $shouldShowTitleErrorMessage,
+            isSecured: .constant(false),
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Title",
-            errorMessage: "Please add a title.",
-            shouldShowErrorMessage: $shouldShowTitleErrorMessage,
-            isSecured: .constant(false))
+            errorMessage: "Please add a title.")
         .focused($focusedField, equals: .title)
         .submitLabel(.next)
     }
     
     private var stars: some View {
         HStack {
-            FiveStars(rating: $pickerSelection, isEditable: true, color: K.Colors.WeenyWitch.orange)
+            FiveStars(isEditable: true,
+                      color: K.Colors.WeenyWitch.orange,
+                      rating: $pickerSelection)
         }
     }
     
     private var description: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return UserInputCellWithIcon(
+         UserInputCellWithIcon(
             input: $descriptionInput,
+            shouldShowErrorMessage: $shouldShowDescriptionErrorMessage,
+            isSecured: .constant(false),
             primaryColor: weenyWitch.orange,
             accentColor: weenyWitch.light,
             icon: nil,
             placeholderText: "Description",
-            errorMessage: "Please add a description.",
-            shouldShowErrorMessage: $shouldShowDescriptionErrorMessage,
-            isSecured: .constant(false))
+            errorMessage: "Please add a description.")
         .focused($focusedField, equals: .description)
         .submitLabel(.next)
     }
@@ -109,16 +110,15 @@ struct LocationReviewView: View {
     private var anonymousOption: some View {
         VStack(spacing: 12) {
             if !isAnonymous {
-                let weenyWitch = K.Colors.WeenyWitch.self
                 UserInputCellWithIcon(
                     input: $nameInput,
+                    shouldShowErrorMessage: .constant(false),
+                    isSecured: .constant(false),
                     primaryColor: weenyWitch.orange,
                     accentColor: weenyWitch.light,
                     icon: nil,
                     placeholderText: userStore.user.name,
-                    errorMessage: "",
-                    shouldShowErrorMessage: .constant(false),
-                    isSecured: .constant(false))
+                    errorMessage: "")
                 .focused($focusedField, equals: .username)
                 .submitLabel(.done)
             }
@@ -126,15 +126,18 @@ struct LocationReviewView: View {
                 Text("Leave Review Anonymously?")
                     .italic()
                     .font(.caption)
-                    .foregroundColor(K.Colors.WeenyWitch.lighter)
+                    .foregroundColor(weenyWitch.lighter)
             }.padding(.horizontal)
-                .tint(K.Colors.WeenyWitch.orange)
+                .tint(weenyWitch.orange)
         }
     }
     //MARK: - Error Banner
     private var firebaseErrorBanner: some View {
 
-            NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
+            NotificationBanner(color: weenyWitch.orange,
+                               messageColor: weenyWitch.lightest,
+                               message: $firebaseErrorMessage,
+                               isVisible: $shouldShowFirebaseError)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     self.shouldShowFirebaseError = false
@@ -145,7 +148,7 @@ struct LocationReviewView: View {
     private var submitButton: some View {
         let isReview = review != nil
         let isDisabled = !requisiteFieldsAreFilled() || !isUpdated()
-        let color = isDisabled ? K.Colors.WeenyWitch.lighter.opacity(0.1) : K.Colors.WeenyWitch.orange
+        let color = isDisabled ? weenyWitch.lighter.opacity(0.1) : weenyWitch.orange
         return Button(action: submitTapped) {
             Text(isReview && isUpdated() ? "Update" : "Submit")
                 .foregroundColor(color)
@@ -159,9 +162,7 @@ struct LocationReviewView: View {
     }
     
     private func submitTapped() {
-        
-        let errorMessages = K.ErrorMessages.Review.self
-        
+                
         checkRequiredFieldsAndAssignErrorMessagesAsNeeded()
         
         if requisiteFieldsAreFilled() {
@@ -177,21 +178,27 @@ struct LocationReviewView: View {
                 locationName: location.location.name)
             
             if self.review != nil && isUpdated() {
+                
                 firebaseManager.updateReviewInFirestore(rev, forID: self.review?.id ?? rev.id) { error in
+                    
                     if let error = error {
                         self.firebaseErrorMessage = error.rawValue
                         self.shouldShowFirebaseError = true
                     }
+                    
                     self.location.reviews.append(rev)
                     LocationStore.instance.switchNewLocationIntoAllBucketsIfExists(location)
                     self.shouldShowSuccessMessage = true
                 }
             } else {
+                
                 firebaseManager.addReviewToFirestoreBucket(rev, location: location.location) { error in
+                    
                     if let error = error {
                         self.firebaseErrorMessage = error.rawValue
                         self.shouldShowFirebaseError = true
                     }
+                    
                     self.location.reviews.append(rev)
                     LocationStore.instance.switchNewLocationIntoAllBucketsIfExists(location)
                     self.shouldShowSuccessMessage = true
@@ -201,11 +208,11 @@ struct LocationReviewView: View {
     }
     
     private func requisiteFieldsAreFilled() -> Bool {
-        return titleInput != "" &&
-        descriptionInput != ""
+        return titleInput != "" && descriptionInput != ""
     }
     
     private func checkRequiredFieldsAndAssignErrorMessagesAsNeeded() {
+        
         if titleInput == "" {
             self.shouldShowTitleErrorMessage = true
         } else {
@@ -234,101 +241,11 @@ struct LocationReviewView: View {
 
 struct LocationReviewView_Previews: PreviewProvider {
     static var previews: some View {
-        LocationReviewView(location: .constant(LocationModel(location: .example, imageURLs: [], reviews: [])), isPresented: .constant(true), review: .constant(nil))
+        LocationReviewView(location: .constant(LocationModel(location: .example,
+                                                             imageURLs: [],
+                                                             reviews: [])),
+                           isPresented: .constant(true),
+                           review: .constant(nil))
     }
 }
 
-
-struct UserInputCellWithIcon: View {
-    
-    @Binding var input: String
-    
-    let primaryColor: Color
-    let accentColor: Color
-    var thirdColor: Color = .clear
-    
-    //        let cellColor: Color
-    //        let dividerColor: Color
-    //        let iconColor: Color
-    //        let textColor: Color
-    //        let placeholderColor: Color
-    let icon: Image?
-    let placeholderText: String
-    
-    let errorMessage: String
-    @Binding var shouldShowErrorMessage: Bool
-    @Binding var isSecured: Bool
-    var canSecure = false
-    var hasDivider = true
-    var boldText = false
-    
-    
-    
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            if shouldShowErrorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-                    .font(.caption)
-            }
-            HStack(spacing: 15) {
-                if let icon = icon {
-                    if canSecure == true {
-                        Button {
-                            isSecured.toggle()
-                        } label: {
-                            icon.foregroundColor(primaryColor)
-                        }
-
-                    } else {
-                    icon
-                        .foregroundColor(primaryColor)
-                    }
-                }
-                
-                if isSecured {
-                    
-                    SecureField(input, text: self.$input)
-                        .disableAutocorrection(true)
-                        .font(.title3.weight(boldText ? .bold : .regular))
-                        .textInputAutocapitalization(.never)
-                        .foregroundColor(primaryColor)
-                        .placeholder(when: self.input.isEmpty) {
-                            Text(placeholderText)
-                                .foregroundColor(accentColor)
-                        }
-                        .onChange(of: input) { newValue in
-                            if !newValue.isEmpty {
-                                self.shouldShowErrorMessage = false
-                            }
-                        }
-                    
-                } else {
-                    
-                    TextField("", text: self.$input)
-                        .disableAutocorrection(true)
-                        .font(.title3.weight(boldText ? .bold : .regular))
-                        .textInputAutocapitalization(.never)
-                        .foregroundColor(primaryColor)
-                        .placeholder(when: input.isEmpty) {
-                            Text(placeholderText)
-                                .foregroundColor(accentColor)
-                        }
-                        .onChange(of: input) { newValue in
-                            if !newValue.isEmpty {
-                                self.shouldShowErrorMessage = false
-                            }
-                        }
-                        
-                }
-            }
-            if hasDivider {
-            Divider().background(primaryColor)
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top, 40)
-        
-    }
-}

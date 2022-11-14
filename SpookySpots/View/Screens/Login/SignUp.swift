@@ -37,7 +37,7 @@ struct SignUp: View {
     @State var firebaseErrorMessage = ""
     
     
-    @EnvironmentObject var network: Network
+    @EnvironmentObject var network: NetworkManager
     
     var body: some View {
         ZStack {
@@ -101,13 +101,13 @@ struct SignUp: View {
     private var userNameField: some View {
         UserInputCellWithIcon(
             input: $usernameInput,
+            shouldShowErrorMessage: $shouldShowUserNameErrorMessage,
+            isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: "person.fill"),
             placeholderText: "Your Name",
-            errorMessage: "Please provide a name.",
-            shouldShowErrorMessage: $shouldShowUserNameErrorMessage,
-            isSecured: .constant(false))
+            errorMessage: "Please provide a name.")
         .focused($focusedField, equals: .username)
         .submitLabel(.next)
     }
@@ -117,13 +117,13 @@ struct SignUp: View {
     private var email: some View {
         UserInputCellWithIcon(
             input: $emailInput,
+            shouldShowErrorMessage: $shouldShowEmailErrorMessage,
+            isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: "envelope.fill"),
             placeholderText: "Email Address",
-            errorMessage: emailErrorMessage,
-            shouldShowErrorMessage: $shouldShowEmailErrorMessage,
-            isSecured: .constant(false))
+            errorMessage: emailErrorMessage)
         .focused($focusedField, equals: .email)
         .submitLabel(.next)
     }
@@ -131,13 +131,13 @@ struct SignUp: View {
     private var password: some View {
         UserInputCellWithIcon(
             input: $passwordInput,
+            shouldShowErrorMessage: $shouldShowPasswordErrorMessage,
+            isSecured: $passwordIsSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: passwordIsSecured ? "eye.slash.fill" : "eye" ),
             placeholderText: "Password",
             errorMessage: passwordErrorMessage,
-            shouldShowErrorMessage: $shouldShowPasswordErrorMessage,
-            isSecured: $passwordIsSecured,
             canSecure: true)
         .focused($focusedField, equals: .password)
         .submitLabel(.next)
@@ -146,13 +146,13 @@ struct SignUp: View {
     private var confirmPassword: some View {
         UserInputCellWithIcon(
             input: $confirmPasswordInput,
+            shouldShowErrorMessage: $shouldShowConfirmPasswordError,
+            isSecured: $confirmPasswordIsSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: confirmPasswordIsSecured ? "eye.slash.fill" : "eye" ),
             placeholderText: "Confirm Password",
-            errorMessage: PasswordErrorType.dontMatch.rawValue,
-            shouldShowErrorMessage: $shouldShowConfirmPasswordError,
-            isSecured: $confirmPasswordIsSecured,
+            errorMessage: K.ErrorMessages.Auth.passwordsDontMatch.rawValue,
             canSecure: true)
         .focused($focusedField, equals: .confirmPassword)
         .submitLabel(.done)
@@ -177,7 +177,10 @@ struct SignUp: View {
     
     private var firebaseErrorBanner: some View {
 
-            NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
+            NotificationBanner(color: weenyWitch.orange,
+                               messageColor: weenyWitch.lightest,
+                               message: $firebaseErrorMessage,
+                               isVisible: $shouldShowFirebaseError)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     self.shouldShowFirebaseError = false
@@ -228,11 +231,13 @@ struct SignUp: View {
     }
     
     private func checkForErrorAndSendAppropriateErrorMessage() {
+        
         if usernameInput == "" {
             self.shouldShowUserNameErrorMessage = true
         } else {
             self.shouldShowUserNameErrorMessage = false
         }
+        
         if emailInput == "" {
             setErrorMessage(.email, message: "Please provide an email address.")
         } else {
@@ -270,20 +275,25 @@ struct SignUp: View {
     }
     
     private func setErrorMessage(_ type: ErrorMessageType, message: String) {
+        
         switch type {
         
         case .email:
             self.emailErrorMessage = message
             self.shouldShowEmailErrorMessage = true
+            
         case .password:
             self.passwordErrorMessage = message
             self.shouldShowPasswordErrorMessage = true
+            
         case .confirmPassword:
             self.confirmPasswordErrorMessage = message
             self.shouldShowConfirmPasswordError = true
+            
         case .firebase:
             self.firebaseErrorMessage = message
             self.shouldShowFirebaseError = true
+            
         }
     }
     
@@ -298,7 +308,7 @@ struct SignUp: View {
 struct SignUp_Previews: PreviewProvider {
     static var previews: some View {
         SignUp(index: .constant(0))
-            .environmentObject(Network())
+            .environmentObject(NetworkManager())
     }
 }
 
@@ -313,11 +323,4 @@ struct CurvedShapeRight : Shape {
             path.addLine(to: CGPoint(x: rect.width, y: 0))
         }
     }
-}
-
-//MARK: - Password Error Type
-enum PasswordErrorType: String {
-    case empty = "Please provide a password."
-    case tooWeak = "Password must be at least 6 characters long."
-    case dontMatch = "Passwords must match."
 }

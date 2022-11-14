@@ -81,12 +81,13 @@ struct DatabaseView: View {
     }
     
     var failedLocationsList: some View {
+        
         List(failedLocations) { location in
             Text("\(location.location.id): \(location.location.name)")
                 .foregroundColor(weenyWitch.lightest)
 
         }
-        .modifier(ListBackgroundModifier())
+        .modifier(ClearListBackgroundMod())
         .lineLimit(self.showingMoreFailedLocations ? .none : 4)
     }
     
@@ -130,8 +131,11 @@ struct DatabaseView: View {
     }
     
     private func createGFCTapped() {
+        
         for loc in locationStore.hauntedHotels {
+            
             GeoFireManager.instance.createSpookySpotForLocation(loc) { result in
+                
                 if result == false {
                     self.failedLocations.append(loc)
                 } else {

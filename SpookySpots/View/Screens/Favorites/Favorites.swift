@@ -9,9 +9,9 @@ import SwiftUI
 
 struct Favorites: View {
     
-    @ObservedObject var locationStore = LocationStore.instance
-    
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    
+    @ObservedObject var locationStore = LocationStore.instance
         
     var body: some View {
         ZStack {
@@ -23,22 +23,21 @@ struct Favorites: View {
     }
     
     var locationsList: some View {
+        
         VStack {
+            
             ScrollView(showsIndicators: false) {
+                
                 ForEach(0..<locationStore.favoriteLocations.count, id: \.self) { index in
+                    
                     NavigationLink {
                         LD(location: $locationStore.favoriteLocations[index])
                     } label: {
-                        
                         FavoritesCell(location: locationStore.favoriteLocations[index])
-//                    }
                     }.padding(.top, 8)
-                    
-
                 }
                 
             }
-            
         }
     }
 }

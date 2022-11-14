@@ -121,9 +121,13 @@ struct ProfilePage: View {
     //MARK: - Methods
     
     private func saveTapped() {
+        
         auth.setCurrentUsersName(displayNameInput) { error in
+            
             self.shouldShowFirebaseError = true
+            
             self.firebaseErrorMessage = error.message()
+    
         }
         self.dismiss.callAsFunction()
     }
@@ -134,9 +138,13 @@ struct ProfilePage: View {
     }
     
     private func confirmDeleteTapped() {
+        
         auth.deleteUserAccount { error in
+            
             self.deleteAcctAlertShown = true
+            
         } success: { result in
+            
             if result == true {
                 
             }

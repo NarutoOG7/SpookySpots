@@ -9,12 +9,11 @@ import SwiftUI
 
 struct SearchBar: View {
     
-    
-    //    @State var searchText: String = ""
-    
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
     @ObservedObject var locationStore = LocationStore.instance
+    
+    let weenyWitch = K.Colors.WeenyWitch.self
 
     var body: some View {
         VStack {
@@ -38,7 +37,7 @@ struct SearchBar: View {
     private var magGlass: some View {
         Image(systemName: "magnifyingglass")
             .padding()
-            .foregroundColor(K.Colors.WeenyWitch.orange)
+            .foregroundColor(weenyWitch.orange)
     }
     
     private var searchField: some View {
@@ -46,9 +45,8 @@ struct SearchBar: View {
                   text:
                     $exploreVM.searchText)
         .padding()
-        .foregroundColor(K.Colors.WeenyWitch.brown)
-        .accentColor(K.Colors.WeenyWitch.orange)
-        
+        .foregroundColor(weenyWitch.brown)
+        .accentColor(weenyWitch.orange)
         
     }
     
@@ -63,23 +61,24 @@ struct SearchBar: View {
                 LD(location: $exploreVM.searchedLocations[index])
             } label: {
                 Text(exploreVM.searchedLocations[index].location.name)
+                    .foregroundColor(weenyWitch.brown)
             }
             .listRowBackground(Color.clear)
         }
             
         }
-        .modifier(ListBackgroundModifier())
+        .modifier(ClearListBackgroundMod())
         .frame(height: listHasNoItems ? 0 : listHeight)
         .listStyle(.inset)
     }
     
     private var background: some View {
         RoundedRectangle(cornerRadius: 20)
-            .fill(K.Colors.WeenyWitch.lightest)
+            .fill(weenyWitch.lightest)
             .padding(2)
             .background(
                 RoundedRectangle(cornerRadius: 20)
-                    .fill(K.Colors.WeenyWitch.brown))
+                    .fill(weenyWitch.brown))
     }
     
     //MARK: - Buttons

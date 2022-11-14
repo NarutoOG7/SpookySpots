@@ -19,24 +19,22 @@ struct ChangeStartAndStop: View {
     
     @State var startResult = MKMapItem.init()
     @State var endResult = MKMapItem.init()
-
+    
     @State var startPlaceholder: String = ""
     @State var endPlaceholder: String = ""
-
+    
     @State var editedField = FieldType.none
-
+    
     @State var shouldShowCurrentLocationFailedErrorMessage = false
     
     @ObservedObject var localSearchService = LocalSearchService.instance
     @ObservedObject var tripLogic = TripLogic.instance
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var tripPageVM = TripPageVM.instance
+    @ObservedObject var userStore = UserStore.instance    
     
-
     let weenyWitch = K.Colors.WeenyWitch.self
     
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
         ZStack {
             
@@ -55,49 +53,45 @@ struct ChangeStartAndStop: View {
                     type: .end)
                 .padding(.horizontal)
                 .padding(.bottom)
-
-                if !startInput.isEmpty || !endInput.isEmpty {
-                    Button(action: currentLocationTapped) {
-                        Text("Current Location")
-                            .foregroundColor(weenyWitch.orange)
-                    }
-                }
                 
+                if !startInput.isEmpty || !endInput.isEmpty && userStore.currentLocation != nil {
+                    currentLocationButton
+                }
                 
                 searchResultsList
                 
             }
         }
-            .padding(.top)
+        .padding(.top)
+        
+        .background(weenyWitch.black)
+        
+        .toolbar {
             
-            .background(weenyWitch.black)
+            ToolbarItem(placement: .navigationBarLeading) {
+                cancelButton
+            }
             
-            .toolbar {
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    cancelButton
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    doneButton
-                }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                doneButton
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden()
-            .onAppear {
-                                
-                self.startPlaceholder = tripLogic.currentTrip?.startLocation.name ?? ""
-                self.endPlaceholder = tripLogic.currentTrip?.endLocation.name ?? ""
-                
-            }
-            .alert("Location Not Found!", isPresented: $shouldShowCurrentLocationFailedErrorMessage) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text("You must allow the app permission to get your current location. Please visit your device settings.")
-            }
-
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .onAppear {
+            
+            self.startPlaceholder = tripLogic.currentTrip?.startLocation.name ?? ""
+            self.endPlaceholder = tripLogic.currentTrip?.endLocation.name ?? ""
+            
+        }
+        .alert("Location Not Found!", isPresented: $shouldShowCurrentLocationFailedErrorMessage) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("You must allow the app permission to get your current location. Please visit your device settings.")
+        }
+        
     }
-
+    
     private var searchResultsList: some View {
         List(localSearchService.locationsList) { location in
             Button(action: {
@@ -116,13 +110,13 @@ struct ChangeStartAndStop: View {
                     Text(location.placemark.postalAddress?.streetCityState() ?? "")
                         .font(.caption)
                         .foregroundColor(weenyWitch.orange)
-
+                    
                 }
             })
             .listRowBackground(Color.clear)
-
+            
         }
-        .modifier(ListBackgroundModifier())
+        .modifier(ClearListBackgroundMod())
     }
     
     private var errorBanner: some View {
@@ -132,11 +126,11 @@ struct ChangeStartAndStop: View {
             messageColor: weenyWitch.lightest,
             message: .constant("You must allow the app access to your current location."),
             isVisible: $shouldShowCurrentLocationFailedErrorMessage)
-            .task {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
-                    self.shouldShowCurrentLocationFailedErrorMessage = false
-                }
+        .task {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+                self.shouldShowCurrentLocationFailedErrorMessage = false
             }
+        }
     }
     
     //MARK: - Buttons
@@ -148,10 +142,10 @@ struct ChangeStartAndStop: View {
             Text("Cancel")
                 .font(.title3)
                 .fontWeight(.light)
-
+            
         })
     }
-
+    
     var doneButton: some View {
         Button(action: {
             addStartAndStopToTrip()
@@ -162,14 +156,19 @@ struct ChangeStartAndStop: View {
         })
     }
     
+    private var currentLocationButton: some View {
+        Button(action: currentLocationTapped) {
+            Text("Current Location")
+                .foregroundColor(weenyWitch.orange)
+        }
+    }
+    
     //MARK: - Methods
-
+    
     func cancel() {
-        tripLogic.isShowingSheetForStartOrStop = false
-        tripPageVM.isShowingChangeOfStartAndStop = false
         self.dismiss.callAsFunction()
     }
-
+    
     private func isSearching() -> Bool {
         !startInput.isEmpty || !endInput.isEmpty
     }
@@ -200,8 +199,9 @@ struct ChangeStartAndStop: View {
                                remainingSteps: trip?.remainingSteps ?? [],
                                completedStepCount: trip?.completedStepCount ?? 0,
                                totalStepCount: trip?.totalStepCount ?? 0,
+                               currentStepIndex: trip?.currentStepIndex ?? 0,
                                tripState: .building)
-
+            
             newTrip.nextDestinationIndex = 0
             
             if startInput != "" || endInput != "" {
@@ -209,19 +209,22 @@ struct ChangeStartAndStop: View {
             }
             tripLogic.currentTrip = newTrip
             
-
-            tripLogic.isShowingSheetForStartOrStop = false
-            tripPageVM.isShowingChangeOfStartAndStop = false
+            
             
             self.dismiss.callAsFunction()
         }
     }
     
     func currentLocationTapped() {
+        
         if userStore.currentLocation != nil {
+            
             if editedField == .start {
+                
                 startInput = "Current Location"
+                
             } else if editedField == .end {
+                
                 endInput = "Current Location"
             }
         }
@@ -237,28 +240,31 @@ struct ChangeStartAndStop: View {
             
             return startDest
         }
+        
         return nil
     }
-
+    
     func updatedEnd() -> Destination? {
-
-        if !endInput.isEmpty {
         
-        let endName = endInput == "" ? tripLogic.currentTrip?.endLocation.name : endInput
+        if !endInput.isEmpty {
             
-        let endDest = createDestinationFromResult(endResult, name: endName ?? "", isStart: false)
+            let endName = endInput == "" ? tripLogic.currentTrip?.endLocation.name : endInput
+            
+            let endDest = createDestinationFromResult(endResult, name: endName ?? "", isStart: false)
             
             return endDest
         }
-        
         
         return nil
     }
     
     
     func createDestinationFromResult(_ result: MKMapItem, name: String, isStart: Bool) -> Destination {
+        
         let postalAddress = result.placemark.postalAddress?.streetCityState()
+        
         let position = isStart ? 0 : (tripLogic.currentTrip?.destinations.count ?? 0 + 1)
+        
         var newDest = Destination(
             id: isStart ? "\(TripDetails.startingLocationID)" : "\(TripDetails.endLocationID)",
             lat: 0,
@@ -268,18 +274,20 @@ struct ChangeStartAndStop: View {
             position: position)
         
         if name == "Current Location" {
+            
             if let currentLocation = userStore.currentLocation {
+                
                 newDest.lat = currentLocation.coordinate.latitude
                 newDest.lon = currentLocation.coordinate.longitude
                 
             } else {
+                
                 self.shouldShowCurrentLocationFailedErrorMessage = true
-                /// handle error of not being able to get current location when the start is set to current location.
-                /// route will not show up nor will placemark.
-                /// user won't know what the fuck is happening
             }
         } else {
+            
             let newLocCoord = result.placemark.coordinate
+            
             newDest.lat = newLocCoord.latitude
             newDest.lon = newLocCoord.longitude
         }
@@ -288,30 +296,11 @@ struct ChangeStartAndStop: View {
     }
     
 }
+
+
 struct ChangeStartAndStop_Previews: PreviewProvider {
     static var previews: some View {
         ChangeStartAndStop(startInput: "", endInput: "")
     }
 }
 
-extension Binding where Value == String? {
-    func toNonOptional() -> Binding<String> {
-        return Binding<String>(
-            get: {
-                return self.wrappedValue ?? ""
-            },
-            set: {
-                self.wrappedValue = $0
-            }
-        )
-
-    }
-}
-
-extension CNPostalAddress {
-    func streetCityState() -> String {
-        "\(self.street), \(self.city), \(self.state)"
-    }
-}
-
-extension MKMapItem: Identifiable {}

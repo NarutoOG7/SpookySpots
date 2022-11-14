@@ -8,14 +8,23 @@
 import SwiftUI
 
 struct FiveStars: View {
-    @Binding var rating: Int
+    
     var isEditable = false
+    
     let color: Color
+    
+    @Binding var rating: Int
+    
+    
     var body: some View {
+        
          HStack {
+             
              ForEach(1...5, id: \.self) { index in
+                 
                  Image(systemName: self.starImageNameFromRating(index))
                      .foregroundColor(color)
+                 
                      .onTapGesture {
                          if isEditable {
                              self.rating = index
@@ -34,8 +43,8 @@ struct FiveStars: View {
 struct FiveStars_Previews: PreviewProvider {
     static var previews: some View {
         FiveStars(
-            rating: .constant(3),
             isEditable: true,
-            color: K.Colors.WeenyWitch.orange)
+            color: K.Colors.WeenyWitch.orange,
+            rating: .constant(3))
     }
 }

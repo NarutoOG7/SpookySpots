@@ -6,9 +6,7 @@
 //
 
 import SwiftUI
-//import Firebase
 import FirebaseFirestore
-//import FirebaseDatabase
 import CoreLocation
 import GeoFire
 import Firebase
@@ -16,17 +14,16 @@ import MapKit
 
 
 class FirebaseManager: ObservableObject {
+    
     let constantToNeverTouch: Void = FirebaseApp.configure()
+    
     static let instance = FirebaseManager()
     
-    //    @ObservedObject var userLocManager = UserLocationManager.instance
-    //    @ObservedObject var exploreByMapVM = ExploreByMapVM.instance
+    @Published var favoriteLocations: [FavoriteLocation] = []
     
+    @ObservedObject var errorManager = ErrorManager.instance
     @ObservedObject var locationStore = LocationStore.instance
     @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var errorManager = ErrorManager.instance
-    
-    @Published var favoriteLocations: [FavoriteLocation] = []
     
     var db: Firestore?
     
@@ -34,48 +31,11 @@ class FirebaseManager: ObservableObject {
         db = Firestore.firestore()
     }
     
-    func getHotelWithReviews(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
-        getSelectHotel(byID: locID) { location in
-            self.getReviewsForLocation(locID) { reviews in
-                var newLoc = location
-                newLoc.reviews = reviews
-                completion(newLoc)
-            }
-        }
-    }
-    
-//    func getSelectHotel(byName locName: String, withCompletion completion: @escaping(LocationModel) -> Void) {
-//
-//        let ref = Database.database().reference().child("Haunted Hotels").
-//
-//        ref.observe(.value) { snapshot in
-//
-//            if let data = snapshot.value as? [String : AnyObject] {
-//
-//                let locData = LocationData(data: data)
-//
-//                var imageURLS: [URL] = []
-//                self.getLocationImages(locID: "\(locData.id)") { fsImage in
-//                    if let url = URL(string: "\(fsImage.imageURL)") {
-//                        imageURLS.append(url)
-//                    }
-//                }
-//
-//                let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
-//                completion(locModel)
-//
-//
-//
-//            }
-//        }
-//    }
-    
-    
+
     func getSelectHotel(byID locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
         
         let ref = Database.database().reference().child("Haunted Hotels/\(locID)")
         
-//        ref.observeSingleEvent(of: .value) { snapshot in
         ref.observe(.value) { snapshot in
 
             if let data = snapshot.value as? [String : AnyObject] {
@@ -83,41 +43,42 @@ class FirebaseManager: ObservableObject {
                 let locData = LocationData(data: data)
                 
                 var imageURLS: [URL] = []
+                
                 self.getLocationImages(locID: "\(locData.id)") { fsImage in
+                    
                     if let url = URL(string: "\(fsImage.imageURL)") {
                         imageURLS.append(url)
                     }
                 }
         
                 let locModel = LocationModel(location: locData, imageURLs: imageURLS, reviews: [])
+                
                 completion(locModel)
-                
-                
                 
             }
         }
-        
     }
     
     func getHauntedHotels() {
+        
         let ref = Database.database().reference().child("Haunted Hotels")
+        
         ref.observeSingleEvent(of: .value) { (snapshot) in
+            
             if snapshot.childrenCount > 0 {
+                
                 self.locationStore.hauntedHotels.removeAll()
                 
                 if let objects = snapshot.children.allObjects as? [DataSnapshot] {
+                    
                     for object in objects {
+                        
                         if let data = object.value as? [String : AnyObject] {
+                            
                             let locData = LocationData(data: data)
-                            var imageURLs: [URL] = []
-//                            self.getLocationImages(locID: "\(locData.id)") { fsImage in
-//                                if let url = URL(string: "\(fsImage.imageURL)") {
-//                                    imageURLs.append(url)
-//                                }
-//                            }
                             
+                            let locModel = LocationModel(location: locData, imageURLs: [], reviews: [])
                             
-                            let locModel = LocationModel(location: locData, imageURLs: imageURLs, reviews: [])
                             self.locationStore.hauntedHotels.append(locModel)
                             
                         }
@@ -127,27 +88,30 @@ class FirebaseManager: ObservableObject {
         }
     }
  
-    func getTrendingLocations() {
+    func getTrendingLocations(onError: @escaping(String) -> Void) {
         
         guard let db = db else { return }
 
         db.collection("Trending").getDocuments() { (querySnapshot, err) in
+            
             if let err = err {
+                
                 print("Error getting documents: \(err)")
+                onError("")
+                
             } else {
                 
                 if let snapshot = querySnapshot {
+                    
                     for document in snapshot.documents {
+                        
                         let dict = document.data()
                         let key = dict["id"] as? Int ?? 0
                         
-//                        self.getSelectHotel("\(key)") { locModel in
-//                            if !self.locationStore.trendingLocations.contains(locModel) {
-//                                self.locationStore.trendingLocations.append(locModel)
-//                            }
-//                        } /// REPLACED BY
                         self.getHotelWithReviews("\(key)") { locModel in
+                            
                             if !self.locationStore.trendingLocations.contains(locModel) {
+                                
                                 self.locationStore.trendingLocations.append(locModel)
                             }
                         }
@@ -158,27 +122,30 @@ class FirebaseManager: ObservableObject {
     }
     
     
-    func getFeaturedLocations() {
+    func getFeaturedLocations(onError: @escaping(String) -> Void) {
         
         guard let db = db else { return }
 
         db.collection("Featured").getDocuments() { (querySnapshot, err) in
+            
             if let err = err {
+                
                 print("Error getting documents: \(err)")
+                onError(err.localizedDescription)
+                
             } else {
                 
                 if let snapshot = querySnapshot {
+                    
                     for document in snapshot.documents {
+                        
                         let dict = document.data()
                         let key = dict["id"] as? Int ?? 0
-                        
-//                        self.getSelectHotel("\(key)") { locModel in
-//                            if !self.locationStore.featuredLocations.contains(locModel) {
-//                                self.locationStore.featuredLocations.append(locModel)
-//                            }
-//                        } /// REPLACED BY
+
                         self.getHotelWithReviews("\(key)") { locModel in
+                            
                             if !self.locationStore.featuredLocations.contains(locModel) {
+                                
                                 self.locationStore.featuredLocations.append(locModel)
                             }
                         }
@@ -188,6 +155,8 @@ class FirebaseManager: ObservableObject {
         }
     }
     
+    //MARK: - Favorites
+    
     func getFavorites(withCompletion completion: @escaping(FavoriteLocation) -> Void) {
         
         guard let db = db else { return }
@@ -195,14 +164,19 @@ class FirebaseManager: ObservableObject {
         db.collection("Favorites")
             .whereField("userID", isEqualTo: UserStore.instance.user.id)
             .getDocuments { snapshot, error in
+                
                 if let error = error {
                     
                     print(error.localizedDescription)
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 } else if let snapshot = snapshot {
+                    
                     for doc in snapshot.documents {
+                        
                         let dict = doc.data()
+                        
                         let favLocation = FavoriteLocation(
                             id: dict["id"] as? String ?? "",
                             locationID: dict["locationID"] as? String ?? "",
@@ -223,11 +197,15 @@ class FirebaseManager: ObservableObject {
             "id" : favLoc.id,
             "locationID" : "\(favLoc.locationID)",
             "userID" : "\(favLoc.userID)"
+            
         ]) { error in
+            
             if let error = error {
+                
                 print(error.localizedDescription)
                 self.errorManager.message = "Check your network connection and try again."
                 self.errorManager.shouldDisplay = true
+                
                 completion?(false)
             } else {
                 completion?(true)
@@ -241,10 +219,13 @@ class FirebaseManager: ObservableObject {
 
         db.collection("Favorites").document(favLoc.id)
             .delete() { err in
+                
                 if let err = err {
+                    
                     print("Error removing favorite: \(err)")
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 } else {
                     print("Favorite successfully removed!")
                 }
@@ -252,8 +233,11 @@ class FirebaseManager: ObservableObject {
     }
     //MARK: - Reviews
     func addReviewToFirestoreBucket(_ review: ReviewModel, location: LocationData, withcCompletion completion: @escaping (K.ErrorMessages.Review?) -> () = {_ in}) {
+        
         guard let db = db else { return }
+        
         let id = review.title + review.username + review.locationID
+        
         db.collection("Reviews").document(id).setData([
             "id" : id,
             "userID" : userStore.user.id,
@@ -263,7 +247,9 @@ class FirebaseManager: ObservableObject {
             "username" : review.username,
             "locationID" : "\(location.id)",
             "locationName" : location.name
+            
         ]) { error in
+            
             if let error = error {
                 print(error.localizedDescription)
                 completion(.savingReview)
@@ -274,15 +260,21 @@ class FirebaseManager: ObservableObject {
     }
     
     func removeReviewFromFirestore(_ review: ReviewModel, withCompletion completion: @escaping(Error?) -> () = {_ in}) {
+        
         guard let db = db else { return }
+        
         let id = review.title + review.username + review.locationID
+        
         db.collection("Reviews").document(id)
             .delete() { err in
+                
                 if let err = err {
+                    
                     print("Error removing review: \(err)")
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
                     completion(err)
+                    
                 } else {
                     print("Review successfully removed!")
                     completion(nil)
@@ -291,7 +283,9 @@ class FirebaseManager: ObservableObject {
     }
     
     func updateReviewInFirestore(_ review: ReviewModel, forID id: String, withCompletion completion: @escaping(K.ErrorMessages.Review?) -> () = {_ in}) {
+        
         guard let db = db else { return }
+        
         db.collection("Reviews").document(id)
             .updateData([
                 "id" : id,
@@ -302,7 +296,9 @@ class FirebaseManager: ObservableObject {
                 "username" : review.username,
                 "locationID" : review.locationID,
                 "locationName" : review.locationName
+                
             ], completion: { err in
+                
                 if let err = err {
                     print("Error updating review: \(err)")
                     completion(.updatingReview)
@@ -314,22 +310,29 @@ class FirebaseManager: ObservableObject {
     }
     
     func getReviewsForLocation(_ locationID: String, withCompletion completion: @escaping ([ReviewModel]) -> (Void)) {
+        
         guard let db = db else { return }
 
         db.collection("Reviews")
             .whereField("locationID", isEqualTo: locationID)
             .getDocuments { snapshot, error in
+                
                 if let error = error {
+                    
                     print(error.localizedDescription)
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 } else if let snapshot = snapshot {
+                    
                     var reviews: [ReviewModel] = []
+                    
                     for doc in snapshot.documents {
                         let dict = doc.data()
                         let review = ReviewModel(dictionary: dict)
                         reviews.append(review)
                     }
+                    
                     completion(reviews)
                 }
             }
@@ -337,23 +340,45 @@ class FirebaseManager: ObservableObject {
     }
     
     func getAllReviews(withCompletion completion: @escaping(ReviewModel) -> (Void)) {
+        
         guard let db = db else { return }
 
         db.collection("Reviews")
             .getDocuments { snapshot, error in
+                
                 if let error = error {
+                    
                     print(error.localizedDescription)
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 } else if let snapshot = snapshot {
+                    
                     for doc in snapshot.documents {
+                        
                         let dict = doc.data()
                         let review = ReviewModel(dictionary: dict)
+                        
                         completion(review)
                     }
                 }
             }
     }
+    
+    func getHotelWithReviews(_ locID: String, withCompletion completion: @escaping(LocationModel) -> Void) {
+        
+        getSelectHotel(byID: locID) { location in
+            
+            self.getReviewsForLocation(locID) { reviews in
+                
+                var newLoc = location
+                newLoc.reviews = reviews
+                
+                completion(newLoc)
+            }
+        }
+    }
+    
     
     func getReviewsForUser(_ user: User, withCompletion completion: @escaping(_ review: ReviewModel) -> Void) {
         
@@ -364,13 +389,19 @@ class FirebaseManager: ObservableObject {
             .whereField("userID", isEqualTo: user.id)
         
             .getDocuments { querySnapshot, error in
+                
                 if let error = error {
+                    
                     print("Error getting reviews: \(error.localizedDescription)")
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 } else {
+                    
                     if let snapshot = querySnapshot {
+                        
                         for doc in snapshot.documents {
+                            
                             let dict = doc.data()
                             
                             let review = ReviewModel(dictionary: dict)
@@ -381,15 +412,23 @@ class FirebaseManager: ObservableObject {
                 }
             }
     }
+    
     //MARK: - Add Location to 'User Created Locations' Bucket
+    
     func addUserCreatedLocationToBucket(_ loc: LocationData, _ image: UIImage?, withCompletion completion: @escaping (Error?) -> () = {_ in}) {
+        
         let imageName = loc.name + UUID().uuidString
+        
         if let image = image {
+            
             uploadImageToFirebaseStorage(image, imageName: imageName) { error in
+                
                 if let error = error {
+                    
                     print("Error saving image to firebase.: \(error)")
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 }
             }
         }
@@ -400,16 +439,18 @@ class FirebaseManager: ObservableObject {
 
         db.collection("UserCreatedLocations").document(docID).setData([
             "name" : loc.name,
-            "street" : loc.address?.address,
-            "city" : loc.address?.city,
-            "state" : loc.address?.state,
-            "country" : loc.address?.country,
-            "zipCode" : loc.address?.zipCode,
-            "description" : loc.description,
-            "moreInfoLink" : loc.moreInfoLink,
-            "locationType" : loc.locationType,
+            "street" : loc.address?.address as Any,
+            "city" : loc.address?.city as Any,
+            "state" : loc.address?.state as Any,
+            "country" : loc.address?.country as Any,
+            "zipCode" : loc.address?.zipCode as Any,
+            "description" : loc.description as Any,
+            "moreInfoLink" : loc.moreInfoLink as Any,
+            "locationType" : loc.locationType as Any,
             "imageName" : image == nil ? "" : imageName
+            
         ]) { error in
+            
             if let error = error {
                 print(error.localizedDescription)
                 completion(error)
@@ -422,14 +463,20 @@ class FirebaseManager: ObservableObject {
     //MARK: - Images
     
     func uploadImageToFirebaseStorage(_ image: UIImage, imageName: String, withCompletion completion: @escaping (Error?) -> () = {_ in}) {
+        
         let storage = Storage.storage()
+        
         let storageRef = storage.reference().child(imageName)
+        
         let data = image.jpegData(compressionQuality: 0.2)
+        
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpg"
         
         if let data = data {
+            
             storageRef.putData(data, metadata: metadata) { (metadata, error) in
+                
                 if let error = error {
                     print("error uploading file: \(error.localizedDescription)")
                     completion(error)
@@ -447,12 +494,17 @@ class FirebaseManager: ObservableObject {
         let storageRef = Storage.storage().reference().child(urlString)
         
         storageRef.downloadURL { url, error in
+            
             if let error = error {
+                
                 print(error.localizedDescription)
+                
                 self.errorManager.message = "Check your network connection and try again."
                 self.errorManager.shouldDisplay = true
             }
+            
             guard let url = url else { return }
+            
             completion(url)
         }
     }
@@ -473,12 +525,16 @@ class FirebaseManager: ObservableObject {
                     
                     self.errorManager.message = "Check your network connection and try again."
                     self.errorManager.shouldDisplay = true
+                    
                 } else {
                     
                     if let snapshot = querySnapshot {
+                        
                         for document in snapshot.documents {
+                            
                             let dict = document.data()
                             let image = FSImage(dict: dict)
+                            
                             completion(image)
                         }
                     }
@@ -498,14 +554,19 @@ class FirebaseManager: ObservableObject {
             .whereField("name", isGreaterThanOrEqualTo: text)
             .whereField("name", isLessThanOrEqualTo: text + "/uf8ff")
             .getDocuments() { (querySnapshot, err) in
+                
                if let err = err {
+                   
                    print("Error getting documents: \(err)")
                    self.errorManager.message = "Check your network connection and try again."
                    self.errorManager.shouldDisplay = true
+                   
                } else {
                    
                    if let snapshot = querySnapshot {
+                       
                        for document in snapshot.documents {
+                           
                            let dict = document.data()
                            let name = dict["name"] as? String ?? ""
                            
@@ -517,30 +578,27 @@ class FirebaseManager: ObservableObject {
        }
     
     
-    
-    //MARK: - Queries
-    enum Queries: String, CaseIterable {
-        case hauntedHotels = "Haunted Hotels"
-        case ghostTowns = "Ghost Towns"
-        
-    }
-    
     //MARK: - Coordinates & Address
     
     func getCoordinatesFromAddress(address: String, withCompletion completion: @escaping (CLLocation) -> Void) {
+        
         let geoCoder = CLGeocoder()
+        
         geoCoder.geocodeAddressString(address) { (placemarks, error) in
+            
             guard
                 let placemarks = placemarks,
                 let loc = placemarks.first?.location
             else {
-                // handle no location found
+                
                 self.errorManager.message = "No location found."
                 self.errorManager.shouldDisplay = true
+                
                 print("error on forward geocoding.. getting coordinates from location address: \(address)")
+                
                 return
             }
-            //            print("successful geocode with addrress: \(addressString)")
+            
             print(loc)
             completion(loc)
         }
@@ -548,19 +606,23 @@ class FirebaseManager: ObservableObject {
     
     
     func getAddressFrom(coordinates: CLLocationCoordinate2D, withCompletion completion: @escaping ((_ address: Address) -> (Void))) {
+        
         let location  = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
         let geoCoder = CLGeocoder()
+        
         geoCoder.reverseGeocodeLocation(location) { (placemarks, error) in
+            
             guard
                 let placemarks = placemarks,
                 let location = placemarks.first
             else {
-                // Handle error
                 
                 self.errorManager.message = "Could not get address from these coordinates."
                 self.errorManager.shouldDisplay = true
+                
                 return
             }
+            
             if let buildingNumber = location.subThoroughfare,
                let street = location.thoroughfare,
                let city = location.locality,

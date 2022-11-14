@@ -12,14 +12,14 @@ import Firebase
 import Contacts
 
 struct LocationData: Identifiable, Equatable, Codable, Hashable {
-    static func == (lhs: LocationData, rhs: LocationData) -> Bool {
-        return lhs.id == rhs.id && lhs.name == rhs.name
-    }
-    
     
     static let example = LocationData(id: 1111,
                                   name: "Bannack",
-                                  address: Address(address: "721 Bannack Rd", city: "Dillon", state: "MT", zipCode: "59725", country: "USA"),
+                                  address: Address(address: "721 Bannack Rd",
+                                                   city: "Dillon",
+                                                   state: "MT",
+                                                   zipCode: "59725",
+                                                   country: "USA"),
                                   description: "Bannack State Park is a National Historic Landmark and is the best preserved of all Montana ghost towns. Back in the “Old West”, during the mighty gold rush of 1862, Bannack’s population grew over 3,000. Today, no residents remain in this town.",
                                   moreInfoLink: "https://fwp.mt.gov/stateparks/bannack-state-park",
                                   locationType: "Ghost Town",
@@ -32,14 +32,14 @@ struct LocationData: Identifiable, Equatable, Codable, Hashable {
     var name: String
     var address: Address?
     var description: String?
-    var moreInfoLink: String?     //
+    var moreInfoLink: String?
     var locationType: String?
-    var tours: Bool?              //
-    var hours: String?            //
+    var tours: Bool?
+    var hours: String?
     var likes: Int?
     var imageName: String?
     var distanceToUser: Double?
-    var price: Double?            //
+    var price: Double?
     var hotelKey: String?
     var geoKey: String?
     var imageURL: URL?
@@ -64,12 +64,11 @@ struct LocationData: Identifiable, Equatable, Codable, Hashable {
 
         self.id = id
         self.name = name
-        self.address = Address(
-            address: street,
-            city: city,
-            state: state,
-            zipCode: zipCode,
-            country: country)
+        self.address = Address(address: street,
+                               city: city,
+                               state: state,
+                               zipCode: zipCode,
+                               country: country)
         self.description = description
         self.moreInfoLink = moreInfoLink
         self.imageName = imageName
@@ -79,7 +78,17 @@ struct LocationData: Identifiable, Equatable, Codable, Hashable {
     }
    
     
-        init(id: Int, name: String, address: Address?, description: String?, moreInfoLink: String?, locationType: String?, tours: Bool?, imageName: String?, distanceToUser: Double?, price: Double?) {
+        init(id: Int,
+             name: String,
+             address: Address?,
+             description: String?,
+             moreInfoLink: String?,
+             locationType: String?,
+             tours: Bool?,
+             imageName: String?,
+             distanceToUser: Double?,
+             price: Double?) {
+            
             self.id = id
             self.name = name
             self.address = address
@@ -99,24 +108,13 @@ struct LocationData: Identifiable, Equatable, Codable, Hashable {
         self = result
     }
     
-}
-
-
-
-struct FavoriteLocation {
-    var id: String
-    var locationID: String
-    var userID: String
-}
-
-
-struct FSImage {
-    var locID: String
-    var imageURL: String
+    //MARK: - Equatable
     
-    init(dict: [String: Any]) {
-        self.locID = dict["locID"] as? String ?? ""
-        self.imageURL = dict["imageURL"] as? String ?? ""
+    static func == (lhs: LocationData, rhs: LocationData) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
     }
+    
+    
 }
+
 

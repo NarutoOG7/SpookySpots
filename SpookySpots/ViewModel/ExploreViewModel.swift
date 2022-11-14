@@ -10,12 +10,17 @@ import Firebase
 import MapKit
 
 class ExploreViewModel: ObservableObject {
+    
     static let instance = ExploreViewModel()
     
     @Published var isShowingMap = false
+    @Published var showingLocationList = false
     @Published var showingSearchLocations = false
+    
     @Published var searchedLocations: [LocationModel] = []
     @Published var searchRegion = MapDetails.defaultRegion
+    @Published var highlightedAnnotation: LocationAnnotationModel?
+    
     @Published var displayedLocation: LocationModel? {
         didSet {
             if let displayedLocation = displayedLocation {
@@ -28,13 +33,6 @@ class ExploreViewModel: ObservableObject {
             }
         }
     }
-    @Published var highlightedAnnotation: LocationAnnotationModel? 
-    @Published var showingLocationList = false
-
-        
-    @ObservedObject var geoFireManager = GeoFireManager.instance
-    @ObservedObject var locationStore = LocationStore.instance
-    @ObservedObject var userLocManager = UserLocationManager.instance
     
     @Published var searchText = "" {
         willSet {
@@ -46,28 +44,27 @@ class ExploreViewModel: ObservableObject {
             }
         }
     }
-//    {
-//        willSet {
-//            self.searchedLocations = []
-//            
-//            for loc in locationStore.hauntedHotels.filter({ $0.location.name.localizedCaseInsensitiveContains(newValue) }) {
-//                if !self.searchedLocations.contains(loc) {
-//                    self.searchedLocations.append(loc)
-//                }
-//            }
-////            FirebaseManager.instance.searchForLocationInFullDatabase(text: newValue) { loc in
-////                self.searchedLocations.append(loc)
-////            }
-//        }
-//    }
+
+    @ObservedObject var geoFireManager = GeoFireManager.instance
+    @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var userLocManager = UserLocationManager.instance
+    @ObservedObject var errorManager = ErrorManager.instance
     
     func supplyLocationLists() {
+        
         geoFireManager.getNearbyLocations(
             region: locServiceIsEnabled() ? self.searchRegion : MapDetails.defaultRegion,
             radius: 700)
         let firebaseManager = FirebaseManager.instance
-        firebaseManager.getTrendingLocations()
-        firebaseManager.getFeaturedLocations()
+        
+        firebaseManager.getTrendingLocations { error in
+            self.errorManager.message = error
+            self.errorManager.shouldDisplay = true
+        }
+        firebaseManager.getFeaturedLocations { error in
+            self.errorManager.message = error
+            self.errorManager.shouldDisplay = true
+        }
         firebaseManager.getHauntedHotels()
         
         firebaseManager.getAllReviews { review in
@@ -77,7 +74,7 @@ class ExploreViewModel: ObservableObject {
     }
     
     func locServiceIsEnabled() -> Bool {
-        userLocManager.locationServEnabled
+        userLocManager.locationServicesEnabled
     }
     
     func setCurrentLocRegion(_ currentLoc: CLLocation) {
@@ -85,6 +82,7 @@ class ExploreViewModel: ObservableObject {
     }
     
     func setRegion(location: LocationModel) {
+        
         FirebaseManager.instance.getCoordinatesFromAddress(address: location.location.address?.geoCodeAddress() ?? "") { cloc in
             
             let region = MKCoordinateRegion(
@@ -98,7 +96,9 @@ class ExploreViewModel: ObservableObject {
     }
     
     func setRegion(destination: Destination) {
-        let center = CLLocationCoordinate2D(latitude: destination.lat, longitude: destination.lon)
+        
+        let center = CLLocationCoordinate2D(latitude: destination.lat,
+                                            longitude: destination.lon)
         let region = MKCoordinateRegion(
             center: center,
             span: MapDetails.defaultSpan)
@@ -109,9 +109,11 @@ class ExploreViewModel: ObservableObject {
     }
     
     func showLocation(_ loc: LocationModel) {
+        
         withAnimation(.easeInOut) {
             displayedLocation = loc
         }
+        
         if let anno = geoFireManager.gfOnMapLocations.first(where: { $0.id == "\(loc.location.id)" }) {
             highlightedAnnotation = anno
         }
@@ -138,7 +140,9 @@ class ExploreViewModel: ObservableObject {
     }
     
     //MARK: - Greeting Logic
+    
     func greetingLogic() -> String {
+        
       let hour = Calendar.current.component(.hour, from: Date())
       
       let morning = 0
@@ -146,7 +150,7 @@ class ExploreViewModel: ObservableObject {
       let sunset = 18
       let midnight = 24
       
-      var greetingText = "Hello" // Default greeting text
+      var greetingText = "Hello"
         
       switch hour {
           
@@ -171,13 +175,6 @@ class ExploreViewModel: ObservableObject {
     
     func searchLogic(text: String, withCompletion completion: @escaping([LocationModel]?) -> () = {_ in}) {
         if text != "" {
-//            FirebaseManager.instance.searchForLocationInFullDatabase(text: searchText) { locModel in
-//            FirebaseManager.instance.searchByLocationName(text: searchText) { locName in
-//
-//                FirebaseManager.instance.getSelectHotel(byID: locName) { locModel in
-//                    completion(locModel)
-//                }
-//            }
             let filtered = locationStore.hauntedHotels.filter({ $0.location.name.localizedCaseInsensitiveContains(text) })
             completion(filtered)
         } else {

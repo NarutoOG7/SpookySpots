@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct ManageReviews: View {
+    
+    
+    @State private var reviews: [ReviewModel] = []
+    @State private var selectedReview: ReviewModel?
+    @State private var isEditingReview = false
+    
     @ObservedObject var firebaseManager = FirebaseManager.instance
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var locationStore = LocationStore.instance
-    
-    @State private var reviews: [ReviewModel] = []
-    
-    @State private var selectedReview: ReviewModel?
-    @State private var isEditingReview = false
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
@@ -23,11 +24,11 @@ struct ManageReviews: View {
         ZStack {
             weenyWitch.black
                 .edgesIgnoringSafeArea(.all)
-
+            
             if userStore.reviews.isEmpty {
-                 noReviews
+                noReviews
             } else {
-            listOfReviews
+                listOfReviews
                     .padding(.vertical, 30)
             }
         }
@@ -47,21 +48,9 @@ struct ManageReviews: View {
         .navigationTitle("My Reviews")
         .navigationBarTitleDisplayMode(.large)
         
-            .onAppear {
-                userStore.reviews = []
-                firebaseManager.getReviewsForUser(userStore.user) { rev in
-                    
-                    var review = rev
-                    if let location = locationStore.hauntedHotels.first(where: { "\($0.location.id)" == review.locationID }) {
-                        review.location = location
-                    }
-                    
-                    userStore.reviews.append(review)
-                    print(review.title)
-                }
-                
-                UITableView.appearance().backgroundColor = .clear
-            }
+        .onAppear {
+            self.assignReviews()
+        }
     }
     
     private var noReviews: some View {
@@ -71,33 +60,54 @@ struct ManageReviews: View {
     }
     
     private var listOfReviews: some View {
-
-             List {
-                ForEach(userStore.reviews, id: \.self) { review in
-                    Button(action: {
-                        self.selectedReview = review
-                        self.isEditingReview = true
-                        
-                    }, label: {
-                        Text(review.title)
-                    })
-                    .listRowBackground(weenyWitch.lightest)
+        
+        List {
+            ForEach(userStore.reviews, id: \.self) { review in
+                Button(action: {
                     
-                }
-                .onDelete(perform: delete)
+                    self.selectedReview = review
+                    self.isEditingReview = true
+                    
+                }, label: {
+                    Text(review.title)
+                        .foregroundColor(weenyWitch.brown)
+                        .italic()
+                })
+                .listRowBackground(weenyWitch.lightest)
+                
             }
-             .modifier(ListBackgroundModifier())
-                .listStyle(.insetGrouped)
-            
+            .onDelete(perform: delete)
+        }
+        .modifier(ClearListBackgroundMod())
+        .listStyle(.insetGrouped)
+        
     }
     
     private func delete(at offsets: IndexSet) {
         
         offsets.map { userStore.reviews[$0] }.forEach { review in
+            
             firebaseManager.removeReviewFromFirestore(review)
         }
         
         userStore.reviews.remove(atOffsets: offsets)
+    }
+    
+    private func assignReviews() {
+        
+        userStore.reviews = []
+        
+        firebaseManager.getReviewsForUser(userStore.user) { rev in
+            
+            var review = rev
+            
+            if let location = locationStore.hauntedHotels.first(where: { "\($0.location.id)" == review.locationID }) {
+                
+                review.location = location
+            }
+            
+            userStore.reviews.append(review)
+        }
     }
 }
 

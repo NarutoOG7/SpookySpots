@@ -11,16 +11,15 @@ import SDWebImageSwiftUI
 struct LD: View {
     
     @Binding var location: LocationModel
-        
+    
     @State private var imageURL = URL(string: "")
     @State private var isSharing = false
-    @State private var imageIsAvailable = false
-    
     @State private var isCreatingNewReview = false
+    @State private var isShowingMoreReviews = false
     
     @EnvironmentObject var favoritesLogic: FavoritesLogic
     @EnvironmentObject var tripLogic: TripLogic
-
+    
     let imageMaxHeight = UIScreen.main.bounds.height * 0.38
     let collapsedImageHeight: CGFloat = 10
     
@@ -54,21 +53,24 @@ struct LD: View {
                     HStack {
                         backButton
                         Spacer()
-            }.padding(.horizontal)
-                .padding(.top, 60)
-            Spacer()
-        }
+                    }.padding(.horizontal)
+                        .padding(.top, 60)
+                    Spacer()
+                }
                 
+                .onAppear {
+                    loadImageFromFirebase()
+                    print(location.reviews.count)
+                }
+                .sheet(isPresented: $isSharing) {
+                    ShareActivitySheet(itemsToShare: [location.location.name])
+                }
                 
-                    .onAppear {
-                        loadImageFromFirebase()
-                        print(location.reviews.count)
-                    }
-                    .sheet(isPresented: $isSharing) {
-                        ShareActivitySheet(itemsToShare: [location.location.name])
-                    }
+                .sheet(isPresented: $isShowingMoreReviews) {
+                    MoreReviewsSheet(reviews: location.reviews)
+                }
             }
-            .background(K.Images.paperBackground.opacity(0.5))
+            .background(K.Images.paperBackground)
         }
         .edgesIgnoringSafeArea(.vertical)
         .navigationBarHidden(true)
@@ -106,15 +108,14 @@ struct LD: View {
                 .shadow(radius: self.calculateShadow(geo))
                 .overlay(header
                     .opacity(self.getBlurRadiusForImage(geo) - 0.35))
-                .frame(width: geo.size.width, height: self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
+                .frame(width: geo.size.width,
+                       height: self.calculateHeight(minHeight: collapsedImageHeight,
+                                                    maxHeight: imageMaxHeight,
+                                                    yOffset: geo.frame(in: .global).origin.y))
                 .offset(y: geo.frame(in: .global).origin.y < 0
                         ? abs(geo.frame(in: .global).origin.y)
                         : -geo.frame(in: .global).origin.y)
             
-        let _ = print(geo.size.width / (self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y)))
-            let _ = print(geo.size.width)
-            let _ = print(self.calculateHeight(minHeight: collapsedImageHeight, maxHeight: imageMaxHeight, yOffset: geo.frame(in: .global).origin.y))
-
         }
     }
     
@@ -136,8 +137,8 @@ struct LD: View {
     private var avgRatingDisplay: some View {
         HStack {
             FiveStars(
-                rating: $location.avgRating,
-                color: K.Colors.WeenyWitch.orange)
+                color: K.Colors.WeenyWitch.orange,
+                rating: $location.avgRating)
             let reviewCount = location.reviews.count
             let textEnding = reviewCount == 1 ? "" : "s"
             Text("(\(reviewCount) review\(textEnding))")
@@ -145,6 +146,81 @@ struct LD: View {
                 .foregroundColor(K.Colors.WeenyWitch.brown)
         }
     }
+    
+
+    private var description: some View {
+        Text(location.location.description ?? "")
+            .font(.avenirNext(size: 17))
+            .lineLimit(nil)
+            .foregroundColor(K.Colors.WeenyWitch.brown)
+    }
+    
+    private var reviewHelper: some View {
+        VStack(alignment: .leading) {
+            if location.reviews.isEmpty {
+                Divider()
+                Text("No Reviews")
+                    .foregroundColor(K.Colors.WeenyWitch.brown)
+            } else {
+                if let last = location.reviews.last {
+                    ReviewCard(review: last)
+                    
+                }
+            }
+            HStack {
+                leaveAReviewView
+                if location.reviews.count > 1 {
+                    moreReviewsButton
+                }
+            }
+                .padding(.vertical, 30)
+            Spacer(minLength: 200)
+        }
+        .sheet(isPresented: $isCreatingNewReview) {
+            LocationReviewView(location: $location, isPresented: $isCreatingNewReview, review: .constant(nil))
+        }
+    }
+    
+    private var moreInfoLink: some View {
+        
+        let view: AnyView
+        
+        if let url = URL(string: location.location.moreInfoLink ?? "") {
+            
+            view = AnyView(
+                HStack {
+                    Spacer()
+                    Link(destination: url, label: {
+                        Text("Get More Info")
+                            .underline()
+                            .foregroundColor(K.Colors.WeenyWitch.orange)
+                    })
+                }
+            )
+        } else {
+            view = AnyView(EmptyView())
+        }
+        return view
+    }
+    
+    private var leaveAReviewView: some View {
+        
+        VStack(alignment: .leading) {
+            Text("Been here before?")
+                .italic()
+                .foregroundColor(K.Colors.WeenyWitch.brown)
+            Button {
+                self.isCreatingNewReview = true
+                
+            } label: {
+                Text("Leave A Review")
+                    .underline()
+                    .foregroundColor(K.Colors.WeenyWitch.orange)
+            }
+        }
+    }
+    
+    //MARK: - Buttons
     
     var buttons: some View {
         HStack(alignment: .top) {
@@ -158,89 +234,8 @@ struct LD: View {
             .frame(height: 150)
     }
     
-    private var description: some View {
-            Text(location.location.description ?? "")
-                .font(.avenirNext(size: 17))
-                .lineLimit(nil)
-                .foregroundColor(K.Colors.WeenyWitch.brown)
-    }
-    
-    private var reviewHelper: some View {
-        VStack(alignment: .leading) {
-//            if location.location.review?.lastReview == "" {
-            if location.reviews.isEmpty {
-                Divider()
-                Text("No Reviews")
-                    .foregroundColor(K.Colors.WeenyWitch.brown)
-            } else {
-                if let last = location.reviews.last {
-                    
-                    ReviewCard(review: last)
-                }
-            }
-                
-                
-            leaveAReviewView
-                .padding(.vertical, 30)
-            Spacer(minLength: 200)
-        }
-        .sheet(isPresented: $isCreatingNewReview) {
-            LocationReviewView(location: $location, isPresented: $isCreatingNewReview, review: .constant(nil))
-        }
-    }
-    
-    private var moreInfoLink: some View {
-        let view: AnyView
-        if let url = URL(string: location.location.moreInfoLink ?? "") {
-            view = AnyView(
-                HStack {
-                    Spacer()
-                Link(destination: url, label: {
-                    Text("Get More Info")
-                        .underline()
-                        .foregroundColor(K.Colors.WeenyWitch.orange)
-                })
-                }
-            )
-        } else {
-            view = AnyView(EmptyView())
-        }
-        return view
-    }
-    
-    private var leaveAReviewView: some View {
-
-         VStack(alignment: .leading) {
-            Text("Been here before?")
-                .italic()
-                .foregroundColor(K.Colors.WeenyWitch.brown)
-//             NavigationLink(destination: LocationReviewView(location: $location, isPresented: $isCreatingNewReview)) {
-                    Button {
-                 self.isCreatingNewReview = true
-
-             } label: {
-                 Text("Leave A Review")
-                     .underline()
-                     .foregroundColor(K.Colors.WeenyWitch.orange)
-             }
-
-                    
-                
-//            }
-//            }.onDisappear {
-//                self.location = locReviewView.location
-//            }
-        }
-    }
-    
-    //MARK: - Buttons
     
     private var directionsButton: some View {
-//        BorderedCircularButton(
-//            image: Image(systemName: ),
-//            title: "Directions",
-//            color: K.Colors.WeenyWitch.brown,
-//            tapped: directionsTapped)
         CircleButton(
             size: .medium,
             image: images.directions,
@@ -251,12 +246,6 @@ struct LD: View {
     }
     
     private var shareButton: some View {
-//        BorderedCircularButton(
-//            image: Image(systemName: K.Images.share),
-//            title: "Share",
-//            color: K.Colors.WeenyWitch.brown,
-//            tapped: shareTapped)
-//
         CircleButton(
             size: .medium,
             image: images.share,
@@ -265,24 +254,8 @@ struct LD: View {
             title: "Share",
             clicked: shareTapped)
     }
-    
-    
-    
-//    private var addRemoveFromTrip: some View {
-//        BorderedCircularButton(
-//            image: Image(systemName: "plus"),
-//            title: "Add To Trip",
-//            color: .green,
-//            tapped: addToTripTapped)
-//    }
-//
+
     private var addRemoveFromTrip: some View {
-//        BorderedCircularButton(
-//            image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
-//            title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
-//            color: K.Colors.WeenyWitch.brown,
-//            tapped: addToTripTapped)
-//
         CircleButton(
             size: .medium,
             image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
@@ -291,26 +264,17 @@ struct LD: View {
             title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
             clicked: addToTripTapped)
     }
+    
     private var favoriteButton: some View {
-//        BorderedCircularButton(
-//            image: favoritesLogic.contains(location) ?
-//                Image(systemName: "heart.fill") :
-//                Image(systemName: "heart"),
-//            title: "Favorites",
-//            color: K.Colors.WeenyWitch.brown,
-//            tapped: favoritesTapped)
-//
         CircleButton(
             size: .medium,
             image: favoritesLogic.contains(location) ?
             Image(systemName: "heart.fill") :
-            Image(systemName: "heart"),
+                Image(systemName: "heart"),
             mainColor: K.Colors.WeenyWitch.brown,
             accentColor: K.Colors.WeenyWitch.lightest,
             title: "Favorites",
             clicked: favoritesTapped)
-        
-
     }
     
     private var moreReviewsButton: some View {
@@ -337,15 +301,16 @@ struct LD: View {
     //MARK: - Methods
     
     private func directionsTapped() {
-        // Open directions in apple maps //move!!
-        // need to test with all locations... may need to use address instead of location name
+
         var addressString: String {
+            
             location.location.name.replacingOccurrences(of: " ", with: "+")
         }
         
         guard let url = URL(string: "maps://?daddr=\(addressString)") else { return }
         
         if UIApplication.shared.canOpenURL(url) {
+            
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
@@ -355,15 +320,15 @@ struct LD: View {
     }
     
     private func addToTripTapped() {
-        if tripLogic.destinationsContains(location) {
-            tripLogic.removeDestination(location)
-        } else {
-            tripLogic.addDestination(location)
-        }        
-    }
-    
-    private func moreReviewsTapped() {
         
+        if tripLogic.destinationsContains(location) {
+            
+            tripLogic.removeDestination(location)
+            
+        } else {
+            
+            tripLogic.addDestination(location)
+        }
     }
     
     private func backButtonTapped() {
@@ -371,17 +336,26 @@ struct LD: View {
     }
     
     private func favoritesTapped() {
+        
         if favoritesLogic.contains(location) {
+            
             favoritesLogic.removeHotel(location)
         } else {
             favoritesLogic.addHotel(location)
         }
     }
     
+    private func moreReviewsTapped() {
+        self.isShowingMoreReviews = true
+    }
+    
     
     private func loadImageFromFirebase()  {
+        
         if let imageString = location.location.imageName {
+            
             FirebaseManager.instance.getImageURLFromFBPath(imageString) { url in
+                
                 self.imageURL = url
             }
         }
@@ -403,7 +377,6 @@ struct LD_Previews: PreviewProvider {
 
 extension LD {
     
-    /////MARK: - Calculate Height
     private func calculateHeight(minHeight: CGFloat, maxHeight: CGFloat, yOffset: CGFloat) -> CGFloat {
         /// If scrolling up, yOffset will be a negative number
         if maxHeight + yOffset < minHeight {
@@ -415,8 +388,6 @@ extension LD {
         return maxHeight + yOffset
     }
     
-    
-    /////MARK: - Header Shadow
     func calculateShadow(_ geo: GeometryProxy) -> Double {
         self.calculateHeight(
             minHeight: collapsedImageHeight,
@@ -424,7 +395,6 @@ extension LD {
             yOffset: geo.frame(in: .global).origin.y) < 140 ? 8 : 0
     }
     
-    /////MARK: - Blur Image
     func getBlurRadiusForImage(_ geometry: GeometryProxy) -> CGFloat {
         let offset = geometry.frame(in: .global).maxY
         
@@ -435,64 +405,3 @@ extension LD {
     }
 }
 
-
-//MARK: - Share Activity View
-struct ShareActivitySheet: UIViewControllerRepresentable {
-    
-    var itemsToShare: [Any]
-    var servicesToShareItem: [UIActivity]? = nil
-    
-    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareActivitySheet>) -> UIActivityViewController {
-        
-        let controller = UIActivityViewController(activityItems: itemsToShare, applicationActivities: servicesToShareItem)
-        return controller
-    }
-    
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareActivitySheet>) { }
-}
-
-
-struct ReviewCard: View {
-    let review: ReviewModel
-    
-    var body: some View {
-        VStack(alignment: .leading,spacing: 7) {
-            title
-            stars
-                .padding(.bottom, 6)
-            description
-            name
-                .padding(.trailing, 15)
-        }
-        .padding()
-        .overlay(RoundedRectangle(cornerRadius: 14)
-            .strokeBorder(K.Colors.WeenyWitch.brown, lineWidth: 3))
-//            .stroke(K.Colors.WeenyWitch.brown, lineWidth: 4))
-    }
-    
-    var title: some View {
-        Text(review.title)
-            .fontWeight(.medium)
-            .foregroundColor(K.Colors.WeenyWitch.brown)
-    }
-    
-    var stars: some View {
-        FiveStars(rating: .constant(review.rating), color: K.Colors.WeenyWitch.orange)
-    }
-    
-    var description: some View {
-        Text(review.review)
-            .fontWeight(.light)
-            .foregroundColor(K.Colors.WeenyWitch.brown)
-            .fixedSize(horizontal: true, vertical: false)
-    }
-    
-    var name: some View {
-        HStack {
-            Spacer()
-            Text("-\(review.username)")
-                .fontWeight(.medium)
-                .foregroundColor(K.Colors.WeenyWitch.brown)
-        }
-    }
-}

@@ -30,12 +30,32 @@ struct PersistenceController {
         
         self.mainQueueContext = container.viewContext
         self.backgroundContext = container.newBackgroundContext()
+        self.deleteAll()
+    }
+    
+    func deleteAll(completion: @escaping (Error?) -> () = {_ in}) {
+        
+        do {
+//            let context = container.viewContext
+            
+            let context = backgroundContext
+            
+            let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
+            let trips = try context.fetch(request)
+            
+            for trip in trips {
+                context.delete(trip)
+            }
+            save(context, completion: completion)
+        } catch {
+            print("Error fetching request: \(error)")
+        }
     }
     
     func save(_ context: NSManagedObjectContext, completion: @escaping (Error?) -> () = {_ in}) {
         
-            context.perform {
-                
+        context.perform {
+            
             
             do {
                 try context.save()
@@ -73,7 +93,7 @@ struct PersistenceController {
                     startContext.id = tripStart.id
                     startContext.name = tripStart.name
                     startContext.address = tripStart.address
-
+                    
                     newTrip.startPoint = startContext
                     
                     let endContext = CDDestination(context: context)
@@ -85,14 +105,13 @@ struct PersistenceController {
                     endContext.lon = tripEnd.lon
                     
                     newTrip.endPoint = endContext
-                     
+                    
                     newTrip.id = trip.id
                     newTrip.userID = UserStore.instance.user.id
                     newTrip.completedStepCount = trip.completedStepCount
                     newTrip.totalStepCount = trip.totalStepCount
                     newTrip.tripState = trip.tripState.rawValue
                     
-                    newTrip.recentlyCompletedDestinationIndex = Int16(trip.recentlyCompletedDestinationIndex ?? 0)
                     newTrip.nextDestinationIndex = Int16(trip.nextDestinationIndex ?? 0)
                     newTrip.currentRouteIndex = Int16(trip.currentRouteIndex ?? 0)
                     newTrip.remainingDestinationsIndices = NSSet(array: trip.remainingDestinationsIndices)
@@ -105,7 +124,7 @@ struct PersistenceController {
                         tripToUpdate.removeFromDestinations(tripToUpdate.destinations ?? [])
                         tripToUpdate.removeFromRoutes(tripToUpdate.routes ?? [])
                         tripToUpdate.removeFromRemainingSteps(tripToUpdate.remainingSteps ?? [])
-   
+                        
                         
                         for route in trip.routes {
                             let routeContext = CDRoute(context: context)
@@ -192,18 +211,18 @@ struct PersistenceController {
                         
                         tripToUpdate.completedStepCount = trip.completedStepCount
                         tripToUpdate.totalStepCount = trip.totalStepCount
+                        tripToUpdate.currentStepIndex = trip.currentStepIndex
                         tripToUpdate.tripState = trip.tripState.rawValue
-                    
-                        tripToUpdate.recentlyCompletedDestinationIndex = Int16(trip.recentlyCompletedDestinationIndex ?? 0)
+                        
                         tripToUpdate.nextDestinationIndex = Int16(trip.nextDestinationIndex ?? 0)
                         tripToUpdate.currentRouteIndex = Int16(trip.currentRouteIndex ?? 0)
                         tripToUpdate.remainingDestinationsIndices = NSSet(array: trip.remainingDestinationsIndices)
                         tripToUpdate.completedDestinationsIndices = NSSet(array: trip.completedDestinationsIndices)
-                                            }
+                    }
                     
                     
                 }
-
+                
                 self.save(context) { error in
                     if let error = error {
                         print("Error saving to core data: \(error.localizedDescription)")
@@ -222,7 +241,7 @@ struct PersistenceController {
     
     
     func activeTrip(completion: @escaping(Trip?) -> Void, onError: @escaping(Error) -> Void) {
-            let context = backgroundContext
+        let context = backgroundContext
         
         do {
             let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()

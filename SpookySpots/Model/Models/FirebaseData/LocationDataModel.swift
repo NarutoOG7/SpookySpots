@@ -13,15 +13,8 @@ struct LocationDataModel {
     let address: Address
     let description: String
     let moreInfoLink: String
-    let review: Review
+    let review: ReviewData
     
-    
-    //MARK: - Images
-    struct Images {
-        var id: Int
-        var imageURL: String
-        var locationID: Int
-    }
 }
 
 

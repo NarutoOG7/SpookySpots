@@ -13,22 +13,15 @@ struct TheTripPage: View {
     let weenyWitch = K.Colors.WeenyWitch.self
     
     @State var isShowingMoreSteps = false
-    
-    @State var isShowingEditSheet = false
-    
+        
     @State var destinations: [Destination] = []
     
     @State var shouldShowResetAlert = false
     @State var shouldShowResetButton = false
     
-    @State var shouldDisplayErrorBanner = false
-    
-    
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var userStore = UserStore.instance
-        
-//     @State private var map = MapViewUI(mappedPolylines: .constant([]), mappedAltPolylines: .constant([]))
-    
+            
     private let map = MapViewUI(mapIsForExplore: false)
     
     var body: some View {
@@ -45,7 +38,8 @@ struct TheTripPage: View {
                     if currentTrip.tripState == .navigating {
                         currentLocationButton
                         VStack {
-                            routeStepHelper(geo)
+                            StepHelper(geo: geo,
+                                       isShowingMoreSteps: $isShowingMoreSteps)
                             Spacer()
                         }
                         
@@ -54,7 +48,11 @@ struct TheTripPage: View {
                             .padding(.top, 40)
                     }
                 }
-                SlideOverCard(position: .middle, canSlide: .constant(true), color: weenyWitch.black, handleColor: weenyWitch.orange, screenSize: geo.size.height) { () -> AnyView in
+                SlideOverCard(position: .bottom,
+                              canSlide: .constant(true),
+                              color: weenyWitch.black,
+                              handleColor: weenyWitch.orange,
+                              screenSize: geo.size.height) { () -> AnyView in
                     if tripLogic.currentTrip?.destinations == [] {
                         return AnyView(emptyTripView)
                     } else {
@@ -73,7 +71,6 @@ struct TheTripPage: View {
             
             .task {
                 DispatchQueue.background {
-                    
                     
                     self.destinations = []
                     self.destinations.append(tripLogic.currentTrip?.startLocation ?? Destination())
@@ -98,7 +95,9 @@ struct TheTripPage: View {
                         totalTripDetails
                     }
                 }
+                
                 Spacer()
+                
                 if shouldShowHuntButton {
                     huntButton
                 }
@@ -129,7 +128,7 @@ struct TheTripPage: View {
     }
     
     private var totalTripDetails: some View {
-        DurationDistanceString(
+        DurationDistanceStringView(
             travelTime: tripLogic.currentTrip?.totalTimeInSeconds ?? 0,
             distanceInMeters: tripLogic.currentTrip?.totalDistanceInMeters ?? 0,
             isShortened: false,
@@ -143,7 +142,7 @@ struct TheTripPage: View {
         if trip?.routes.indices.contains(index) ?? false,
            let currentRoute = trip?.routes[index] {
             return  AnyView(
-                DurationDistanceString(
+                DurationDistanceStringView(
                     travelTime: currentRoute.travelTime,
                     distanceInMeters: currentRoute.distance,
                     isShortened: false,
@@ -159,7 +158,6 @@ struct TheTripPage: View {
     //MARK: - Buttons
     
     private var huntButton: some View {
-        
          Button(action: huntLogic) {
             Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "HUNT")
                 .foregroundColor(weenyWitch.orange)
@@ -203,7 +201,6 @@ struct TheTripPage: View {
         }
         .padding(. horizontal, 10)
         .padding(.top, 100)
-//        .padding(.top, 180)
     }
     
     //MARK: - Methods
@@ -226,17 +223,21 @@ struct TheTripPage: View {
 
         default: return
             
-            // could do away with .finished here. and just say that the trip state is back to building ??? what about reset when all destinations are complete? what if they want to reset even without all complete? Is it easy enough to just remove locations from trip? would be if it was slide to remove and dragGesture to move becasue they are in a list like apple maps new destinations feature
         }
     }
     
     private func endTapped() {
+        
         if self.destinationsAreComplete() {
+            
             tripLogic.currentTrip?.tripState = .finished
             self.shouldShowResetAlert = true
+            
         } else {
+            
             tripLogic.pauseDirections()
         }
+        
         self.shouldShowResetButton = true
     }
     
@@ -266,88 +267,5 @@ struct TheTripPage_Previews: PreviewProvider {
     }
 }
 
-//MARK: - Navigation
-extension TheTripPage {
-    
-    private func routeStepHelper(_ geo: GeometryProxy) -> some View {
-        
-        let maxFrameSize = geo.size.height / 2
-        let fittedSize = CGFloat(tripLogic.currentTrip?.remainingSteps.count ?? 0) * 40
-        let fittedIsSmallerThanMax = fittedSize < maxFrameSize
-        let frameSize = fittedIsSmallerThanMax ? fittedSize : maxFrameSize
-        
-        return VStack {
-            currentStep(geo)
-            if isShowingMoreSteps {
-                list
-                    .frame(height: frameSize)
-//                    .frame(maxHeight: geo.size.height / 2)
-
-            }
-        }
-        .frame(width: UIScreen.main.bounds.width)
-        .background(weenyWitch.black)
-        .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 15)
-    }
-    
-    private func currentStep(_ geo: GeometryProxy) -> some View {
-        let orderedSteps = tripLogic.currentTrip?
-            .remainingSteps
-            .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? []
-        
-        let firstStepWithText = orderedSteps.first(where: { $0.instructions != "" })
-        
-        return Button {
-            self.isShowingMoreSteps.toggle()
-        } label: {
-            DirectionsLabel(
-                txt: firstStepWithText?.instructions ?? "",
-                geo: geo,
-                isShowingMore: $isShowingMoreSteps)
-            
-        }
-        .padding()
-        
-        .onAppear {
-            if let first = orderedSteps.first {
-                if first.instructions == "" {
-                    tripLogic.currentTrip?.remainingSteps.removeAll(where: { $0 == first })
-                }
-            }
-        }
-    }
-    
-    private var list: some View {
-        let orderedSteps = tripLogic.currentTrip?
-            .remainingSteps
-            .sorted(by: { $0.id ?? 0 < $1.id ?? 1 }) ?? []
-       return List(orderedSteps,
-                    id: \.self) { step in
-            
-            if step != orderedSteps.first {
-                if step.instructions != "" {
-                    Text(step.instructions ?? "")
-                        .foregroundColor(weenyWitch.light)
-                        .listRowBackground(Color.clear)
-                }
-            }
-        }
-                    .modifier(ListBackgroundModifier())
-                    .padding(.top, -35)
-    }
-}
 
 
-struct ListBackgroundModifier: ViewModifier {
-
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if #available(iOS 16.0, *) {
-            content
-                .scrollContentBackground(.hidden)
-        } else {
-            content
-            
-        }
-    }
-}

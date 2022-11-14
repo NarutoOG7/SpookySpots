@@ -9,45 +9,33 @@ import SwiftUI
 
 struct LocationCollection: View {
     
+    var collectionType: LocationCollectionTypes
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
+    @State var nearbyLocations = [LocationModel]()
+    @State var featuredLocations = [LocationModel]()
+    @State var trendingLocations = [LocationModel]()
+
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var exploreVM = ExploreViewModel.instance
     
-//    @Binding var locations: [LocationModel]
-//    var title: String
-    
-    @State var nearbyLocations = [LocationModel]()
-    @State var trendingLocations = [LocationModel]()
-    @State var featuredLocations = [LocationModel]()
-
     @EnvironmentObject var locationStore: LocationStore
-//    @ObservedObject var locationStore = LocationStore.instance
-    
-    @State var passingLocation: LocationModel?
-
-    var collectionType: LocationCollectionTypes
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             titleView
-//            list
             locationsList
         }
-//        .onAppear {
-//            self.nearbyLocations = locationStore.nearbyLocations
-//            self.trendingLocations = locationStore.trendingLocations
-//            self.featuredLocations = locationStore.featuredLocations
-//        }
     }
     
     //MARK: - Subviews
     
     private var titleView: some View {
         Text(collectionType.rawValue)
-//        Text(title)
             .font(.title2)
             .fontWeight(.bold)
             .offset(x: 15, y: 17)
-            .foregroundColor(K.Colors.WeenyWitch.brown)
+            .foregroundColor(weenyWitch.brown)
     }
     
     private var locationsList: some View {
@@ -68,30 +56,17 @@ struct LocationCollection: View {
             })
         }
     }
-//    private var list: some View {
-//        HStack {
-//            ForEach(locations) { location in
-//                NavigationLink {
-//                    LD(location: location)
-//                } label: {
-//                    MainLocCell(location: location)
-//                        .padding(isLastInTrending(location)
-//                                 ? .horizontal : .leading)
-//                        .padding(.vertical)
-//                }
-//            }
-//        }
-//    }
-//    private func isLastInList(_ location: LocationModel) -> Bool {
-//        location.location.id == locations.last?.location.id ?? UUID().hashValue
-//    }
-//
+
     //MARK: - Search Locations
     private var searchLocationsView: some View {
-
-        ForEach(0..<locationStore.hauntedHotels.filter({ exploreVM.searchText.isEmpty ? true : $0.location.name.localizedCaseInsensitiveContains(exploreVM.searchText)
-        }).count, id: \.self) { index in
-//        ForEach(0..<exploreVM.searchedLocations.filter({ exploreVM.searchText.isEmpty ? true : $0.location.name.localizedCaseInsensitiveContains(exploreVM.searchText) }).count, id: \.self) { index in
+        
+        let notSearching = exploreVM.searchText.isEmpty
+        
+        let filteredLocations = locationStore.hauntedHotels
+            .filter({ notSearching ? true : $0.location.name.localizedCaseInsensitiveContains(exploreVM.searchText)
+        })
+        
+        return ForEach(0..<filteredLocations.count, id: \.self) { index in
             NavigationLink {
                 LD(location: $locationStore.hauntedHotels[index])
             } label: {
@@ -101,14 +76,19 @@ struct LocationCollection: View {
     }
     
     //MARK: - Trending Locations
+    
     private var trendingLocationsView: some View {
+        
         ForEach(0..<locationStore.trendingLocations.count, id: \.self) { index in
-//        ForEach(trendingLocations) { location in
+            
             VStack(alignment: .leading) {
+                
                 NavigationLink {
+                    
                     LD(location: $locationStore.trendingLocations[index])
                     
                 } label: {
+                    
                     let location = locationStore.trendingLocations[index]
                     
                     MainLocCell(location: location)
@@ -127,15 +107,19 @@ struct LocationCollection: View {
     //MARK: - Featured
     
     private var featuredList: some View {
+        
         ForEach(0..<locationStore.featuredLocations.count, id: \.self) { index in
-//        ForEach(locationStore.featuredLocations, id: \.id) { location in
-//        ForEach(featuredLocations, id: \.id) { location in
+
         VStack(alignment: .leading) {
+            
             NavigationLink {
+                
                 LD(location: $locationStore.featuredLocations[index])
+                
             } label: {
                 
                 let location = locationStore.featuredLocations[index]
+                
                 MainLocCell(location: location)
                     .padding(isLastInFeatued(location)
                              ? .horizontal : .leading)
@@ -150,20 +134,31 @@ private func isLastInFeatued(_ location: LocationModel) -> Bool {
 }
     
     //MARK: - Nearby Locations
+    
     private var nearbyLocationsView: some View {
+        
         let view: AnyView
+        
         if userStore.currentLocation == nil {
+            
             view = AnyView(Text("Need Current Location").fontWeight(.light).padding())
+            
         } else {
+            
             view = AnyView(
-//                ForEach(locationStore.nearbyLocations, id: \.id) { location in
-
+                
                 ForEach(0..<locationStore.nearbyLocations.count, id: \.self) { index in
+                    
                     VStack(alignment: .leading) {
+                        
                         NavigationLink {
+                            
                             LD(location: $locationStore.nearbyLocations[index])
+                            
                         } label: {
+                            
                             let location = locationStore.nearbyLocations[index]
+                            
                             MainLocCell(location: location)
                                 .padding(isLastInNearbyList(location)
                                          ? .horizontal : .leading)
@@ -172,6 +167,7 @@ private func isLastInFeatued(_ location: LocationModel) -> Bool {
                     }
                 })
         }
+        
         return view
     }
     
@@ -180,11 +176,13 @@ private func isLastInFeatued(_ location: LocationModel) -> Bool {
     }
 }
 
+//MARK: - Preview
+
 struct LocationCollection_Previews: PreviewProvider {
+    
     static let locationStore = LocationStore()
+    
     static var previews: some View {
-//        LocationCollection(locations: [], title: "")
-//        LocationCollection(locations: .constant([]), title: "Nearby")
         LocationCollection(collectionType: .featured)
             .environmentObject(locationStore)
     }

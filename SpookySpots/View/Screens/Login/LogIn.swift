@@ -32,10 +32,8 @@ struct LogIn: View {
     
     //MARK: - Focused Text Field
     @FocusState private var focusedField: Field?
-    
-//    @ObservedObject var errorBannerManager = ErrorBannerManager.instance
-    
-    @EnvironmentObject var network: Network
+        
+    @EnvironmentObject var network: NetworkManager
     
     var body: some View {
         ZStack {
@@ -52,10 +50,10 @@ struct LogIn: View {
             }
             .padding()
             .padding(.bottom, 65)
-            .background(K.Colors.WeenyWitch.light)
+            .background(weenyWitch.light)
             .clipShape(CurvedShapeLeft())
             .contentShape(CurvedShapeLeft())
-            .shadow(color: K.Colors.WeenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
+            .shadow(color: weenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
             .onTapGesture(perform: authTypeLoginTapped)
             .cornerRadius(45)
             .padding(.horizontal, 20)
@@ -83,7 +81,10 @@ struct LogIn: View {
     
     private var firebaseErrorBanner: some View {
 
-            NotificationBanner(color: weenyWitch.orange, messageColor: weenyWitch.lightest, message: $firebaseErrorMessage, isVisible: $shouldShowFirebaseError)
+            NotificationBanner(color: weenyWitch.orange,
+                               messageColor: weenyWitch.lightest,
+                               message: $firebaseErrorMessage,
+                               isVisible: $shouldShowFirebaseError)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     self.shouldShowFirebaseError = false
@@ -95,12 +96,12 @@ struct LogIn: View {
         HStack {
             VStack(spacing: 50) {
                 Text("Login")
-                    .foregroundColor(self.index == 0 ? K.Colors.WeenyWitch.brown : K.Colors.WeenyWitch.lightest)
+                    .foregroundColor(self.index == 0 ? weenyWitch.brown : weenyWitch.lightest)
                     .font(.title)
                     .fontWeight(.bold)
                 
                 Capsule()
-                    .fill(self.index == 0 ? K.Colors.WeenyWitch.brown : Color.clear)
+                    .fill(self.index == 0 ? weenyWitch.brown : Color.clear)
                     .frame(width: 90, height: 4)
                     .offset(y: -35)
                 
@@ -113,13 +114,13 @@ struct LogIn: View {
     private var email: some View {
         UserInputCellWithIcon(
             input: $emailInput,
+            shouldShowErrorMessage: $shouldShowEmailErrorMessage,
+            isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: "envelope.fill"),
             placeholderText: "Email Address",
-            errorMessage: emailErrorMessage,
-            shouldShowErrorMessage: $shouldShowEmailErrorMessage,
-            isSecured: .constant(false))
+            errorMessage: emailErrorMessage)
         .focused($focusedField, equals: .email)
         .submitLabel(.next)
     }
@@ -127,14 +128,13 @@ struct LogIn: View {
     private var password: some View {
         UserInputCellWithIcon(
             input: $passwordInput,
+            shouldShowErrorMessage: $shouldShowPasswordErrorMessage,
+            isSecured: $isSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: isSecured ? "eye.slash.fill" : "eye"),
             placeholderText: "Password",
-            errorMessage: passwordErrorMessage,
-            shouldShowErrorMessage: $shouldShowPasswordErrorMessage,
-            isSecured: $isSecured,
-            canSecure: true)
+            errorMessage: passwordErrorMessage)
         .focused($focusedField, equals: .password)
         .submitLabel(.done)
     }
@@ -147,13 +147,14 @@ struct LogIn: View {
     }
     
     //MARK: - Buttons
+    
     private var forgotPasswordButton: some View {
         HStack {
             Spacer(minLength: 0)
             
             Button(action: forgotPasswordTapped) {
                 Text("Forgot Password?")
-                    .foregroundColor(K.Colors.WeenyWitch.lightest)
+                    .foregroundColor(weenyWitch.lightest)
             }
         }
         .padding(.horizontal)
@@ -163,13 +164,14 @@ struct LogIn: View {
     private var loginButton: some View {
         Button(action: loginTapped) {
             Text("LOGIN")
-                .foregroundColor(K.Colors.WeenyWitch.brown)
+                .foregroundColor(weenyWitch.brown)
                 .fontWeight(.bold)
                 .padding(.vertical)
                 .padding(.horizontal, 50)
-                .background(K.Colors.WeenyWitch.orange)
+                .background(weenyWitch.orange)
                 .clipShape(Capsule())
-                .shadow(color: K.Colors.WeenyWitch.lightest.opacity(0.1), radius: 5, x: 0, y: 5)
+                .shadow(color: weenyWitch.lightest.opacity(0.1),
+                        radius: 5, x: 0, y: 5)
         }
         .offset(y: 25)
         .opacity(self.index == 0 ? 1 : 0)
@@ -177,30 +179,40 @@ struct LogIn: View {
     
     
     //MARK: - Methods
+    
     private func authTypeLoginTapped() {
         self.index = 0
     }
     
     private func forgotPasswordTapped() {
+        
         auth.passwordReset(email: emailInput) { result in
+            
             if result == true {
+                
                 self.showingAlertPasswordRest = true
             }
         } error: { error in
+            
             if error == .firebaseTrouble {
+                
                 self.shouldShowFirebaseError = true
             }
         }
     }
     
     func setErrorMessage(_ type: ErrorMessageType, message: String) {
+        
         switch type {
+            
         case .email:
             self.emailErrorMessage = message
             self.shouldShowEmailErrorMessage = true
+            
         case .password:
             self.passwordErrorMessage = message
             self.shouldShowPasswordErrorMessage = true
+            
         default:
             self.firebaseErrorMessage = message
             self.shouldShowFirebaseError = true
@@ -258,6 +270,7 @@ struct LogIn: View {
     }
     
     private func checkForErrorAndSendAppropriateErrorMessage() {
+        
         if emailInput == "" {
             self.shouldShowEmailErrorMessage = true
         } else {
@@ -281,7 +294,7 @@ struct LogIn: View {
 struct LogIn_Previews: PreviewProvider {
     static var previews: some View {
         LogIn(index: .constant(0))
-            .environmentObject(Network())
+            .environmentObject(NetworkManager())
     }
 }
 

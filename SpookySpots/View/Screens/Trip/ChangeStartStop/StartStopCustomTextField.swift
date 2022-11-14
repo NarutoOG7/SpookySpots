@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct StartStopCustomTextField: View {
+    
     @Binding var textInput: String
     @Binding var placeholderText: String
     @Binding var editedField: FieldType
-    
     
     var type: FieldType
     
@@ -26,6 +26,9 @@ struct StartStopCustomTextField: View {
             txtField
         }
         
+        .onAppear {
+            UITextField.appearance().tintColor = UIColor(weenyWitch.orange)
+        }
         .padding()
         .overlay(Capsule().stroke(weenyWitch.orange))
     }

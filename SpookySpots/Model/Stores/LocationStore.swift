@@ -21,28 +21,29 @@ class LocationStore: ObservableObject {
     @Published var featuredLocations: [LocationModel] = []
     
     @Published var reviewBucket: [ReviewModel] = []
-//    @Published var activeTripLocations: [Destination] = []
-
     
     func switchNewLocationIntoAllBucketsIfExists(_ location: LocationModel) {
+        
         if let favIndex = favoriteLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             favoriteLocations[favIndex] = location
         }
+        
         if let onMapIndex = onMapLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             onMapLocations[onMapIndex] = location
         }
+        
         if let nearbyIndex = nearbyLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             nearbyLocations[nearbyIndex] = location
         }
+        
         if let hhIndex = hauntedHotels.firstIndex(where: { $0.location.id == location.location.id }) {
             hauntedHotels[hhIndex] = location
         }
+        
         if let trendingIndex = trendingLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             trendingLocations[trendingIndex] = location
         }
-//        for trendIndx in 0..<trendingLocations.filter({ $0.location.id == location.location.id }).count {
-//            trendingLocations[trendIndx] = location
-//        }
+
         if let featuredIndex = featuredLocations.firstIndex(where: { $0.location.id == location.location.id }) {
             featuredLocations[featuredIndex] = location
         }

@@ -10,6 +10,7 @@ import AuthenticationServices
 
 
 struct CreativeSignInUp: View {
+    
     @State var index = 0
     
     @State var firebaseErrorMessage = ""
@@ -56,16 +57,7 @@ struct CreativeSignInUp: View {
                         .padding(.horizontal, 30)
                         .padding(.top, 25)
                         
-                        
-                        //                HStack(spacing: 25) {
-                        //
-                        //                    appleButton
-                        //                    facebookButton
-                        //                    twitterButton
-                        //
-                        //                }
                         .padding(.top, 30)
-                        //                Spacer()
                         guest
                     }
                     .padding(.vertical)
@@ -76,12 +68,12 @@ struct CreativeSignInUp: View {
             .alert("Firebase Error", isPresented: $showingAlertForFirebaseError) {
                 Button("OK", role: .cancel) { }
             } message: {
-                Text("There was an error with firebase. Check your connection and try again.")
+                Text(K.ErrorMessages.Network.firebaseConnection.rawValue)
             }
 
         }
         .preferredColorScheme(.dark)
-        .background(K.Colors.WeenyWitch.black.edgesIgnoringSafeArea(.all))
+        .background(weenyWitch.black.edgesIgnoringSafeArea(.all))
     }
     
     var logo: some View {
@@ -127,9 +119,13 @@ struct CreativeSignInUp: View {
     }
     
     private func continueAsGuestTapped() {
+        
         Authorization.instance.anonymousSignIn { error in
+            
             if error == .troubleConnectingToFirebase {
+                
                 self.firebaseErrorMessage = error.message()
+                
                 self.showingAlertForFirebaseError = true
             }
             
@@ -145,20 +141,5 @@ struct CreativeSignInUp: View {
 struct CreativeSignInUp_Previews: PreviewProvider {
     static var previews: some View {
         CreativeSignInUp()
-    }
-}
-
-
-//MARK: - Placeholder
-extension View {
-    func placeholder<Content: View>(
-        when shouldShow: Bool,
-        alignment: Alignment = .leading,
-        @ViewBuilder placeholder: () -> Content) -> some View {
-
-        ZStack(alignment: alignment) {
-            placeholder().opacity(shouldShow ? 1 : 0)
-            self
-        }
     }
 }

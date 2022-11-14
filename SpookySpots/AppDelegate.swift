@@ -33,12 +33,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     
     func getUserIfSignedIn() {
+        
         if let data = UserDefaults.standard.data(forKey: "user") {
+            
             do {
-                // Create JSON Decoder
                 let decoder = JSONDecoder()
 
-                // Decode Note
                 let user = try decoder.decode(User.self, from: data)
 
                 userStore.user = user
