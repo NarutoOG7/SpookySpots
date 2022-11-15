@@ -9,9 +9,6 @@ import SwiftUI
 
 struct NotificationBanner: View {
     
-    let color: Color
-    let messageColor: Color
-    
     @Binding var message: String
     @Binding var isVisible: Bool
     
@@ -22,9 +19,9 @@ struct NotificationBanner: View {
             if isVisible {
                 VStack {
                     ZStack {
-                        banner
+                        banner(geo)
                         messageView
-                            .offset(y: 20)
+                            .offset(y: 33)
                     }
                     Spacer()
                 }
@@ -47,24 +44,22 @@ struct NotificationBanner: View {
         
     }
     
-    private var banner: some View {
-        Rectangle()
-            .frame(width: UIScreen.main.bounds.size.width, height: 125)
-            .foregroundColor(color)
+    private func banner(_ geo: GeometryProxy) -> some View {
+        return Rectangle()
+            .frame(width: geo.size.width, height: 125)
+            .foregroundColor(.red)
     }
     
     private var messageView: some View {
         Text(message)
-            .foregroundColor(messageColor)
-            .font(.subheadline)
+            .foregroundColor(.white)
+            .font(.avenirNext(size: 18))
     }
 }
 
 struct NotificationBanner_Previews: PreviewProvider {
     static var previews: some View {
-        NotificationBanner(color: .red,
-                           messageColor: .white,
-                           message: .constant("This is going well."),
+        NotificationBanner(message: .constant("This is going well."),
                            isVisible: .constant(true))
     }
 }

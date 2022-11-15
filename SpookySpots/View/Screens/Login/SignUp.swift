@@ -8,34 +8,20 @@
 import SwiftUI
 
 struct SignUp: View {
-    
-    @State var usernameInput = ""
-    @State var emailInput = ""
-    @State var passwordInput = ""
-    @State var confirmPasswordInput = ""
      
     @State var passwordIsSecured = true
     @State var confirmPasswordIsSecured = true
     
-    let weenyWitch = K.Colors.WeenyWitch.self
     @Binding var index: Int
+    
     var auth = Authorization()
+    
+    let weenyWitch = K.Colors.WeenyWitch.self
     
     //MARK: - TextField Focus State
     @FocusState private var focusedField: Field?
     
-    //MARK: - ErrorMessage Helpers
-    @State var shouldShowUserNameErrorMessage = false
-    @State var shouldShowEmailErrorMessage = false
-    @State var shouldShowPasswordErrorMessage = false
-    @State var shouldShowConfirmPasswordError = false
-    @State var shouldShowFirebaseError = false
-
-    @State var emailErrorMessage = ""
-    @State var passwordErrorMessage = ""
-    @State var confirmPasswordErrorMessage = ""
-    @State var firebaseErrorMessage = ""
-    
+    @ObservedObject var signupVM = SignupVM.instance
     
     @EnvironmentObject var network: NetworkManager
     
@@ -73,7 +59,7 @@ struct SignUp: View {
             case .password:
                 focusedField = .confirmPassword
             case .confirmPassword:
-                signUpTapped()
+                signupVM.signupTapped()
             default: break
             }
         }
@@ -84,12 +70,14 @@ struct SignUp: View {
             
             VStack(spacing: 50) {
                 Text("Sign Up")
-                    .foregroundColor(self.index == 1 ? K.Colors.WeenyWitch.brown : K.Colors.WeenyWitch.lightest)
-                    .font(.title)
+                    .foregroundColor(self.index == 1 ?
+                                     weenyWitch.brown : weenyWitch.lightest)
+                    .font(.avenirNext(size: 27))
                     .fontWeight(.bold)
                 
                 Capsule()
-                    .fill(self.index == 1 ? K.Colors.WeenyWitch.brown : Color.clear)
+                    .fill(self.index == 1 ?
+                          weenyWitch.brown : Color.clear)
                     .frame(width: 90, height: 4)
                     .offset(y: -35)
                 
@@ -100,8 +88,8 @@ struct SignUp: View {
     
     private var userNameField: some View {
         UserInputCellWithIcon(
-            input: $usernameInput,
-            shouldShowErrorMessage: $shouldShowUserNameErrorMessage,
+            input: $signupVM.usernameInput,
+            shouldShowErrorMessage: $signupVM.shouldShowUserNameErrorMessage,
             isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
@@ -116,28 +104,28 @@ struct SignUp: View {
     
     private var email: some View {
         UserInputCellWithIcon(
-            input: $emailInput,
-            shouldShowErrorMessage: $shouldShowEmailErrorMessage,
+            input: $signupVM.emailInput,
+            shouldShowErrorMessage: $signupVM.shouldShowEmailErrorMessage,
             isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: "envelope.fill"),
             placeholderText: "Email Address",
-            errorMessage: emailErrorMessage)
+            errorMessage: signupVM.emailErrorMessage)
         .focused($focusedField, equals: .email)
         .submitLabel(.next)
     }
 
     private var password: some View {
         UserInputCellWithIcon(
-            input: $passwordInput,
-            shouldShowErrorMessage: $shouldShowPasswordErrorMessage,
+            input: $signupVM.passwordInput,
+            shouldShowErrorMessage: $signupVM.shouldShowPasswordErrorMessage,
             isSecured: $passwordIsSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: passwordIsSecured ? "eye.slash.fill" : "eye" ),
             placeholderText: "Password",
-            errorMessage: passwordErrorMessage,
+            errorMessage: signupVM.passwordErrorMessage,
             canSecure: true)
         .focused($focusedField, equals: .password)
         .submitLabel(.next)
@@ -145,14 +133,14 @@ struct SignUp: View {
     
     private var confirmPassword: some View {
         UserInputCellWithIcon(
-            input: $confirmPasswordInput,
-            shouldShowErrorMessage: $shouldShowConfirmPasswordError,
+            input: $signupVM.confirmPasswordInput,
+            shouldShowErrorMessage: $signupVM.shouldShowConfirmPasswordError,
             isSecured: $confirmPasswordIsSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: confirmPasswordIsSecured ? "eye.slash.fill" : "eye" ),
             placeholderText: "Confirm Password",
-            errorMessage: K.ErrorMessages.Auth.passwordsDontMatch.rawValue,
+            errorMessage: K.ErrorHelper.Messages.Auth.passwordsDontMatch.rawValue,
             canSecure: true)
         .focused($focusedField, equals: .confirmPassword)
         .submitLabel(.done)
@@ -161,15 +149,17 @@ struct SignUp: View {
     //MARK: - Buttons
     
     private var signUpButton: some View {
-        Button(action: signUpTapped) {
+        Button(action: signupVM.signupTapped) {
             Text("SIGNUP")
-                .foregroundColor(self.index == 1 ? K.Colors.WeenyWitch.brown : .gray)
+                .foregroundColor(weenyWitch.brown)
+                .font(.avenirNext(size: 20))
                 .fontWeight(.bold)
                 .padding(.vertical)
                 .padding(.horizontal, 50)
-                .background(self.index == 1 ? K.Colors.WeenyWitch.orange : Color.clear)
+                .background(weenyWitch.orange)
                 .clipShape(Capsule())
-                .shadow(color: K.Colors.WeenyWitch.lightest.opacity(0.1), radius: 5, x: 0, y: 5)
+                .shadow(color: weenyWitch.lightest.opacity(0.1),
+                        radius: 5, x: 0, y: 5)
         }
         .offset(y: 25)
         .opacity(self.index == 1 ? 1 : 0)
@@ -177,126 +167,21 @@ struct SignUp: View {
     
     private var firebaseErrorBanner: some View {
 
-            NotificationBanner(color: weenyWitch.orange,
-                               messageColor: weenyWitch.lightest,
-                               message: $firebaseErrorMessage,
-                               isVisible: $shouldShowFirebaseError)
+            NotificationBanner(message: $signupVM.firebaseErrorMessage,
+                               isVisible: $signupVM.shouldShowFirebaseError)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                    self.shouldShowFirebaseError = false
+                    signupVM.shouldShowFirebaseError = false
                 }
             }
     }
     
     //MARK: - Methods
     
-    private func signUpTapped() {
-        
-        guard isConnectedToNetwork() else {
-            setErrorMessage(.firebase, message: "Please check your network connection and try again.")
-            return
-        }
-        
-        checkForErrorAndSendAppropriateErrorMessage()
-        
-        if fieldsAreFilled() {
-            
-            auth.signUp(userName: usernameInput, email: emailInput, password: passwordInput, confirmPassword: confirmPasswordInput) { error in
-                
-                switch error {
-                    
-                case .incorrectEmail,
-                        .unrecognizedEmail,
-                        .emailIsBadlyFormatted,
-                        .emailInUse:
-                    setErrorMessage(.email, message: error.message())
-                     
-                case .incorrectPassword,
-                        .insufficientPassword:
-                    setErrorMessage(.password, message: error.message())
-                    
-                case .passwordsDontMatch:
-                    setErrorMessage(.confirmPassword, message: error.message())
-                    
-                case .failedToSaveUser,
-                        .troubleConnectingToFirebase,
-                        .firebaseTrouble:
-                    setErrorMessage(.firebase, message: error.message())
-
-                }
-            }
-        }
-        
-        
-    }
-    
-    private func checkForErrorAndSendAppropriateErrorMessage() {
-        
-        if usernameInput == "" {
-            self.shouldShowUserNameErrorMessage = true
-        } else {
-            self.shouldShowUserNameErrorMessage = false
-        }
-        
-        if emailInput == "" {
-            setErrorMessage(.email, message: "Please provide an email address.")
-        } else {
-            self.shouldShowEmailErrorMessage = false
-        }
-        
-        if passwordInput == "" {
-            setErrorMessage(.password, message: "Please provide a password.")
-        } else {
-            self.shouldShowPasswordErrorMessage = false
-        }
-        
-        if confirmPasswordInput != passwordInput {
-            self.shouldShowConfirmPasswordError = true
-        } else {
-            self.shouldShowConfirmPasswordError = false
-        }
-    }
-    
-    private func fieldsAreFilled() -> Bool {
-        usernameInput != "" &&
-        emailInput != "" &&
-        passwordInput != "" &&
-        confirmPasswordInput != ""
-    }
-    
-    
-    
     private func authTypeSignUpTapped() {
         self.index = 1
     }
-    
-    func isConnectedToNetwork() -> Bool {
-        self.network.connected
-    }
-    
-    private func setErrorMessage(_ type: ErrorMessageType, message: String) {
-        
-        switch type {
-        
-        case .email:
-            self.emailErrorMessage = message
-            self.shouldShowEmailErrorMessage = true
-            
-        case .password:
-            self.passwordErrorMessage = message
-            self.shouldShowPasswordErrorMessage = true
-            
-        case .confirmPassword:
-            self.confirmPasswordErrorMessage = message
-            self.shouldShowConfirmPasswordError = true
-            
-        case .firebase:
-            self.firebaseErrorMessage = message
-            self.shouldShowFirebaseError = true
-            
-        }
-    }
-    
+      
     //MARK: - Field
     enum Field {
         case username, email, password, confirmPassword

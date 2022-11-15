@@ -50,7 +50,7 @@ struct Account: View {
         .alert("Failed To Sign Out", isPresented: $failSignOutAlertShown) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(K.ErrorMessages.Auth.failToSignOut.rawValue)
+            Text(K.ErrorHelper.Messages.Auth.failToSignOut.rawValue)
         }
         
         /////MARK: - Password Reset Alert
@@ -61,7 +61,7 @@ struct Account: View {
         .alert("Trouble with Firebase", isPresented: $firebaseErrorAlertShown) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text(K.ErrorMessages.Network.firebaseTrouble.rawValue)
+            Text(K.ErrorHelper.Messages.Network.firebaseTrouble.rawValue)
         }
     }
     
@@ -69,6 +69,7 @@ struct Account: View {
         NavigationLink(destination: ProfilePage()) {
             Text("Edit Profile")
                 .foregroundColor(weenyWitch.lighter)
+                .font(.avenirNext(size: 18))
         }
 
             .listRowSeparator(.hidden)
@@ -79,6 +80,7 @@ struct Account: View {
         NavigationLink(destination: ManageReviews()) {
             Text("Manage Reviews")
                 .foregroundColor(weenyWitch.lighter)
+                .font(.avenirNext(size: 18))
         }
 
             .listRowSeparator(.hidden)
@@ -90,13 +92,14 @@ struct Account: View {
         Button(action: changePasswordTapped) {
             Text("Change Password")
                 .foregroundColor(weenyWitch.lighter)
+                .font(.avenirNext(size: 18))
         }
     }
     
     private var signOutButton: some View {
         Button(action: signOutTapped) {
             Text("SIGN OUT")
-                .font(.callout)
+                .font(.avenirNext(size: 17))
                 .fontWeight(.light)
                 .foregroundColor(weenyWitch.lighter)
         }

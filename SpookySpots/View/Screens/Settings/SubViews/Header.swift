@@ -35,7 +35,7 @@ struct SettingsHeader: View {
     
     private var headerText: some View {
         Text(settingType.rawValue.capitalized)
-            .font(.title3)
+            .font(.avenirNext(size: 22))
             .fontWeight(.semibold)
             .foregroundColor(weenyWitch.lighter)
     }

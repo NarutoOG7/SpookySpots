@@ -106,9 +106,9 @@ struct ChangeStartAndStop: View {
                 VStack(alignment: .leading) {
                     Text(location.name ?? "").truncationMode(.tail)
                         .foregroundColor(weenyWitch.light)
-                        .font(.title3)
+                        .font(.avenirNext(size: 20))
                     Text(location.placemark.postalAddress?.streetCityState() ?? "")
-                        .font(.caption)
+                        .font(.avenirNext(size: 17))
                         .foregroundColor(weenyWitch.orange)
                     
                 }
@@ -122,8 +122,6 @@ struct ChangeStartAndStop: View {
     private var errorBanner: some View {
         
         NotificationBanner(
-            color: weenyWitch.orange,
-            messageColor: weenyWitch.lightest,
             message: .constant("You must allow the app access to your current location."),
             isVisible: $shouldShowCurrentLocationFailedErrorMessage)
         .task {
@@ -140,7 +138,7 @@ struct ChangeStartAndStop: View {
             cancel()
         }, label: {
             Text("Cancel")
-                .font(.title3)
+                .font(.avenirNext(size: 20))
                 .fontWeight(.light)
             
         })
@@ -151,7 +149,7 @@ struct ChangeStartAndStop: View {
             addStartAndStopToTrip()
         }, label: {
             Text("Done")
-                .font(.title3)
+                .font(.avenirNext(size: 20))
                 .fontWeight(.medium)
         })
     }
@@ -160,6 +158,7 @@ struct ChangeStartAndStop: View {
         Button(action: currentLocationTapped) {
             Text("Current Location")
                 .foregroundColor(weenyWitch.orange)
+                .font(.avenirNext(size: 20))
         }
     }
     

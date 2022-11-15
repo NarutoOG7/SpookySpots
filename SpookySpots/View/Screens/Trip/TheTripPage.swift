@@ -117,13 +117,15 @@ struct TheTripPage: View {
     private var emptyTripView: some View {
         Text("Add locations to your trip.")
             .foregroundColor(weenyWitch.orange)
-            .font(.system(size: 22, weight: .medium))
+            .font(.avenirNext(size: 22))
+
     }
     
     
     private var destinationTitle: some View {
         let nextDestination = tripLogic.currentTrip?.destinations[tripLogic.currentTrip?.nextDestinationIndex ?? 0]
         return AnyView(Text(nextDestination?.name ?? "")
+            .font(.avenirNext(size: 20))
             .foregroundColor(weenyWitch.lightest))
     }
     
@@ -161,6 +163,7 @@ struct TheTripPage: View {
          Button(action: huntLogic) {
             Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "HUNT")
                 .foregroundColor(weenyWitch.orange)
+                .font(.avenirNext(size: 18))
                 .padding()
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)

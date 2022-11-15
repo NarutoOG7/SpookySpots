@@ -29,6 +29,7 @@ struct ReviewCard: View {
     
     var title: some View {
         Text(review.title)
+            .font(.avenirNext(size: 20))
             .fontWeight(.medium)
             .foregroundColor(weenyWitch.brown)
     }
@@ -40,6 +41,7 @@ struct ReviewCard: View {
     
     var description: some View {
         Text(review.review)
+            .font(.avenirNext(size: 17))
             .fontWeight(.light)
             .foregroundColor(weenyWitch.brown)
             .fixedSize(horizontal: true, vertical: false)
@@ -49,6 +51,7 @@ struct ReviewCard: View {
         HStack {
             Spacer()
             Text("-\(review.username)")
+                .font(.avenirNext(size: 17))
                 .fontWeight(.medium)
                 .foregroundColor(weenyWitch.brown)
         }

@@ -247,7 +247,7 @@ struct AddLocationView: View {
                     .padding(.leading, 5)
             })
             .tint(weenyWitch.orange)
-            
+            .font(.avenirNext(size: 18))
             .padding()
             .frame(height: 250)
             .foregroundColor(weenyWitch.orange)
@@ -279,12 +279,12 @@ struct AddLocationView: View {
     //MARK: - Submit Button
     
     var submitButton: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
-        return Button(action: submitTapped) {
+         Button(action: submitTapped) {
             Capsule()
                 .fill(weenyWitch.orange)
                 .frame(width: 150, height: 45)
                 .overlay(Text("Submit")
+                    .font(.avenirNext(size: 18))
                     .foregroundColor(weenyWitch.brown))
             
         }

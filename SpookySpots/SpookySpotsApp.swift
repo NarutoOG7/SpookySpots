@@ -16,9 +16,7 @@ struct SpookySpotsApp: App {
     let persistenceController = PersistenceController.shared
     
     @StateObject var locationStore = LocationStore.instance
-    
-    @StateObject var network = NetworkManager()
-            
+                
     @Environment(\.scenePhase) var scenePhase
         
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
@@ -29,7 +27,6 @@ struct SpookySpotsApp: App {
                 .onAppear(perform: UIApplication.shared.addTapGestureRecognizer)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(locationStore)
-                .environmentObject(network)
 
         }
     }

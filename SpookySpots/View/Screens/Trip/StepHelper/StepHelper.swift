@@ -29,11 +29,13 @@ struct StepHelper: View {
         let frameSize = fittedIsSmallerThanMax ? fittedSize : maxFrameSize
         
         return VStack {
+            
             currentStep(geo)
+            
             if isShowingMoreSteps {
+                
                 list
                     .frame(height: frameSize)
-
             }
         }
         .frame(width: UIScreen.main.bounds.width)

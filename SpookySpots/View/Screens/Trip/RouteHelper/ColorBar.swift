@@ -30,6 +30,7 @@ struct ColorBar: View {
     private var titleView: some View {
         Text(title ?? "")
             .foregroundColor(weenyWitch.brown)
+            .font(.avenirNext(size: 18))
     }
     
     private var colorBar: some View {

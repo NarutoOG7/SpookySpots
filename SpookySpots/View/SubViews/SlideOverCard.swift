@@ -30,11 +30,11 @@ struct SlideOverCard<Content: View> : View {
             .onEnded(onDragEnded)
         
         return VStack {
-
+            
             Handle(color: handleColor)
-                    .padding(.bottom, 5)
+                .padding(.bottom, 5)
             self.content()
-                Spacer()
+            Spacer()
             
         }
         .frame(width: UIScreen.main.bounds.width, height: screenSize + 300)

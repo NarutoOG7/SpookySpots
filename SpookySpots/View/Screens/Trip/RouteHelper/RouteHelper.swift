@@ -62,6 +62,7 @@ struct RouteHelper: View {
 
             Text(tripLogic.getHighlightedRouteTravelTimeAsDigitalString() ?? "")
                 .foregroundColor(weenyWitch.brown)
+                .font(.avenirNext(size: 18))
         }
         .padding(.bottom, 2)
     }
@@ -73,7 +74,7 @@ struct RouteHelper: View {
                 .foregroundColor(weenyWitch.brown)
             Text(tripLogic.getDistanceStringFromRoute(tripLogic.currentRoute ?? Route(), shortened: true))
                 .foregroundColor(weenyWitch.brown)
-
+                .font(.avenirNext(size: 18))
         }
     }
     
@@ -84,9 +85,11 @@ struct RouteHelper: View {
             if tripLogic.alternateRouteState == .selected && tripLogic.selectedAlternate != nil {
                 Text("DONE")
                     .foregroundColor(weenyWitch.orange)
+                    .font(.avenirNext(size: 18))
             } else if tripLogic.alternateRouteState == .showingAll {
                 Text("cancel")
                     .foregroundColor(weenyWitch.orange)
+                    .font(.avenirNext(size: 18))
             } else {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .foregroundColor(weenyWitch.orange)

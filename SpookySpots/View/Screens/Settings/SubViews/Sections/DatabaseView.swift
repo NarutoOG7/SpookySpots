@@ -37,7 +37,7 @@ struct DatabaseView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("All Locations")
-                    .font(.title2)
+                    .font(.avenirNext(size: 24))
                     .fontWeight(.thin)
                     .foregroundColor(weenyWitch.lightest)
                 Spacer()
@@ -53,6 +53,7 @@ struct DatabaseView: View {
             ForEach(locationStore.hauntedHotels.prefix(self.showingMoreAllLocations ? .max : 4)) { location in
                 Text("\(location.location.id): \(location.location.name)")
                     .foregroundColor(weenyWitch.lightest)
+                    .font(.avenirNext(size: 18))
 
             }
         }
@@ -68,7 +69,7 @@ struct DatabaseView: View {
         VStack {
             HStack {
                 Text("Failed Locations")
-                    .font(.title2)
+                    .font(.avenirNext(size: 24))
                     .fontWeight(.thin)
                     .foregroundColor(weenyWitch.lightest)
 
@@ -96,6 +97,7 @@ struct DatabaseView: View {
     var allLocationsButton: some View {
         Button(action: allTapped) {
             Text(self.showingMoreAllLocations ? "Less" : "More")
+                .font(.avenirNext(size: 18))
                 .foregroundColor(weenyWitch.orange)
         }
     }
@@ -103,6 +105,7 @@ struct DatabaseView: View {
     private var failedLocationsButton: some View {
         Button(action: moreFailedTapped) {
             Text(self.showingMoreFailedLocations ? "Less" : "More")
+                .font(.avenirNext(size: 18))
                 .foregroundColor(weenyWitch.orange)
         }
     }
@@ -110,7 +113,7 @@ struct DatabaseView: View {
     var createGeoFireCoordsButton: some View {
         Button(action: createGFCTapped) {
             Text("Create GeoFire Coordinates")
-                .font(.subheadline)
+                .font(.avenirNext(size: 18))
                 .fontWeight(.black)
                 .foregroundColor(weenyWitch.orange)
                 .padding()

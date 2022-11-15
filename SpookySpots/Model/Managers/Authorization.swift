@@ -27,7 +27,7 @@ class Authorization {
         id == auth.currentUser?.uid
     }
     
-    func signIn(email: String, password: String, error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+    func signIn(email: String, password: String, error onError: @escaping(K.ErrorHelper.Errors) -> Void) {
         
         auth.signIn(withEmail: email, password: password) { authResult, error in
             
@@ -89,7 +89,7 @@ class Authorization {
         }
     }
     
-    func signUp(userName: String, email: String, password: String, confirmPassword: String, error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+    func signUp(userName: String, email: String, password: String, confirmPassword: String, error onError: @escaping(K.ErrorHelper.Errors) -> Void) {
         
         if confirmPassword == password {
             
@@ -159,7 +159,7 @@ class Authorization {
     }
     
     
-    func setCurrentUsersName(_ name: String, onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+    func setCurrentUsersName(_ name: String, onError: @escaping(K.ErrorHelper.Errors) -> Void) {
         
         if let currentUser = auth.currentUser {
             
@@ -191,7 +191,7 @@ class Authorization {
     
     
     //MARK: - SignOut
-    func signOut(error onError: @escaping(K.ErrorMessages.Auth) -> Void) {
+    func signOut(error onError: @escaping(K.ErrorHelper.Messages.Auth) -> Void) {
         
         do {
             
@@ -218,7 +218,7 @@ class Authorization {
     }
     
     //MARK: - GuestSignIn
-    func anonymousSignIn(error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+    func anonymousSignIn(error onError: @escaping(K.ErrorHelper.Errors) -> Void) {
         
         auth.signInAnonymously { result, error in
             
@@ -248,7 +248,7 @@ class Authorization {
     }
     
     //MARK: - PasswordReset
-    func passwordReset(email: String, withCompletion completion: @escaping(Bool) -> Void, error onError: @escaping(K.ErrorMessages.ErrorType) -> Void) {
+    func passwordReset(email: String, withCompletion completion: @escaping(Bool) -> Void, error onError: @escaping(K.ErrorHelper.Errors) -> Void) {
         
         auth.sendPasswordReset(withEmail: email) { error in
             
@@ -308,8 +308,9 @@ class Authorization {
             
         } catch {
             
-            onError(K.ErrorMessages.Auth.failedToSaveUser.rawValue)
+            onError(K.ErrorHelper.Messages.Auth.failedToSaveUser.rawValue)
         }
     }
     
+
 }

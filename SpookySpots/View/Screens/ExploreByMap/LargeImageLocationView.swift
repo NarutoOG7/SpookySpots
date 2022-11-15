@@ -63,7 +63,7 @@ struct LargeImageLocationView: View {
     
     private var title: some View {
         Text(location.location.name)
-            .font(.headline)
+            .font(.avenirNext(size: 20))
             .fontWeight(.medium)
             .lineLimit(2)
             .foregroundColor(weenyWitch.lightest)
@@ -72,7 +72,7 @@ struct LargeImageLocationView: View {
     
     private var address: some View {
         Text(location.location.address?.streetCityState() ?? "")
-            .font(.footnote)
+            .font(.avenirNextRegular(size: 17))
             .foregroundColor(weenyWitch.light)
             .lineLimit(1)
             .padding(.horizontal)

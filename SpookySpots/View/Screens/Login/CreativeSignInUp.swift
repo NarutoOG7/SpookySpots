@@ -40,22 +40,8 @@ struct CreativeSignInUp: View {
                                 LogIn(index: self.$index)
                             }
                         }
-                        HStack(spacing: 15) {
-                            
-                            Rectangle()
-                                .fill(K.Colors.WeenyWitch.light)
-                                .frame(height: 1)
-                            
-                            Text("OR")
-                                .foregroundColor(K.Colors.WeenyWitch.lightest)
-                            
-                            Rectangle()
-                                .fill(K.Colors.WeenyWitch.light)
-                                .frame(height: 1)
-                            
-                        }
-                        .padding(.horizontal, 30)
-                        .padding(.top, 25)
+                        
+                        orDivider
                         
                         .padding(.top, 30)
                         guest
@@ -68,7 +54,7 @@ struct CreativeSignInUp: View {
             .alert("Firebase Error", isPresented: $showingAlertForFirebaseError) {
                 Button("OK", role: .cancel) { }
             } message: {
-                Text(K.ErrorMessages.Network.firebaseConnection.rawValue)
+                Text(K.ErrorHelper.Messages.Network.firebaseConnection.rawValue)
             }
 
         }
@@ -84,38 +70,36 @@ struct CreativeSignInUp: View {
         
     }
     
+    private var orDivider: some View {
+        HStack(spacing: 15) {
+            
+            Rectangle()
+                .fill(weenyWitch.light)
+                .frame(height: 1)
+            
+            Text("OR")
+                .foregroundColor(weenyWitch.lightest)
+                .font(.avenirNext(size: 20))
+            
+            Rectangle()
+                .fill(weenyWitch.light)
+                .frame(height: 1)
+            
+        }
+        .padding(.horizontal, 30)
+        .padding(.top, 25)
+    }
+    
     //MARK: - Other Options
-    
-    private var facebookButton: some View {
-        Button(action: facebookTapped) {
-            Image("apple")
-                .logoStyle()
-        }
-    }
-    
-    private var twitterButton: some View {
-        Button(action: twitterTapped) {
-            Image("apple")
-                .logoStyle()
-        }
-    }
     
     private var guest: some View {
         Text("Continue As Guest")
-            .font(.title3)
+            .font(.avenirNext(size: 23))
             .fontWeight(.light)
             .italic()
-            .foregroundColor(K.Colors.WeenyWitch.orange)
+            .foregroundColor(weenyWitch.orange)
             .onTapGesture(perform: continueAsGuestTapped)
             .padding()
-    }
-    
-    private func facebookTapped() {
-        
-    }
-    
-    private func twitterTapped() {
-        
     }
     
     private func continueAsGuestTapped() {

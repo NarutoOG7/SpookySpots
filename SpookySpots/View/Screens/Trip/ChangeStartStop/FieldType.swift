@@ -20,7 +20,7 @@ enum FieldType {
             return "start:"
             
         case .end, .none:
-            return "end:  "
+            return "  end:"
         }
     }
 }

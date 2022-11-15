@@ -22,14 +22,12 @@ struct DirectionsLabel: View {
 
     var body: some View {
             Text(txt)
+                .font(.avenirNext(size: 18))
                 .foregroundColor(weenyWitch.lightest)
                 .frame(maxWidth: geo.size.width - 60)
                 .padding()
                 .overlay(alignment: .bottomTrailing) {
-                    Image(systemName: isShowingMore ? "arrow.up" : "arrow.down")
-                        .font(.headline)
-                        .foregroundColor(weenyWitch.orange)
-                        .padding()
+                    chevron
                 }
             
                 .onAppear {
@@ -37,6 +35,13 @@ struct DirectionsLabel: View {
                     speechSynthesizer.speak(speechUtterance)
                 }
         
+    }
+    
+    private var chevron: some View {
+        Image(systemName: isShowingMore ? "arrow.up" : "arrow.down")
+            .font(.headline)
+            .foregroundColor(weenyWitch.orange)
+            .padding()
     }
     
 }

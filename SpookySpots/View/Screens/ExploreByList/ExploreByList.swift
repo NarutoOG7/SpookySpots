@@ -23,17 +23,19 @@ struct ExploreByList: View {
     let weenyWitch = K.Colors.WeenyWitch.self
     
     var body: some View {
-        ZStack {
-            VStack {
-                greeting
-                mapButton
-                divider
-                ScrollView(showsIndicators: false) {
-                    locationsCollections
+        GeometryReader { geo in
+            ZStack {
+                VStack {
+                    greeting
+                    mapButton(geo)
+                    divider
+                    ScrollView(showsIndicators: false) {
+                        locationsCollections
+                    }
                 }
+                    searchView(geo)
+                
             }
-            searchView
-            
         }
         .onAppear {
             exploreVM.supplyLocationLists()
@@ -43,16 +45,19 @@ struct ExploreByList: View {
     }
     
     var greeting: some View {
-        HStack(spacing: -7) {
+        let nameSizeIsLarge = user.name.count > 10
+        return HStack(spacing: -7) {
             Text("\(exploreVM.greetingLogic()),")
-                .font(.title)
+                .font(.avenirNext(size: nameSizeIsLarge ? 20 : 27))
                 .fontWeight(.ultraLight)
                 .padding(.horizontal)
                 .foregroundColor(weenyWitch.brown)
+                .lineLimit(1)
             Text("\(user.name)")
-                .font(.title)
+                .font(.avenirNext(size: nameSizeIsLarge ? 20 : 27))
                 .fontWeight(.medium)
                 .foregroundColor(weenyWitch.orange)
+                .lineLimit(1)
             Spacer()
         }
         .padding(.top, 20)
@@ -76,10 +81,10 @@ struct ExploreByList: View {
             .padding(.bottom, -8)
     }
     
-    private var searchView: some View {
+    private func searchView(_ geo: GeometryProxy) -> some View {
         VStack {
             SearchBar()
-                .padding(.top, 70)
+                .padding(.top, geo.size.height / 9.7)
                 .padding(.horizontal)
                 .padding(.trailing, 65)
             Spacer()
@@ -88,8 +93,8 @@ struct ExploreByList: View {
     
     //MARK: - Buttons
     
-    private var mapButton: some View {
-        HStack {
+    private func mapButton(_ geo: GeometryProxy) -> some View {
+        return HStack {
             Spacer()
             Spacer()
             CircleButton(size: .small,
@@ -98,6 +103,7 @@ struct ExploreByList: View {
                          accentColor: K.Colors.WeenyWitch.lightest,
                          clicked: isShowingMap)
         }
+//        .padding(.top, geo.size.height / 10)
         .padding(.horizontal)
     }
     

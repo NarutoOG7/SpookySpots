@@ -24,6 +24,7 @@ struct LD: View {
     let collapsedImageHeight: CGFloat = 10
     
     private let images = K.Images.self
+    private let weenyWitch = K.Colors.WeenyWitch.self
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -70,7 +71,7 @@ struct LD: View {
                     MoreReviewsSheet(reviews: location.reviews)
                 }
             }
-            .background(K.Images.paperBackground)
+            .background(images.paperBackground)
         }
         .edgesIgnoringSafeArea(.vertical)
         .navigationBarHidden(true)
@@ -123,7 +124,7 @@ struct LD: View {
         Text(location.location.name)
             .font(.avenirNext(size: 34))
             .fontWeight(.medium)
-            .foregroundColor(K.Colors.WeenyWitch.brown)
+            .foregroundColor(weenyWitch.brown)
     }
     
     
@@ -131,19 +132,19 @@ struct LD: View {
         Text(location.location.address?.fullAddress() ?? "")
             .font(.avenirNextRegular(size: 19))
             .lineLimit(nil)
-            .foregroundColor(K.Colors.WeenyWitch.brown)
+            .foregroundColor(weenyWitch.brown)
     }
     
     private var avgRatingDisplay: some View {
-        HStack {
+        let reviewCount = location.reviews.count
+        let textEnding = reviewCount == 1 ? "" : "s"
+        return HStack {
             FiveStars(
-                color: K.Colors.WeenyWitch.orange,
+                color: weenyWitch.orange,
                 rating: $location.avgRating)
-            let reviewCount = location.reviews.count
-            let textEnding = reviewCount == 1 ? "" : "s"
             Text("(\(reviewCount) review\(textEnding))")
                 .font(.avenirNextRegular(size: 17))
-                .foregroundColor(K.Colors.WeenyWitch.brown)
+                .foregroundColor(weenyWitch.brown)
         }
     }
     
@@ -152,7 +153,7 @@ struct LD: View {
         Text(location.location.description ?? "")
             .font(.avenirNext(size: 17))
             .lineLimit(nil)
-            .foregroundColor(K.Colors.WeenyWitch.brown)
+            .foregroundColor(weenyWitch.brown)
     }
     
     private var reviewHelper: some View {
@@ -160,7 +161,8 @@ struct LD: View {
             if location.reviews.isEmpty {
                 Divider()
                 Text("No Reviews")
-                    .foregroundColor(K.Colors.WeenyWitch.brown)
+                    .font(.avenirNext(size: 17))
+                    .foregroundColor(weenyWitch.brown)
             } else {
                 if let last = location.reviews.last {
                     ReviewCard(review: last)
@@ -193,7 +195,8 @@ struct LD: View {
                     Link(destination: url, label: {
                         Text("Get More Info")
                             .underline()
-                            .foregroundColor(K.Colors.WeenyWitch.orange)
+                            .foregroundColor(weenyWitch.orange)
+                            .font(.avenirNextRegular(size: 17))
                     })
                 }
             )
@@ -208,14 +211,16 @@ struct LD: View {
         VStack(alignment: .leading) {
             Text("Been here before?")
                 .italic()
-                .foregroundColor(K.Colors.WeenyWitch.brown)
+                .font(.avenirNextRegular(size: 17))
+                .foregroundColor(weenyWitch.brown)
             Button {
                 self.isCreatingNewReview = true
                 
             } label: {
                 Text("Leave A Review")
                     .underline()
-                    .foregroundColor(K.Colors.WeenyWitch.orange)
+                    .font(.avenirNextRegular(size: 17))
+                    .foregroundColor(weenyWitch.orange)
             }
         }
     }
@@ -239,8 +244,8 @@ struct LD: View {
         CircleButton(
             size: .medium,
             image: images.directions,
-            mainColor: K.Colors.WeenyWitch.brown,
-            accentColor: K.Colors.WeenyWitch.lightest,
+            mainColor: weenyWitch.brown,
+            accentColor: weenyWitch.lightest,
             title: "Directions",
             clicked: directionsTapped)
     }
@@ -249,8 +254,8 @@ struct LD: View {
         CircleButton(
             size: .medium,
             image: images.share,
-            mainColor: K.Colors.WeenyWitch.brown,
-            accentColor: K.Colors.WeenyWitch.lightest,
+            mainColor: weenyWitch.brown,
+            accentColor: weenyWitch.lightest,
             title: "Share",
             clicked: shareTapped)
     }
@@ -259,8 +264,8 @@ struct LD: View {
         CircleButton(
             size: .medium,
             image: Image(systemName: tripLogic.destinationsContains(location) ? "minus" : "plus"),
-            mainColor: K.Colors.WeenyWitch.brown,
-            accentColor: K.Colors.WeenyWitch.lightest,
+            mainColor: weenyWitch.brown,
+            accentColor: weenyWitch.lightest,
             title: tripLogic.destinationsContains(location) ? "Remove From Trip" : "Add To Trip",
             clicked: addToTripTapped)
     }
@@ -271,8 +276,8 @@ struct LD: View {
             image: favoritesLogic.contains(location) ?
             Image(systemName: "heart.fill") :
                 Image(systemName: "heart"),
-            mainColor: K.Colors.WeenyWitch.brown,
-            accentColor: K.Colors.WeenyWitch.lightest,
+            mainColor: weenyWitch.brown,
+            accentColor: weenyWitch.lightest,
             title: "Favorites",
             clicked: favoritesTapped)
     }
@@ -284,6 +289,7 @@ struct LD: View {
                 Text("More Reviews")
                     .font(.avenirNextRegular(size: 17))
                     .fontWeight(.medium)
+                    .foregroundColor(weenyWitch.brown)
             }
         }.padding(.vertical)
     }
@@ -293,7 +299,7 @@ struct LD: View {
             Image(systemName: "chevron.left")
                 .resizable()
                 .frame(width: 25, height: 35)
-                .tint(K.Colors.WeenyWitch.orange)
+                .tint(weenyWitch.orange)
         }
     }
     

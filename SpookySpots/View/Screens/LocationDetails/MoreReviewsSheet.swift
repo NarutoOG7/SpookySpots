@@ -32,12 +32,12 @@ struct MoreReviewsSheet: View {
     private func cellFor(_ review: ReviewModel) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(review.title)
-                .font(.title)
+                .font(.avenirNextRegular(size: 25))
                 .foregroundColor(weenyWitch.lightest)
             FiveStars(color: weenyWitch.orange,
                       rating: .constant(review.rating))
             Text(review.review)
-                .font(.body)
+                .font(.avenirNextRegular(size: 18))
                 .foregroundColor(weenyWitch.light)
             
         }

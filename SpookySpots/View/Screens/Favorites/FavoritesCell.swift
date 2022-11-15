@@ -12,6 +12,8 @@ struct FavoritesCell: View {
     
     var location: LocationModel
     
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     @State private var imageURL = URL(string: "")
     
     var body: some View {
@@ -41,9 +43,9 @@ struct FavoritesCell: View {
         VStack {
             Spacer()
             Text(location.location.name)
-                .font(.title)
+                .font(.avenirNext(size: 27))
                 .fontWeight(.heavy)
-                .foregroundColor(Color.white)
+                .foregroundColor(weenyWitch.lightest)
                 .shadow(color: .black, radius: 1, x: 0, y: 2)
                 .padding(10)
         }

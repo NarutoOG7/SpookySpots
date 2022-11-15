@@ -53,17 +53,20 @@ struct ProfilePage: View {
         HStack(alignment: .center, spacing: 24) {
             Text("Name:")
                 .foregroundColor(weenyWitch.orange)
-             
+                .font(.avenirNext(size: 18))
+
                 
                 TextField("", text: $displayNameInput)
                     .placeholder(when: displayNameInput.isEmpty) {
                         Text(userStore.user.name)
                             .foregroundColor(weenyWitch.lightest)
+                            .font(.avenirNext(size: 24))
+
                     }
                     .foregroundColor(weenyWitch.lightest)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
-                    .font(.title2)
+                    .font(.avenirNext(size: 24))
                     .onChange(of: displayNameInput) { _ in
                         wasEdited = true
                     }
@@ -75,16 +78,18 @@ struct ProfilePage: View {
         HStack(alignment: .center, spacing: 24) {
             Text("Email:")
                 .foregroundColor(weenyWitch.orange)
+                .font(.avenirNext(size: 18))
             
                 TextField("", text: $emailInput)
                     .placeholder(when: emailInput.isEmpty) {
                         Text(userStore.user.email)
                             .foregroundColor(weenyWitch.lightest)
+                            .font(.avenirNext(size: 24))
                     }
                     .foregroundColor(weenyWitch.lightest)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
-                    .font(.title2)
+                    .font(.avenirNext(size: 24))
                     .onChange(of: emailInput) { _ in
                         wasEdited = true
                     }
@@ -98,8 +103,10 @@ struct ProfilePage: View {
         Button(action: saveTapped) {
             Text("SAVE")
                 .foregroundColor(weenyWitch.orange)
+                .font(.avenirNext(size: 24))
                 .padding()
-                .overlay(Capsule().stroke(weenyWitch.orange))
+                .overlay(RoundedRectangle(cornerRadius: 15)
+                    .stroke(weenyWitch.orange))
         }.disabled(!wasEdited)
             .padding()
         
@@ -111,7 +118,7 @@ struct ProfilePage: View {
             Spacer()
         Button(action: deleteAcctTapped) {
             Text("Delete Account")
-                .font(.callout)
+                .font(.avenirNext(size: 16))
                 .fontWeight(.light)
                 .foregroundColor(Color.red.opacity(0.8))
         }.padding(.horizontal)

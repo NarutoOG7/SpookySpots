@@ -42,8 +42,10 @@ struct StartStopCustomTextField: View {
         .placeholder(when: textInput.isEmpty) {
             Text(placeholderText)
                 .foregroundColor(weenyWitch.lightest)
+                .font(.avenirNext(size: 18))
         }
         .foregroundColor(weenyWitch.lightest)
+        .font(.avenirNext(size: 18))
         .offset(x: 10, y: 1)
         
         .onChange(of: textInput) { newValue in
@@ -56,7 +58,7 @@ struct StartStopCustomTextField: View {
     
     private var labelTextView: some View {
         Text(type.labelText)
-            .font(.title3)
+            .font(.avenirNext(size: 22))
             .foregroundColor(weenyWitch.orange)
             .offset(x: 10)
     }

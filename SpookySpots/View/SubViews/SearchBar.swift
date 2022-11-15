@@ -45,6 +45,7 @@ struct SearchBar: View {
                   text:
                     $exploreVM.searchText)
         .padding()
+        .font(.avenirNext(size: 18))
         .foregroundColor(weenyWitch.brown)
         .accentColor(weenyWitch.orange)
         
@@ -62,6 +63,7 @@ struct SearchBar: View {
             } label: {
                 Text(exploreVM.searchedLocations[index].location.name)
                     .foregroundColor(weenyWitch.brown)
+                    .font(.avenirNext(size: 18))
             }
             .listRowBackground(Color.clear)
         }
@@ -85,6 +87,8 @@ struct SearchBar: View {
     private var cancelButton: some View {
         Button(action: cancelSearchTapped) {
             Text("Cancel")
+                .font(.avenirNext(size: 18))
+                .foregroundColor(weenyWitch.brown)
         }
         .opacity(exploreVM.searchText.isEmpty ? 0 : 1)
         .padding()

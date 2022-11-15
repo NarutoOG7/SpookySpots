@@ -10,6 +10,8 @@ import Network
 
 class NetworkManager: ObservableObject {
     
+    static let instance = NetworkManager()
+    
     let monitor = NWPathMonitor()
     let queue = DispatchQueue(label: "Monitor")
     

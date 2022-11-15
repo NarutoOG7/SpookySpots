@@ -9,32 +9,16 @@ import SwiftUI
 
 struct LogIn: View {
     
-    @State var emailInput = ""
-    @State var passwordInput = ""
-    
     @State var isSecured = true
+    
     @Binding var index: Int
-    
-    @State var showingAlertPasswordRest = false
-    
-    var auth = Authorization()
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    //MARK: - Error Message Helpers
-    @State var shouldShowEmailErrorMessage = false
-    @State var shouldShowPasswordErrorMessage = false
-    @State var shouldShowFirebaseError = false
-    
-    @State var emailErrorMessage = ""
-    @State var passwordErrorMessage = ""
-    @State var firebaseErrorMessage = ""
-    
-    //MARK: - Focused Text Field
     @FocusState private var focusedField: Field?
-        
-    @EnvironmentObject var network: NetworkManager
     
+    @ObservedObject var loginVM = LoginVM.instance
+            
     var body: some View {
         ZStack {
         ZStack(alignment: .bottom) {
@@ -62,7 +46,7 @@ struct LogIn: View {
         }
             
             
-        .alert("Email Sent", isPresented: $showingAlertPasswordRest) {
+        .alert("Email Sent", isPresented: $loginVM.showingAlertPasswordReset) {
             Button("OK", role: .cancel) { }
         }
             firebaseErrorBanner
@@ -73,7 +57,7 @@ struct LogIn: View {
             case .email:
                 focusedField = .password
             case .password:
-                loginTapped()
+                loginVM.loginTapped()
             default: break
             }
         }
@@ -81,13 +65,11 @@ struct LogIn: View {
     
     private var firebaseErrorBanner: some View {
 
-            NotificationBanner(color: weenyWitch.orange,
-                               messageColor: weenyWitch.lightest,
-                               message: $firebaseErrorMessage,
-                               isVisible: $shouldShowFirebaseError)
+            NotificationBanner(message: $loginVM.firebaseErrorMessage,
+                               isVisible: $loginVM.shouldShowFirebaseError)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                    self.shouldShowFirebaseError = false
+                    loginVM.shouldShowFirebaseError = false
                 }
             }
     }
@@ -96,12 +78,14 @@ struct LogIn: View {
         HStack {
             VStack(spacing: 50) {
                 Text("Login")
-                    .foregroundColor(self.index == 0 ? weenyWitch.brown : weenyWitch.lightest)
-                    .font(.title)
+                    .foregroundColor(self.index == 0 ?
+                                     weenyWitch.brown : weenyWitch.lightest)
+                    .font(.avenirNext(size: 27))
                     .fontWeight(.bold)
                 
                 Capsule()
-                    .fill(self.index == 0 ? weenyWitch.brown : Color.clear)
+                    .fill(self.index == 0 ?
+                          weenyWitch.brown : Color.clear)
                     .frame(width: 90, height: 4)
                     .offset(y: -35)
                 
@@ -113,28 +97,30 @@ struct LogIn: View {
     
     private var email: some View {
         UserInputCellWithIcon(
-            input: $emailInput,
-            shouldShowErrorMessage: $shouldShowEmailErrorMessage,
+            input: $loginVM.emailInput,
+            shouldShowErrorMessage: $loginVM.shouldShowEmailErrorMessage,
             isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: "envelope.fill"),
             placeholderText: "Email Address",
-            errorMessage: emailErrorMessage)
+            errorMessage: loginVM.emailErrorMessage)
         .focused($focusedField, equals: .email)
         .submitLabel(.next)
     }
     
+    
     private var password: some View {
         UserInputCellWithIcon(
-            input: $passwordInput,
-            shouldShowErrorMessage: $shouldShowPasswordErrorMessage,
+            input: $loginVM.passwordInput,
+            shouldShowErrorMessage: $loginVM.shouldShowPasswordErrorMessage,
             isSecured: $isSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             icon: Image(systemName: isSecured ? "eye.slash.fill" : "eye"),
             placeholderText: "Password",
-            errorMessage: passwordErrorMessage)
+            errorMessage: loginVM.passwordErrorMessage,
+            canSecure: true)
         .focused($focusedField, equals: .password)
         .submitLabel(.done)
     }
@@ -152,8 +138,9 @@ struct LogIn: View {
         HStack {
             Spacer(minLength: 0)
             
-            Button(action: forgotPasswordTapped) {
+            Button(action: loginVM.forgotPasswordTapped) {
                 Text("Forgot Password?")
+                    .font(.avenirNext(size: 18))
                     .foregroundColor(weenyWitch.lightest)
             }
         }
@@ -162,9 +149,10 @@ struct LogIn: View {
     }
     
     private var loginButton: some View {
-        Button(action: loginTapped) {
+        Button(action: loginVM.loginTapped) {
             Text("LOGIN")
                 .foregroundColor(weenyWitch.brown)
+                .font(.avenirNext(size: 20))
                 .fontWeight(.bold)
                 .padding(.vertical)
                 .padding(.horizontal, 50)
@@ -183,106 +171,7 @@ struct LogIn: View {
     private func authTypeLoginTapped() {
         self.index = 0
     }
-    
-    private func forgotPasswordTapped() {
-        
-        auth.passwordReset(email: emailInput) { result in
-            
-            if result == true {
-                
-                self.showingAlertPasswordRest = true
-            }
-        } error: { error in
-            
-            if error == .firebaseTrouble {
-                
-                self.shouldShowFirebaseError = true
-            }
-        }
-    }
-    
-    func setErrorMessage(_ type: ErrorMessageType, message: String) {
-        
-        switch type {
-            
-        case .email:
-            self.emailErrorMessage = message
-            self.shouldShowEmailErrorMessage = true
-            
-        case .password:
-            self.passwordErrorMessage = message
-            self.shouldShowPasswordErrorMessage = true
-            
-        default:
-            self.firebaseErrorMessage = message
-            self.shouldShowFirebaseError = true
-        }
-    }
-    
-    func isConnectedToNetwork() -> Bool {
-        network.connected
-    }
-    
-    private func loginTapped() {
-        
-        print(isConnectedToNetwork())
-        
-        guard isConnectedToNetwork() else {
-            setErrorMessage(.firebase, message: "Please check your network connection and try again.")
-            return
-        }
-        
-        checkForErrorAndSendAppropriateErrorMessage()
-        
-        if fieldsAreFilled() {
-            
-            auth.signIn(email: emailInput, password: passwordInput) { error in
-                switch error {
-                    
-                case .incorrectEmail,
-                        .unrecognizedEmail,
-                        .emailIsBadlyFormatted,
-                        .emailInUse:
-                    setErrorMessage(.email, message: error.message())
-                     
-                case .incorrectPassword,
-                        .insufficientPassword:
-                    setErrorMessage(.password, message: error.message())
-                    
-                case .failedToSaveUser,
-                        .troubleConnectingToFirebase,
-                        .firebaseTrouble:
-                    setErrorMessage(.firebase, message: error.message())
-                    
-                default:
-                    setErrorMessage(.firebase, message: error.message())
-                }
-            }
-        }
-    }
-    
-    private func showPasswordTapped() {
-        self.isSecured.toggle()
-    }
-    
-    private func fieldsAreFilled() -> Bool {
-        emailInput != "" && passwordInput != ""
-    }
-    
-    private func checkForErrorAndSendAppropriateErrorMessage() {
-        
-        if emailInput == "" {
-            self.shouldShowEmailErrorMessage = true
-        } else {
-            self.shouldShowEmailErrorMessage = false
-        }
-        
-        if passwordInput == "" {
-            self.shouldShowPasswordErrorMessage = true
-        } else {
-            self.shouldShowPasswordErrorMessage = false
-        }
-    }
+
 
     //MARK: - Field
     enum Field {
@@ -294,7 +183,6 @@ struct LogIn: View {
 struct LogIn_Previews: PreviewProvider {
     static var previews: some View {
         LogIn(index: .constant(0))
-            .environmentObject(NetworkManager())
     }
 }
 
@@ -309,9 +197,4 @@ struct CurvedShapeLeft : Shape {
             path.addLine(to: CGPoint(x: 0, y: 0))
         }
     }
-}
-
-//MARK: - Error Message Type
-enum ErrorMessageType {
-    case email, password, confirmPassword, firebase
 }

@@ -56,7 +56,7 @@ struct ManageReviews: View {
     private var noReviews: some View {
         Text("No Reviews")
             .foregroundColor(weenyWitch.lightest)
-            .font(.title3)
+            .font(.avenirNext(size: 22))
     }
     
     private var listOfReviews: some View {
@@ -71,6 +71,7 @@ struct ManageReviews: View {
                 }, label: {
                     Text(review.title)
                         .foregroundColor(weenyWitch.brown)
+                        .font(.avenirNext(size: 18))
                         .italic()
                 })
                 .listRowBackground(weenyWitch.lightest)

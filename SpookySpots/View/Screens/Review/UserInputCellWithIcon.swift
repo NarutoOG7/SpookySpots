@@ -42,20 +42,7 @@ struct UserInputCellWithIcon: View {
                     
                 } else {
                     
-                    TextField("", text: self.$input)
-                        .disableAutocorrection(true)
-                        .font(.title3.weight(boldText ? .bold : .regular))
-                        .textInputAutocapitalization(.never)
-                        .foregroundColor(primaryColor)
-                        .placeholder(when: input.isEmpty) {
-                            Text(placeholderText)
-                                .foregroundColor(accentColor)
-                        }
-                        .onChange(of: input) { newValue in
-                            if !newValue.isEmpty {
-                                self.shouldShowErrorMessage = false
-                            }
-                        }
+                    textField
                     
                 }
             }
@@ -71,7 +58,7 @@ struct UserInputCellWithIcon: View {
     private var errorView: some View {
         Text(errorMessage)
             .foregroundColor(.red)
-            .font(.caption)
+            .font(.avenirNext(size: 16))
     }
     
     private var iconView: some View {
@@ -92,15 +79,36 @@ struct UserInputCellWithIcon: View {
         }
     }
     
+    private var textField: some View {
+        TextField("", text: self.$input)
+            .disableAutocorrection(true)
+            .font(.avenirNext(size: 22)
+                .weight(boldText ? .bold : .regular))
+            .textInputAutocapitalization(.never)
+            .foregroundColor(primaryColor)
+            .placeholder(when: input.isEmpty) {
+                Text(placeholderText)
+                    .foregroundColor(accentColor)
+                    .font(.avenirNext(size: 17))
+            }
+            .onChange(of: input) { newValue in
+                if !newValue.isEmpty {
+                    self.shouldShowErrorMessage = false
+                }
+            }
+    }
+    
     private var secureFieldView: some View {
         SecureField(input, text: self.$input)
             .disableAutocorrection(true)
-            .font(.title3.weight(boldText ? .bold : .regular))
+            .font(.avenirNext(size: 22)
+                .weight(boldText ? .bold : .regular))
             .textInputAutocapitalization(.never)
             .foregroundColor(primaryColor)
             .placeholder(when: self.input.isEmpty) {
                 Text(placeholderText)
                     .foregroundColor(accentColor)
+                    .font(.avenirNext(size: 17))
             }
             .onChange(of: input) { newValue in
                 if !newValue.isEmpty {

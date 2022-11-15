@@ -14,6 +14,8 @@ struct DurationDistanceStringView: View {
     let isShortened: Bool
     let asStack: Bool
 
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     var body: some View {
         if asStack {
             stackedDetails
@@ -36,6 +38,8 @@ struct DurationDistanceStringView: View {
         let minutesString =  "\(minutes) \(min)"
                 
         return Text("\(hoursString) \(minutesString) (\(distanceString))")
+            .font(.avenirNext(size: 20))
+            .foregroundColor(weenyWitch.lightest)
     }
     
     var stackedDetails: some View {
@@ -62,13 +66,19 @@ struct DurationDistanceStringView: View {
         
         return HStack(alignment: .bottom) {
             Text("\(time.hours)")
-                .font(.title3)
+                .font(.avenirNext(size: 20))
+                .foregroundColor(weenyWitch.lightest)
             Text(time.hours == 0 ? "" : hr)
-                .font(.subheadline)
+                .font(.avenirNext(size: 17))
+                .foregroundColor(weenyWitch.lightest)
+                .fontWeight(.light)
             Text("\(time.minutes)")
-                .font(.title3)
+                .font(.avenirNext(size: 20))
+                .foregroundColor(weenyWitch.lightest)
             Text(time.minutes == 0 ? "" : min)
-                .font(.subheadline)
+                .font(.avenirNext(size: 17))
+                .foregroundColor(weenyWitch.lightest)
+                .fontWeight(.light)
         }
     }
     
@@ -77,9 +87,12 @@ struct DurationDistanceStringView: View {
         let stringDistance = String(format: "%.0f", dst.dist)
          return HStack(alignment: .bottom) {
              Text(stringDistance)
-                 .font(.title3)
+                 .font(.avenirNext(size: 22))
+                 .foregroundColor(weenyWitch.lightest)
              Text(dst.metric)
-                 .font(.subheadline)
+                 .font(.avenirNext(size: 17))
+                 .foregroundColor(weenyWitch.lightest)
+                 .fontWeight(.light)
         }
     }
     

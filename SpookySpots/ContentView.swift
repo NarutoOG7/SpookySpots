@@ -48,11 +48,8 @@ struct ContentView: View {
     
     private var errorBanner: some View {
         let weenyWitch = K.Colors.WeenyWitch.self
-        return NotificationBanner(
-            color: weenyWitch.orange,
-            messageColor: weenyWitch.black,
-            message: $errorManager.message,
-            isVisible: $errorManager.shouldDisplay)
+        return NotificationBanner(message: $errorManager.message,
+                                  isVisible: $errorManager.shouldDisplay)
 
     }
 }

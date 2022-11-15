@@ -125,7 +125,7 @@ struct LocationReviewView: View {
             Toggle(isOn: $isAnonymous) {
                 Text("Leave Review Anonymously?")
                     .italic()
-                    .font(.caption)
+                    .font(.avenirNextRegular(size: 17))
                     .foregroundColor(weenyWitch.lighter)
             }.padding(.horizontal)
                 .tint(weenyWitch.orange)
@@ -134,9 +134,7 @@ struct LocationReviewView: View {
     //MARK: - Error Banner
     private var firebaseErrorBanner: some View {
 
-            NotificationBanner(color: weenyWitch.orange,
-                               messageColor: weenyWitch.lightest,
-                               message: $firebaseErrorMessage,
+            NotificationBanner(message: $firebaseErrorMessage,
                                isVisible: $shouldShowFirebaseError)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
@@ -152,6 +150,7 @@ struct LocationReviewView: View {
         return Button(action: submitTapped) {
             Text(isReview && isUpdated() ? "Update" : "Submit")
                 .foregroundColor(color)
+                .font(.avenirNextRegular(size: 20))
                 .padding()
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)

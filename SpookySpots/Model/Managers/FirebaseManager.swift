@@ -232,7 +232,7 @@ class FirebaseManager: ObservableObject {
             }
     }
     //MARK: - Reviews
-    func addReviewToFirestoreBucket(_ review: ReviewModel, location: LocationData, withcCompletion completion: @escaping (K.ErrorMessages.Review?) -> () = {_ in}) {
+    func addReviewToFirestoreBucket(_ review: ReviewModel, location: LocationData, withcCompletion completion: @escaping (K.ErrorHelper.Messages.Review?) -> () = {_ in}) {
         
         guard let db = db else { return }
         
@@ -282,7 +282,7 @@ class FirebaseManager: ObservableObject {
             }
     }
     
-    func updateReviewInFirestore(_ review: ReviewModel, forID id: String, withCompletion completion: @escaping(K.ErrorMessages.Review?) -> () = {_ in}) {
+    func updateReviewInFirestore(_ review: ReviewModel, forID id: String, withCompletion completion: @escaping(K.ErrorHelper.Messages.Review?) -> () = {_ in}) {
         
         guard let db = db else { return }
         

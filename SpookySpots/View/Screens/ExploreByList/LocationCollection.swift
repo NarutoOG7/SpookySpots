@@ -32,7 +32,7 @@ struct LocationCollection: View {
     
     private var titleView: some View {
         Text(collectionType.rawValue)
-            .font(.title2)
+            .font(.avenirNext(size: 22))
             .fontWeight(.bold)
             .offset(x: 15, y: 17)
             .foregroundColor(weenyWitch.brown)
