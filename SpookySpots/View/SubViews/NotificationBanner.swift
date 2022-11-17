@@ -12,7 +12,7 @@ struct NotificationBanner: View {
     @Binding var message: String
     @Binding var isVisible: Bool
     
-    @ObservedObject var errorManager = ErrorManager.instance
+    @ObservedObject var errorManager: ErrorManager
     
     var body: some View {
         GeometryReader { geo in
@@ -60,6 +60,7 @@ struct NotificationBanner: View {
 struct NotificationBanner_Previews: PreviewProvider {
     static var previews: some View {
         NotificationBanner(message: .constant("This is going well."),
-                           isVisible: .constant(true))
+                           isVisible: .constant(true),
+                           errorManager: ErrorManager())
     }
 }

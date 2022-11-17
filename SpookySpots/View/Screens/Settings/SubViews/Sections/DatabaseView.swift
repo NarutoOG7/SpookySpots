@@ -9,7 +9,7 @@ import SwiftUI
 
 struct DatabaseView: View {
     
-    @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var locationStore: LocationStore
     
     @State var failedLocations: [LocationModel] = []
     
@@ -151,6 +151,6 @@ struct DatabaseView: View {
 
 struct DatabaseView_Previews: PreviewProvider {
     static var previews: some View {
-        DatabaseView()
+        DatabaseView(locationStore: LocationStore())
     }
 }

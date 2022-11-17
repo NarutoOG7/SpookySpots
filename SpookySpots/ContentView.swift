@@ -11,16 +11,18 @@ struct ContentView: View {
     
     @State var showSplash = true
         
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var errorManager = ErrorManager.instance
+    @StateObject var userStore = UserStore.instance
+    @StateObject var errorManager = ErrorManager.instance
     
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 if userStore.isSignedIn {
-                    TabBarSetup()
+                    TabBarSetup(userStore: userStore,
+                                errorManager: errorManager)
                 } else {
-                    CreativeSignInUp()
+                    CreativeSignInUp(userStore: userStore,
+                                     errorManager: errorManager)
                 }
                 
                 splashScreen
@@ -47,9 +49,10 @@ struct ContentView: View {
     }
     
     private var errorBanner: some View {
-        let weenyWitch = K.Colors.WeenyWitch.self
+        _ = K.Colors.WeenyWitch.self
         return NotificationBanner(message: $errorManager.message,
-                                  isVisible: $errorManager.shouldDisplay)
+                                  isVisible: $errorManager.shouldDisplay,
+                                  errorManager: errorManager)
 
     }
 }

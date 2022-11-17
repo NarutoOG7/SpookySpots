@@ -23,9 +23,12 @@ struct TripDestinationCell: View {
     private let images = K.Images.Trip.self
     private let colors = K.Colors.WeenyWitch.self
     
-
-    @ObservedObject var locationStore = LocationStore.instance
+    @StateObject var changeStartStopViewModel = ChangeStartStopViewModel()
     
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
     var body: some View {
         HStack {
 
@@ -35,7 +38,8 @@ struct TripDestinationCell: View {
                 
                 if editable {
                     NavigationLink {
-                        ChangeStartAndStop()
+                        ChangeStartAndStop(viewModel: changeStartStopViewModel,
+                                           errorManager: errorManager)
                             
                     } label: {
                         if #available(iOS 16.0, *) {
@@ -48,7 +52,10 @@ struct TripDestinationCell: View {
                     }
                 } else {
                     NavigationLink {
-                        LD(location: .constant(locationStore.hauntedHotels.first(where: { $0.location.name == mainText }) ?? LocationModel.example))
+                        LD(location: .constant(locationStore.hauntedHotels.first(where: { $0.location.name == mainText }) ?? LocationModel.example),
+                           userStore: userStore,
+                           firebaseManager: firebaseManager,
+                           errorManager: errorManager)
                     } label: {
                         
                         titleView
@@ -98,6 +105,8 @@ struct TripDestinationCell: View {
 }
 
 
+//MARK: - Preview
+
 struct TripDestinationCell_Previews: PreviewProvider {
     static var previews: some View {
         List {
@@ -109,7 +118,11 @@ struct TripDestinationCell_Previews: PreviewProvider {
             isLast: false,
             mainColor: .orange,
             accentColor: .black,
-            editable: true)
+            editable: true,
+            locationStore: LocationStore(),
+            errorManager: ErrorManager(),
+            userStore: UserStore(),
+            firebaseManager: FirebaseManager())
         .listRowSeparator(.hidden)
             TripDestinationCell(
                 mainText: "Sacajawea Hotel",
@@ -118,7 +131,11 @@ struct TripDestinationCell_Previews: PreviewProvider {
                 isCompleted: false,
                 isLast: false,
                 mainColor: .orange,
-                accentColor: .black)
+                accentColor: .black,
+                locationStore: LocationStore(),
+                errorManager: ErrorManager(),
+                userStore: UserStore(),
+                firebaseManager: FirebaseManager())
             .listRowSeparator(.hidden)
 
             TripDestinationCell(
@@ -128,7 +145,11 @@ struct TripDestinationCell_Previews: PreviewProvider {
                 isCompleted: false,
                 isLast: false,
                 mainColor: .orange,
-                accentColor: .black)
+                accentColor: .black,
+                locationStore: LocationStore(),
+                errorManager: ErrorManager(),
+                userStore: UserStore(),
+                firebaseManager: FirebaseManager())
             .listRowSeparator(.hidden)
 
             TripDestinationCell(
@@ -139,7 +160,11 @@ struct TripDestinationCell_Previews: PreviewProvider {
                 isLast: true,
                 mainColor: .orange,
                 accentColor: .black,
-                editable: true)
+                editable: true,
+                locationStore: LocationStore(),
+                errorManager: ErrorManager(),
+                userStore: UserStore(),
+                firebaseManager: FirebaseManager())
             .listRowSeparator(.hidden)
 
         }

@@ -17,6 +17,10 @@ struct LD: View {
     @State private var isCreatingNewReview = false
     @State private var isShowingMoreReviews = false
     
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
+    
     @EnvironmentObject var favoritesLogic: FavoritesLogic
     @EnvironmentObject var tripLogic: TripLogic
     
@@ -179,7 +183,12 @@ struct LD: View {
             Spacer(minLength: 200)
         }
         .sheet(isPresented: $isCreatingNewReview) {
-            LocationReviewView(location: $location, isPresented: $isCreatingNewReview, review: .constant(nil))
+            LocationReviewView(location: $location,
+                               isPresented: $isCreatingNewReview,
+                               review: .constant(nil),
+                               userStore: userStore,
+                               firebaseManager: firebaseManager,
+                               errorManager: errorManager)
         }
     }
     
@@ -371,9 +380,12 @@ struct LD: View {
 //MARK: - Previews
 struct LD_Previews: PreviewProvider {
     static var previews: some View {
-        LD(location: .constant(LocationModel.example))
-            .environmentObject(FavoritesLogic())
-            .environmentObject(TripLogic())
+        LD(location: .constant(LocationModel.example),
+           userStore: UserStore(),
+           firebaseManager: FirebaseManager(),
+           errorManager: ErrorManager())
+        .environmentObject(FavoritesLogic())
+        .environmentObject(TripLogic())
     }
 }
 

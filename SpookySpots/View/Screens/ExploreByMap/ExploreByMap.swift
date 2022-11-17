@@ -14,8 +14,11 @@ struct ExploreByMap: View {
     
     @State private var shouldNavigate = false
     
-    @ObservedObject var locationStore = LocationStore.instance
-    @ObservedObject var exploreVM = ExploreViewModel.instance
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var exploreVM: ExploreViewModel
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
     
     let map = MapViewUI(mapIsForExplore: true)
     
@@ -53,7 +56,10 @@ struct ExploreByMap: View {
         
         .fullScreenCover(isPresented: $shouldNavigate) {
             Binding($exploreVM.displayedLocation).map {
-                LD(location: $0)
+                LD(location: $0,
+                   userStore: userStore,
+                   firebaseManager: firebaseManager,
+                   errorManager: errorManager)
             }
         }
     }
@@ -81,7 +87,7 @@ struct ExploreByMap: View {
                             }
                             .gesture(
                                 DragGesture(minimumDistance: 3.0,
-                                                   coordinateSpace: .local)
+                                            coordinateSpace: .local)
                                 .onEnded({ value in
                                     
                                     switch (value.translation.width, value.translation.height) {
@@ -116,9 +122,13 @@ struct ExploreByMap: View {
     
     private var searchView: some View {
         VStack {
-            SearchBar()
-                .padding(.horizontal)
-                .padding(.trailing, 65)
+            SearchBar(exploreVM: exploreVM,
+                      locationStore: locationStore,
+                      userStore: userStore,
+                      firebaseManager: firebaseManager,
+                      errorManager: errorManager)
+            .padding(.horizontal)
+            .padding(.trailing, 65)
             Spacer()
         }
     }
@@ -168,7 +178,7 @@ struct ExploreByMap: View {
     func currentLocationPressed() {
         map.setCurrentLocationRegion()
     }
-
+    
 }
 
 
@@ -176,7 +186,11 @@ struct ExploreByMap: View {
 //MARK: - Preview
 struct ExploreByMap_Previews: PreviewProvider {
     static var previews: some View {
-        ExploreByMap()
-            .previewInterfaceOrientation(.portrait)
+        ExploreByMap(locationStore: LocationStore(),
+                     exploreVM: ExploreViewModel(),
+                     userStore: UserStore(),
+                     firebaseManager: FirebaseManager(),
+                     errorManager: ErrorManager())
+        .previewInterfaceOrientation(.portrait)
     }
 }

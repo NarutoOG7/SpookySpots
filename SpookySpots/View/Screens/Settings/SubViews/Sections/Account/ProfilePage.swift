@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfilePage: View {
     
-    var userStore = UserStore.instance
+    @ObservedObject var userStore: UserStore
     var auth = Authorization.instance
     
     @State var wasEdited = false
@@ -163,7 +163,7 @@ struct ProfilePage: View {
 //MARK: - Preview
 struct ProfilePage_Previews: PreviewProvider {
     static var previews: some View {
-        ProfilePage()
+        ProfilePage(userStore: UserStore())
     }
 }
 

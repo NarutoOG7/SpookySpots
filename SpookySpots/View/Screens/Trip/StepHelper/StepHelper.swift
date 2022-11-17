@@ -15,7 +15,7 @@ struct StepHelper: View {
     
     @Binding var isShowingMoreSteps: Bool
     
-    @ObservedObject var tripLogic = TripLogic.instance
+    @ObservedObject var tripLogic: TripLogic
     
     var body: some View {
         routeStepHelper(geo)
@@ -94,7 +94,8 @@ struct StepHelper_Previews: PreviewProvider {
     static var previews: some View {
         GeometryReader { geo in
             StepHelper(geo: geo,
-                       isShowingMoreSteps: .constant(true))
+                       isShowingMoreSteps: .constant(true),
+                       tripLogic: TripLogic())
         }
     }
 }

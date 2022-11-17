@@ -9,12 +9,13 @@ import SwiftUI
 
 struct Admin: View {
     
-    @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var locationStore: LocationStore
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
     var body: some View {
-        if userStore.user.id == K.adminKey {
+        if userStore.user.id == userStore.adminKey {
             adminView
         }
     }
@@ -23,7 +24,7 @@ struct Admin: View {
         VStack {
             SettingsHeader(settingType: .admin)
             List {
-                NavigationLink(destination: DatabaseView()) {
+                NavigationLink(destination: DatabaseView(locationStore: locationStore)) {
                     Text("Database")
                         .font(.avenirNext(size: 18))
                         .foregroundColor(weenyWitch.lighter)
@@ -40,6 +41,7 @@ struct Admin: View {
 
 struct Admin_Previews: PreviewProvider {
     static var previews: some View {
-        Admin()
+        Admin(userStore: UserStore(),
+              locationStore: LocationStore())
     }
 }

@@ -29,8 +29,9 @@ struct LocationReviewView: View {
     //MARK: - Focused Text Field
     @FocusState private var focusedField: Field?
     
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var firebaseManager = FirebaseManager.instance
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
     
     @Environment(\.presentationMode) var presentationMode
         
@@ -135,7 +136,8 @@ struct LocationReviewView: View {
     private var firebaseErrorBanner: some View {
 
             NotificationBanner(message: $firebaseErrorMessage,
-                               isVisible: $shouldShowFirebaseError)
+                               isVisible: $shouldShowFirebaseError,
+                               errorManager: errorManager)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     self.shouldShowFirebaseError = false
@@ -244,7 +246,10 @@ struct LocationReviewView_Previews: PreviewProvider {
                                                              imageURLs: [],
                                                              reviews: [])),
                            isPresented: .constant(true),
-                           review: .constant(nil))
+                           review: .constant(nil),
+                           userStore: UserStore(),
+                           firebaseManager: FirebaseManager(),
+                           errorManager: ErrorManager())
     }
 }
 

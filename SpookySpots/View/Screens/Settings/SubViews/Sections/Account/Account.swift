@@ -14,7 +14,10 @@ struct Account: View {
     @State var confirmSignOutAlertShown = false
     @State var firebaseErrorAlertShown = false
     
-    @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var errorManager: ErrorManager
     
     var auth = Authorization.instance
     
@@ -66,7 +69,7 @@ struct Account: View {
     }
     
     private var editProfile: some View {
-        NavigationLink(destination: ProfilePage()) {
+        NavigationLink(destination: ProfilePage(userStore: userStore)) {
             Text("Edit Profile")
                 .foregroundColor(weenyWitch.lighter)
                 .font(.avenirNext(size: 18))
@@ -77,7 +80,10 @@ struct Account: View {
     }
     
     private var manageReviews: some View {
-        NavigationLink(destination: ManageReviews()) {
+        NavigationLink(destination: ManageReviews(firebaseManager: firebaseManager,
+                                                  userStore: userStore,
+                                                  locationStore: locationStore,
+                                                  errorManager: errorManager)) {
             Text("Manage Reviews")
                 .foregroundColor(weenyWitch.lighter)
                 .font(.avenirNext(size: 18))
@@ -150,6 +156,9 @@ struct Account: View {
 
 struct Account_Previews: PreviewProvider {
     static var previews: some View {
-        Account()
+        Account(userStore: UserStore(),
+                firebaseManager: FirebaseManager(),
+                locationStore: LocationStore(),
+                errorManager: ErrorManager())
     }
 }

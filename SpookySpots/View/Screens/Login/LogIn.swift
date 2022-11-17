@@ -17,7 +17,8 @@ struct LogIn: View {
     
     @FocusState private var focusedField: Field?
     
-    @ObservedObject var loginVM = LoginVM.instance
+    @ObservedObject var loginVM: LoginVM
+    @ObservedObject var errorManager: ErrorManager
             
     var body: some View {
         ZStack {
@@ -66,7 +67,8 @@ struct LogIn: View {
     private var firebaseErrorBanner: some View {
 
             NotificationBanner(message: $loginVM.firebaseErrorMessage,
-                               isVisible: $loginVM.shouldShowFirebaseError)
+                               isVisible: $loginVM.shouldShowFirebaseError,
+                               errorManager: errorManager)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     loginVM.shouldShowFirebaseError = false
@@ -182,7 +184,9 @@ struct LogIn: View {
 //MARK: - Previews
 struct LogIn_Previews: PreviewProvider {
     static var previews: some View {
-        LogIn(index: .constant(0))
+        LogIn(index: .constant(0),
+              loginVM: LoginVM(),
+              errorManager: ErrorManager())
     }
 }
 

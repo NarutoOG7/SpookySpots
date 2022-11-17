@@ -11,9 +11,6 @@ import SwiftUI
 //MARK: - K for Constant
 enum K {
     
-    static let adminKey = "7JSe9iXzgrbvEdL7Ql7yOx7AIs72"
-    
-    
     //MARK: - Colors
     enum Colors {
         

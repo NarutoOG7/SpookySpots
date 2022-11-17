@@ -14,9 +14,10 @@ struct ManageReviews: View {
     @State private var selectedReview: ReviewModel?
     @State private var isEditingReview = false
     
-    @ObservedObject var firebaseManager = FirebaseManager.instance
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var errorManager: ErrorManager
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
@@ -41,7 +42,10 @@ struct ManageReviews: View {
                 pickerSelection: review.rating,
                 descriptionInput: review.review,
                 isAnonymous: review.username == "Anonymous",
-                nameInput: review.username
+                nameInput: review.username,
+                userStore: userStore,
+                firebaseManager: firebaseManager,
+                errorManager: errorManager
             )
         })
         
@@ -114,6 +118,9 @@ struct ManageReviews: View {
 
 struct ManageReviews_Previews: PreviewProvider {
     static var previews: some View {
-        ManageReviews()
+        ManageReviews(firebaseManager: FirebaseManager(),
+                      userStore: UserStore(),
+                      locationStore: LocationStore(),
+                      errorManager: ErrorManager())
     }
 }

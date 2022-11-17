@@ -9,12 +9,15 @@ import SwiftUI
 
 struct SearchBar: View {
     
-    @ObservedObject var exploreVM = ExploreViewModel.instance
+    @ObservedObject var exploreVM: ExploreViewModel
     
-    @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
     
     let weenyWitch = K.Colors.WeenyWitch.self
-
+    
     var body: some View {
         VStack {
             HStack {
@@ -28,7 +31,7 @@ struct SearchBar: View {
                 searchResults
             }
         }
-
+        
         .background(background)
         
     }
@@ -57,16 +60,19 @@ struct SearchBar: View {
         let screenHeight = UIScreen.main.bounds.height
         let listHeight = listHasMoreThanTenItems ? (screenHeight / 3) : (CGFloat(exploreVM.searchedLocations.count) * 45)
         return List {
-        ForEach(0..<exploreVM.searchedLocations.count, id: \.self) { index in
-            NavigationLink {
-                LD(location: $exploreVM.searchedLocations[index])
-            } label: {
-                Text(exploreVM.searchedLocations[index].location.name)
-                    .foregroundColor(weenyWitch.brown)
-                    .font(.avenirNext(size: 18))
+            ForEach(0..<exploreVM.searchedLocations.count, id: \.self) { index in
+                NavigationLink {
+                    LD(location: $exploreVM.searchedLocations[index],
+                       userStore: userStore,
+                       firebaseManager: firebaseManager,
+                       errorManager: errorManager)
+                } label: {
+                    Text(exploreVM.searchedLocations[index].location.name)
+                        .foregroundColor(weenyWitch.brown)
+                        .font(.avenirNext(size: 18))
+                }
+                .listRowBackground(Color.clear)
             }
-            .listRowBackground(Color.clear)
-        }
             
         }
         .modifier(ClearListBackgroundMod())
@@ -101,7 +107,7 @@ struct SearchBar: View {
             exploreVM.searchText = ""
             exploreVM.searchedLocations = []
         }
-            
+        
     }
 }
 
@@ -110,6 +116,10 @@ struct SearchBar: View {
 
 struct SearchBar_Previews: PreviewProvider {
     static var previews: some View {
-        SearchBar()
+        SearchBar(exploreVM: ExploreViewModel(),
+                  locationStore: LocationStore(),
+                  userStore: UserStore(),
+                  firebaseManager: FirebaseManager(),
+                  errorManager: ErrorManager())
     }
 }

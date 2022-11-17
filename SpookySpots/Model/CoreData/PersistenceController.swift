@@ -30,32 +30,11 @@ struct PersistenceController {
         
         self.mainQueueContext = container.viewContext
         self.backgroundContext = container.newBackgroundContext()
-        self.deleteAll()
-    }
-    
-    func deleteAll(completion: @escaping (Error?) -> () = {_ in}) {
-        
-        do {
-//            let context = container.viewContext
-            
-            let context = backgroundContext
-            
-            let request : NSFetchRequest<CDTrip> = CDTrip.fetchRequest()
-            let trips = try context.fetch(request)
-            
-            for trip in trips {
-                context.delete(trip)
-            }
-            save(context, completion: completion)
-        } catch {
-            print("Error fetching request: \(error)")
-        }
     }
     
     func save(_ context: NSManagedObjectContext, completion: @escaping (Error?) -> () = {_ in}) {
         
         context.perform {
-            
             
             do {
                 try context.save()

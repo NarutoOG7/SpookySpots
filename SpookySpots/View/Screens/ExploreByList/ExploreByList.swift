@@ -9,14 +9,18 @@ import SwiftUI
 
 
 struct ExploreByList: View {
-        
+    
     @State var searchText = ""
     @State var showingSearchResults = false
-    @State var user = UserStore.instance.user
     
-    @ObservedObject private var exploreVM = ExploreViewModel.instance
-    @ObservedObject private var tripLogic = TripLogic.instance
-    @ObservedObject private var locationStore = LocationStore.instance
+    @Binding var user: User
+    
+    @ObservedObject var exploreVM: ExploreViewModel
+    @ObservedObject var tripLogic: TripLogic
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
     
     @Environment(\.managedObjectContext) var moc
     
@@ -27,13 +31,13 @@ struct ExploreByList: View {
             ZStack {
                 VStack {
                     greeting
-                    mapButton(geo)
+                    mapButton
                     divider
                     ScrollView(showsIndicators: false) {
                         locationsCollections
                     }
                 }
-                    searchView(geo)
+                searchView
                 
             }
         }
@@ -65,9 +69,23 @@ struct ExploreByList: View {
     
     private var locationsCollections: some View {
         VStack {
-            LocationCollection(collectionType: .nearby)
-            LocationCollection(collectionType: .trending)
-            LocationCollection(collectionType: .featured)
+            LocationCollection(collectionType: .nearby,
+                               userStore: userStore,
+                               exploreVM: exploreVM,
+                               firebaseManager: firebaseManager,
+                               errorManager: errorManager)
+            
+            LocationCollection(collectionType: .trending,
+                               userStore: userStore,
+                               exploreVM: exploreVM,
+                               firebaseManager: firebaseManager,
+                               errorManager: errorManager)
+            
+            LocationCollection(collectionType: .featured,
+                               userStore: userStore,
+                               exploreVM: exploreVM,
+                               firebaseManager: firebaseManager,
+                               errorManager: errorManager)
         }
         .frame(width: UIScreen.main.bounds.width)
         
@@ -81,20 +99,24 @@ struct ExploreByList: View {
             .padding(.bottom, -8)
     }
     
-    private func searchView(_ geo: GeometryProxy) -> some View {
+    private var searchView: some View {
         VStack {
-            SearchBar()
-                .padding(.top, geo.size.height / 9.7)
-                .padding(.horizontal)
-                .padding(.trailing, 65)
+            SearchBar(exploreVM: exploreVM,
+                      locationStore: locationStore,
+                      userStore: userStore,
+                      firebaseManager: firebaseManager,
+                      errorManager: errorManager)
+            .padding(.top, 75)
+            .padding(.horizontal)
+            .padding(.trailing, 65)
             Spacer()
         }
     }
     
     //MARK: - Buttons
     
-    private func mapButton(_ geo: GeometryProxy) -> some View {
-        return HStack {
+    private var mapButton: some View {
+        HStack {
             Spacer()
             Spacer()
             CircleButton(size: .small,
@@ -103,7 +125,6 @@ struct ExploreByList: View {
                          accentColor: K.Colors.WeenyWitch.lightest,
                          clicked: isShowingMap)
         }
-//        .padding(.top, geo.size.height / 10)
         .padding(.horizontal)
     }
     
@@ -116,7 +137,13 @@ struct ExploreByList: View {
 
 struct ExplorePage_Previews: PreviewProvider {
     static var previews: some View {
-        ExploreByList()
+        ExploreByList(user: .constant(User()),
+                      exploreVM: ExploreViewModel(),
+                      tripLogic: TripLogic(),
+                      locationStore: LocationStore(),
+                      userStore: UserStore(),
+                      firebaseManager: FirebaseManager(),
+                      errorManager: ErrorManager())
     }
 }
 

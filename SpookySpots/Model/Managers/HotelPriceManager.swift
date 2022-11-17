@@ -12,7 +12,7 @@ class HotelPriceManager {
     
     static let instance = HotelPriceManager()
     
-    let hotelPriceURL = "https://data.xotelo.com/api/rates"
+    var hotelPriceURL: String = ""
     
     func getDates() -> [String] {
         

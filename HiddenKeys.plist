@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict/>
+<dict>
+	<key>hotelPriceAPIKey</key>
+	<string>https://data.xotelo.com/api/rates</string>
+	<key>adminKey</key>
+	<string>7JSe9iXzgrbvEdL7Ql7yOx7AIs72</string>
+</dict>
 </plist>

@@ -15,7 +15,6 @@ struct MapViewUI: UIViewRepresentable {
     @State var shouldCenterOnCurrentLocation = true
     
     @ObservedObject var exploreVM = ExploreViewModel.instance
-    
     @ObservedObject var userStore = UserStore.instance
     @ObservedObject var tripLogic = TripLogic.instance
     @ObservedObject var geoFireManager = GeoFireManager.instance

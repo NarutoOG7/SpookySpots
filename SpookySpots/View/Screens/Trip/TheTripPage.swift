@@ -13,15 +13,18 @@ struct TheTripPage: View {
     let weenyWitch = K.Colors.WeenyWitch.self
     
     @State var isShowingMoreSteps = false
-        
+    
     @State var destinations: [Destination] = []
     
     @State var shouldShowResetAlert = false
     @State var shouldShowResetButton = false
     
-    @ObservedObject var tripLogic = TripLogic.instance
-    @ObservedObject var userStore = UserStore.instance
-            
+    @ObservedObject var tripLogic: TripLogic
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var firebaseManager: FirebaseManager
+    
     private let map = MapViewUI(mapIsForExplore: false)
     
     var body: some View {
@@ -29,9 +32,9 @@ struct TheTripPage: View {
         GeometryReader { geo in
             
             ZStack {
-
+                
                 map
-                .ignoresSafeArea()
+                    .ignoresSafeArea()
                     .environmentObject(TripLogic.instance)
                 
                 if let currentTrip = tripLogic.currentTrip {
@@ -39,7 +42,8 @@ struct TheTripPage: View {
                         currentLocationButton
                         VStack {
                             StepHelper(geo: geo,
-                                       isShowingMoreSteps: $isShowingMoreSteps)
+                                       isShowingMoreSteps: $isShowingMoreSteps,
+                                       tripLogic: tripLogic)
                             Spacer()
                         }
                         
@@ -108,7 +112,12 @@ struct TheTripPage: View {
             .padding(.horizontal, 30)
             DestinationsList(destinations: $destinations,
                              mainColor: weenyWitch.lightest,
-                             accentColor: weenyWitch.light)
+                             accentColor: weenyWitch.light,
+                             tripLogic: tripLogic,
+                             locationStore: locationStore,
+                             errorManager: errorManager,
+                             userStore: userStore,
+                             firebaseManager: firebaseManager)
             .padding()
             .padding(.top, 10)
         }
@@ -118,7 +127,7 @@ struct TheTripPage: View {
         Text("Add locations to your trip.")
             .foregroundColor(weenyWitch.orange)
             .font(.avenirNext(size: 22))
-
+        
     }
     
     
@@ -160,7 +169,7 @@ struct TheTripPage: View {
     //MARK: - Buttons
     
     private var huntButton: some View {
-         Button(action: huntLogic) {
+        Button(action: huntLogic) {
             Text(tripLogic.currentTrip?.tripState.buttonTitle() ?? "HUNT")
                 .foregroundColor(weenyWitch.orange)
                 .font(.avenirNext(size: 18))
@@ -183,7 +192,7 @@ struct TheTripPage: View {
                 .overlay(
                     Circle()
                         .stroke(weenyWitch.orange,
-                            lineWidth: 4)
+                                lineWidth: 4)
                 )
         }
     }
@@ -223,7 +232,7 @@ struct TheTripPage: View {
             // Resume Tapped
             tripLogic.resumeDirections()
             self.shouldShowResetButton = false
-
+            
         default: return
             
         }
@@ -266,7 +275,11 @@ struct TheTripPage: View {
 
 struct TheTripPage_Previews: PreviewProvider {
     static var previews: some View {
-        TheTripPage()
+        TheTripPage(tripLogic: TripLogic(),
+                    userStore: UserStore(),
+                    locationStore: LocationStore(),
+                    errorManager: ErrorManager(),
+                    firebaseManager: FirebaseManager())
     }
 }
 

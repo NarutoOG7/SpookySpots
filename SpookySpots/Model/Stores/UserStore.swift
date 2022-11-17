@@ -15,6 +15,7 @@ class UserStore: ObservableObject {
     
     static let instance = UserStore()
         
+    var adminKey = ""
     
     @Published var currentLocation: CLLocation? {
         willSet {

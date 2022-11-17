@@ -14,7 +14,11 @@ struct DestinationsList: View {
     var mainColor: Color
     var accentColor: Color
     
-    @ObservedObject var tripLogic = TripLogic.instance
+    @ObservedObject var tripLogic: TripLogic
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
     
     var body: some View {
         List {
@@ -43,7 +47,11 @@ struct DestinationsList: View {
             isLast: false,
             mainColor: mainColor,
             accentColor: accentColor,
-            editable: true)
+            editable: true,
+            locationStore: locationStore,
+            errorManager: errorManager,
+            userStore: userStore,
+            firebaseManager: firebaseManager)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: -0.5, leading: 0, bottom: 0, trailing: 0))
@@ -63,7 +71,11 @@ struct DestinationsList: View {
                 isCompleted: tripLogic.currentTrip?.completedDestinationsIndices.contains(destination.position) ?? false,
                 isLast: endLocation == destination,
                 mainColor: mainColor,
-                accentColor: accentColor)
+                accentColor: accentColor,
+                locationStore: locationStore,
+                errorManager: errorManager,
+                userStore: userStore,
+                firebaseManager: firebaseManager)
         }
         .onDelete(perform: delete(at:))
         .listRowSeparator(.hidden)
@@ -83,7 +95,11 @@ struct DestinationsList: View {
             isLast: true,
             mainColor: mainColor,
             accentColor: accentColor,
-            editable: true)
+            editable: true,
+            locationStore: locationStore,
+            errorManager: errorManager,
+            userStore: userStore,
+            firebaseManager: firebaseManager)
         .listRowSeparator(.hidden)
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: -0.5, leading: 0, bottom: 0, trailing: 0))
@@ -125,6 +141,13 @@ struct DestinationsList: View {
 
 struct DestinationsList_Previews: PreviewProvider {
     static var previews: some View {
-        DestinationsList(destinations: .constant([Destination]()), mainColor: .orange, accentColor: .black)
+        DestinationsList(destinations: .constant([Destination]()),
+                         mainColor: .orange,
+                         accentColor: .black,
+                         tripLogic: TripLogic(),
+                         locationStore: LocationStore(),
+                         errorManager: ErrorManager(),
+                         userStore: UserStore(),
+                         firebaseManager: FirebaseManager())
     }
 }

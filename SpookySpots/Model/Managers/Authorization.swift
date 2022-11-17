@@ -13,7 +13,7 @@ import FirebaseFirestore
 class Authorization {
     
     static let instance = Authorization()
-    
+        
     let auth = Auth.auth()
     
     @ObservedObject var locationStore = LocationStore.instance

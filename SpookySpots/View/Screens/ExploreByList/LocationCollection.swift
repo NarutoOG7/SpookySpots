@@ -15,9 +15,11 @@ struct LocationCollection: View {
     @State var nearbyLocations = [LocationModel]()
     @State var featuredLocations = [LocationModel]()
     @State var trendingLocations = [LocationModel]()
-
-    @ObservedObject var userStore = UserStore.instance
-    @ObservedObject var exploreVM = ExploreViewModel.instance
+    
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var exploreVM: ExploreViewModel
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
     
     @EnvironmentObject var locationStore: LocationStore
     
@@ -56,7 +58,7 @@ struct LocationCollection: View {
             })
         }
     }
-
+    
     //MARK: - Search Locations
     private var searchLocationsView: some View {
         
@@ -64,11 +66,14 @@ struct LocationCollection: View {
         
         let filteredLocations = locationStore.hauntedHotels
             .filter({ notSearching ? true : $0.location.name.localizedCaseInsensitiveContains(exploreVM.searchText)
-        })
+            })
         
         return ForEach(0..<filteredLocations.count, id: \.self) { index in
             NavigationLink {
-                LD(location: $locationStore.hauntedHotels[index])
+                LD(location: $locationStore.hauntedHotels[index],
+                   userStore: userStore,
+                   firebaseManager: firebaseManager,
+                   errorManager: errorManager)
             } label: {
                 MainLocCell(location: locationStore.hauntedHotels[index])
             }
@@ -85,7 +90,10 @@ struct LocationCollection: View {
                 
                 NavigationLink {
                     
-                    LD(location: $locationStore.trendingLocations[index])
+                    LD(location: $locationStore.trendingLocations[index],
+                       userStore: userStore,
+                       firebaseManager: firebaseManager,
+                       errorManager: errorManager)
                     
                 } label: {
                     
@@ -109,29 +117,32 @@ struct LocationCollection: View {
     private var featuredList: some View {
         
         ForEach(0..<locationStore.featuredLocations.count, id: \.self) { index in
-
-        VStack(alignment: .leading) {
             
-            NavigationLink {
+            VStack(alignment: .leading) {
                 
-                LD(location: $locationStore.featuredLocations[index])
-                
-            } label: {
-                
-                let location = locationStore.featuredLocations[index]
-                
-                MainLocCell(location: location)
-                    .padding(isLastInFeatued(location)
-                             ? .horizontal : .leading)
-                    .padding(.vertical)
+                NavigationLink {
+                    
+                    LD(location: $locationStore.featuredLocations[index],
+                       userStore: userStore,
+                       firebaseManager: firebaseManager,
+                       errorManager: errorManager)
+                    
+                } label: {
+                    
+                    let location = locationStore.featuredLocations[index]
+                    
+                    MainLocCell(location: location)
+                        .padding(isLastInFeatued(location)
+                                 ? .horizontal : .leading)
+                        .padding(.vertical)
+                }
             }
         }
     }
-}
-
-private func isLastInFeatued(_ location: LocationModel) -> Bool {
-    location.location.id == locationStore.featuredLocations.last?.location.id ?? UUID().hashValue
-}
+    
+    private func isLastInFeatued(_ location: LocationModel) -> Bool {
+        location.location.id == locationStore.featuredLocations.last?.location.id ?? UUID().hashValue
+    }
     
     //MARK: - Nearby Locations
     
@@ -153,7 +164,10 @@ private func isLastInFeatued(_ location: LocationModel) -> Bool {
                         
                         NavigationLink {
                             
-                            LD(location: $locationStore.nearbyLocations[index])
+                            LD(location: $locationStore.nearbyLocations[index],
+                               userStore: userStore,
+                               firebaseManager: firebaseManager,
+                               errorManager: errorManager)
                             
                         } label: {
                             
@@ -183,8 +197,12 @@ struct LocationCollection_Previews: PreviewProvider {
     static let locationStore = LocationStore()
     
     static var previews: some View {
-        LocationCollection(collectionType: .featured)
-            .environmentObject(locationStore)
+        LocationCollection(collectionType: .featured,
+                           userStore: UserStore(),
+                           exploreVM: ExploreViewModel(),
+                           firebaseManager: FirebaseManager(),
+                           errorManager: ErrorManager())
+        .environmentObject(locationStore)
     }
 }
 

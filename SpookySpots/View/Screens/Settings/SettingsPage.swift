@@ -15,7 +15,10 @@ struct SettingsPage: View {
     @State var confirmSignOutAlertShown = false
     
     
-    @ObservedObject var userStore = UserStore.instance
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
     
     var auth = Authorization.instance
     
@@ -24,12 +27,16 @@ struct SettingsPage: View {
     var body: some View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 50) {
-                Account()
-                About()
-                Admin()
-                addLocationView
+                    Account(userStore: userStore,
+                            firebaseManager: firebaseManager,
+                            locationStore: locationStore,
+                            errorManager: errorManager)
+                    About()
+                    Admin(userStore: userStore,
+                          locationStore: locationStore)
+                    addLocationView
                         .padding(.top, -30)
-            }
+                }
             .padding(.vertical, 30)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
@@ -64,7 +71,10 @@ struct SettingsPage: View {
 struct SettingsPage_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            SettingsPage()
+            SettingsPage(userStore: UserStore(),
+                         locationStore: LocationStore(),
+                         firebaseManager: FirebaseManager(),
+                         errorManager: ErrorManager())
         }
     }
 }

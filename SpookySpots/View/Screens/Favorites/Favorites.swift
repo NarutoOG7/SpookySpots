@@ -11,15 +11,30 @@ struct Favorites: View {
     
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     
-    @ObservedObject var locationStore = LocationStore.instance
+    @ObservedObject var locationStore: LocationStore
+    @ObservedObject var userStore: UserStore
+    @ObservedObject var firebaseManager: FirebaseManager
+    @ObservedObject var errorManager: ErrorManager
         
+    let weenyWitch = K.Colors.WeenyWitch.self
+    
     var body: some View {
         ZStack {
             K.Colors.WeenyWitch.black
-            locationsList
+            if locationStore.favoriteLocations.count == 0 {
+                emptyLocationsView
+            } else {
+                locationsList
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
 
+    }
+    
+    var emptyLocationsView: some View {
+        Text("Start exploring and track your favorites here!")
+            .foregroundColor(weenyWitch.orange)
+            .font(.avenirNext(size: 22))
     }
     
     var locationsList: some View {
@@ -31,7 +46,10 @@ struct Favorites: View {
                 ForEach(0..<locationStore.favoriteLocations.count, id: \.self) { index in
                     
                     NavigationLink {
-                        LD(location: $locationStore.favoriteLocations[index])
+                        LD(location: $locationStore.favoriteLocations[index],
+                           userStore: userStore,
+                           firebaseManager: firebaseManager,
+                           errorManager: errorManager)
                     } label: {
                         FavoritesCell(location: locationStore.favoriteLocations[index])
                     }.padding(.top, 8)
@@ -44,6 +62,9 @@ struct Favorites: View {
 
 struct Favorites_Previews: PreviewProvider {
     static var previews: some View {
-        Favorites()
+        Favorites(locationStore: LocationStore(),
+                  userStore: UserStore(),
+                  firebaseManager: FirebaseManager(),
+                  errorManager: ErrorManager())
     }
 }

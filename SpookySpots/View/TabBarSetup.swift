@@ -11,14 +11,25 @@ struct TabBarSetup: View {
     
     @State private var selection = 0
     
-    @StateObject var favoritesLogic = FavoritesLogic()
+    @StateObject var favoritesLogic = FavoritesLogic.instance
+    @StateObject var locationStore = LocationStore.instance
     @StateObject var tripLogic = TripLogic.instance
+    @StateObject var exploreVM = ExploreViewModel.instance
+    @StateObject var firebaseManager = FirebaseManager.instance
     
-    @ObservedObject var exploreVM = ExploreViewModel.instance
+    var hotelPriceManager = HotelPriceManager.instance
+    
+    @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var userStore: UserStore
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    init() {
+    init(userStore: UserStore, errorManager: ErrorManager) {
+        self.userStore = userStore
+        self.errorManager = errorManager
+        
+        handleHiddenKeys()
+        
         tabBarAppearance()
         navigationAppearance()
         tableViewAppearance()
@@ -34,7 +45,7 @@ struct TabBarSetup: View {
             }
             
         }
-        .accentColor(K.Colors.WeenyWitch.orange)
+        .accentColor(weenyWitch.orange)
         .environmentObject(favoritesLogic)
         .environmentObject(tripLogic)
         
@@ -46,42 +57,45 @@ struct TabBarSetup: View {
         NavigationView {
             
             exploreHelperView
-
+            
                 .navigationTitle("Explore")
                 .navigationBarHidden(true)
         }
         .background(Color.clear)
-        .accentColor(K.Colors.WeenyWitch.black)
+        .accentColor(weenyWitch.black)
         
-            .tabItem {
-                Text("Explore")
-                Image(systemName: "magnifyingglass")
-                    .resizable()
-                    .frame(width: 25, height: 25)
-            }
-            .tag(0)
+        .tabItem {
+            Text("Explore")
+            Image(systemName: "magnifyingglass")
+                .resizable()
+                .frame(width: 25, height: 25)
+        }
+        .tag(0)
         
     }
     
     private var favoritesTab: some View {
         
         NavigationView {
-
-            Favorites()
-                
-                .navigationTitle("Favorites")
-                
+            
+            Favorites(locationStore: locationStore,
+                      userStore: userStore,
+                      firebaseManager: firebaseManager,
+                      errorManager: errorManager)
+            
+            .navigationTitle("Favorites")
+            
         }
-        .accentColor(K.Colors.WeenyWitch.black)
+        .accentColor(weenyWitch.black)
         
-            .tabItem {
-                Text("Favorites")
-                Image(systemName: "heart")
-                    .resizable()
-                    .frame(width: 25, height: 25)
-            }
-            .tag(1)
-   
+        .tabItem {
+            Text("Favorites")
+            Image(systemName: "heart")
+                .resizable()
+                .frame(width: 25, height: 25)
+        }
+        .tag(1)
+        
     }
     
     
@@ -89,40 +103,47 @@ struct TabBarSetup: View {
         
         NavigationView {
             
-            TheTripPage()
-                .navigationTitle("Trip")
-                .navigationBarHidden(true)
+            TheTripPage(tripLogic: tripLogic,
+                        userStore: userStore,
+                        locationStore: locationStore,
+                        errorManager: errorManager,
+                        firebaseManager: firebaseManager)
+            .navigationTitle("Trip")
+            .navigationBarHidden(true)
         }
-        .accentColor(K.Colors.WeenyWitch.black)
+        .accentColor(weenyWitch.black)
         
-            .tabItem {
-                VStack {
-                    Image(systemName: "car.fill")
-                        .resizable()
-                        .frame(width: 25, height: 25)
-                    Text("Trip")
-                }
+        .tabItem {
+            VStack {
+                Image(systemName: "car.fill")
+                    .resizable()
+                    .frame(width: 25, height: 25)
+                Text("Trip")
             }
-            .tag(2)
+        }
+        .tag(2)
     }
-
-
+    
+    
     private var settingsTab: some View {
         
         NavigationView {
             
-            SettingsPage()
-                .navigationTitle("Settings")
+            SettingsPage(userStore: userStore,
+                         locationStore: locationStore,
+                         firebaseManager: firebaseManager,
+                         errorManager: errorManager)
+            .navigationTitle("Settings")
         }
-        .accentColor(K.Colors.WeenyWitch.black)
+        .accentColor(weenyWitch.black)
         
-            .tabItem {
-                Text("Settings")
-                Image(systemName: "gear")
-                    .resizable()
-                    .frame(width: 25, height: 25)
-            }
-            .tag(3)
+        .tabItem {
+            Text("Settings")
+            Image(systemName: "gear")
+                .resizable()
+                .frame(width: 25, height: 25)
+        }
+        .tag(3)
     }
     
     
@@ -132,11 +153,21 @@ struct TabBarSetup: View {
         
         if exploreVM.isShowingMap {
             
-            view = AnyView(ExploreByMap())
+            view = AnyView(ExploreByMap(locationStore: locationStore,
+                                        exploreVM: exploreVM,
+                                        userStore: userStore,
+                                        firebaseManager: firebaseManager,
+                                        errorManager: errorManager))
             
         } else {
             
-            view = AnyView(ExploreByList())
+            view = AnyView(ExploreByList(user: $userStore.user,
+                                         exploreVM: exploreVM,
+                                         tripLogic: tripLogic,
+                                         locationStore: locationStore,
+                                         userStore: userStore,
+                                         firebaseManager: firebaseManager,
+                                         errorManager: errorManager))
         }
         
         return view
@@ -164,17 +195,17 @@ struct TabBarSetup: View {
             let appearance = UINavigationBarAppearance()
             
             appearance.backgroundColor =
-            UIColor( K.Colors.WeenyWitch.lightest)
+            UIColor( weenyWitch.lightest)
             
             appearance.titleTextAttributes =
-            [.foregroundColor : UIColor(K.Colors.WeenyWitch.brown)]
+            [.foregroundColor : UIColor(weenyWitch.brown)]
             
             appearance.largeTitleTextAttributes =
-            [.foregroundColor : UIColor(K.Colors.WeenyWitch.black)]
+            [.foregroundColor : UIColor(weenyWitch.black)]
             
             appearance.shadowColor = .clear
             appearance.backButtonAppearance.normal.titleTextAttributes =
-            [.foregroundColor : UIColor(K.Colors.WeenyWitch.brown)]
+            [.foregroundColor : UIColor(weenyWitch.brown)]
             
             UINavigationBar.appearance().standardAppearance = appearance
             UINavigationBar.appearance().scrollEdgeAppearance = appearance
@@ -186,13 +217,38 @@ struct TabBarSetup: View {
         
         let textViewAppearance = UITextField.appearance()
         textViewAppearance.backgroundColor = .clear
-        textViewAppearance.tintColor = UIColor(K.Colors.WeenyWitch.orange)
-
+        textViewAppearance.tintColor = UIColor(weenyWitch.orange)
+        
     }
     
     func tableViewAppearance() {
         let tableViewApp = UITableView.appearance()
         tableViewApp.backgroundColor = .clear
+    }
+    
+    //MARK: - Keys
+    
+    private func handleHiddenKeys() {
+        
+        var keys: NSDictionary?
+
+        if let path = Bundle.main.path(forResource: "HiddenKeys", ofType: "plist") {
+               keys = NSDictionary(contentsOfFile: path)
+           }
+           if let dict = keys {
+               
+               if let adminKey = dict["adminKey"] as? String {
+                   
+                   userStore.adminKey = adminKey
+                   
+               }
+               if let hotelPriceAPIKey = dict["hotelPriceAPIKey"] as? String {
+                   
+                   hotelPriceManager.hotelPriceURL = hotelPriceAPIKey
+                   
+               }
+
+           }
     }
 }
 
@@ -200,6 +256,7 @@ struct TabBarSetup: View {
 
 struct TabBarSetup_Previews: PreviewProvider {
     static var previews: some View {
-        TabBarSetup()
+        TabBarSetup(userStore: UserStore(),
+                    errorManager: ErrorManager())
     }
 }

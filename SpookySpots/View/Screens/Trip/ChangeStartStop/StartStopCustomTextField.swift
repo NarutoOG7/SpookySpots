@@ -17,7 +17,7 @@ struct StartStopCustomTextField: View {
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    @ObservedObject var localSearchService = LocalSearchService.instance
+    @ObservedObject var changeStartStopViewModel: ChangeStartStopViewModel
     
     var body: some View {
         
@@ -49,10 +49,7 @@ struct StartStopCustomTextField: View {
         .offset(x: 10, y: 1)
         
         .onChange(of: textInput) { newValue in
-            localSearchService.locationsList.removeAll()
-            localSearchService.performSearch(from: newValue) { (result) -> (Void) in
-                localSearchService.locationsList.append(result)
-            }
+            changeStartStopViewModel.buildResultsList(newValue)
         }
     }
     
@@ -71,6 +68,7 @@ struct StartStopCustomTextField_Previews: PreviewProvider {
             textInput: .constant("Ball Arena"),
             placeholderText: .constant("Avalanche"),
             editedField: .constant(.start),
-            type: .start)
+            type: .start,
+            changeStartStopViewModel: ChangeStartStopViewModel())
     }
 }

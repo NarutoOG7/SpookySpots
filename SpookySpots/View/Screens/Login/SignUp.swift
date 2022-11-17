@@ -21,10 +21,9 @@ struct SignUp: View {
     //MARK: - TextField Focus State
     @FocusState private var focusedField: Field?
     
-    @ObservedObject var signupVM = SignupVM.instance
-    
-    @EnvironmentObject var network: NetworkManager
-    
+    @ObservedObject var signupVM: SignupVM
+    @ObservedObject var errorManager: ErrorManager
+        
     var body: some View {
         ZStack {
         ZStack(alignment: .bottom) {
@@ -168,7 +167,8 @@ struct SignUp: View {
     private var firebaseErrorBanner: some View {
 
             NotificationBanner(message: $signupVM.firebaseErrorMessage,
-                               isVisible: $signupVM.shouldShowFirebaseError)
+                               isVisible: $signupVM.shouldShowFirebaseError,
+                               errorManager: errorManager)
             .task {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                     signupVM.shouldShowFirebaseError = false
@@ -192,8 +192,9 @@ struct SignUp: View {
 //MARK: - Previews
 struct SignUp_Previews: PreviewProvider {
     static var previews: some View {
-        SignUp(index: .constant(0))
-            .environmentObject(NetworkManager())
+        SignUp(index: .constant(0),
+               signupVM: SignupVM(),
+               errorManager: ErrorManager())
     }
 }
 
