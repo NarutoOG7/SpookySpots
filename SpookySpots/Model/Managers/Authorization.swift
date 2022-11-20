@@ -27,7 +27,7 @@ class Authorization {
         id == auth.currentUser?.uid
     }
     
-    func signIn(email: String, password: String, error onError: @escaping(K.ErrorHelper.Errors) -> Void) {
+    func signIn(email: String, password: String, success onSuccess: @escaping(Bool) -> Void, error onError: @escaping(K.ErrorHelper.Errors) -> Void) {
         
         auth.signIn(withEmail: email, password: password) { authResult, error in
             
@@ -75,8 +75,10 @@ class Authorization {
                     
                     self.userStore.isSignedIn = true
                     self.userStore.user = user
+                    self.userStore.isGuest = false
                     
                     UserDefaults.standard.set(true, forKey: "signedIn")
+                    UserDefaults.standard.set(false, forKey: K.UserDefaults.isGuest)
                     
                     self.saveUserToUserDefaults(user: user) { error in
                         if let _ = error {
@@ -84,6 +86,7 @@ class Authorization {
                         }
                     }
                     
+                    onSuccess(true)
                 }
             }
         }
@@ -136,6 +139,7 @@ class Authorization {
                         self.userStore.user = user
                         
                         UserDefaults.standard.set(true, forKey: "signedIn")
+                        UserDefaults.standard.set(false, forKey: K.UserDefaults.isGuest)
                         
                         self.saveUserToUserDefaults(user: user) { error in
                             if let _ = error {
@@ -235,6 +239,7 @@ class Authorization {
                     self.userStore.isGuest = true
                     
                     UserDefaults.standard.set(true, forKey: "signedIn")
+                    UserDefaults.standard.set(true, forKey: K.UserDefaults.isGuest)
                 }
                 
                 self.saveUserToUserDefaults(user: User()) { error in
@@ -268,6 +273,7 @@ class Authorization {
             
             user.delete { error in
                 if let error = error {
+                    print(error.localizedDescription)
                     onError(error.localizedDescription)
                 } else {
                     // Account deleted.

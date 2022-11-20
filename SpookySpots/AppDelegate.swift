@@ -12,7 +12,8 @@ import SwiftUI
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    private var signedInUser = UserDefaults.standard.data(forKey: "user")
+    private var signedInUser = UserDefaults.standard.data(forKey: K.UserDefaults.user)
+    private var isGuest = UserDefaults.standard.data(forKey: K.UserDefaults.isGuest)
     
     @ObservedObject var locationManager = UserLocationManager.instance
     @ObservedObject var userStore = UserStore.instance
@@ -27,6 +28,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         getUserIfSignedIn()
         
+        checkIfIsGuest()
 
         return true
     }
@@ -34,7 +36,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     
     func getUserIfSignedIn() {
         
-        if let data = UserDefaults.standard.data(forKey: "user") {
+        if let data = UserDefaults.standard.data(forKey: K.UserDefaults.user) {
             
             do {
                 let decoder = JSONDecoder()
@@ -44,6 +46,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 userStore.user = user
             } catch {
                 print("Unable to Decode Note (\(error))")
+            }
+        }
+    }
+    
+    func checkIfIsGuest() {
+        if let data = UserDefaults.standard.data(forKey: K.UserDefaults.isGuest) {
+            
+            do {
+                let decoder = JSONDecoder()
+                let isGuest = try decoder.decode(Bool.self, from: data)
+                userStore.isGuest = isGuest
+            } catch {
+                print("Unable to Decode Note (\(error)")
             }
         }
     }

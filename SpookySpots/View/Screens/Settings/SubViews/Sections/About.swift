@@ -28,6 +28,7 @@ struct About: View {
             }
             .listStyle(.plain)
             .frame(minHeight: 80)
+            .modifier(DisabledScroll())
             .modifier(ClearListBackgroundMod())
         }
 

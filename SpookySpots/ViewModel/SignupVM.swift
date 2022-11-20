@@ -23,15 +23,14 @@ class SignupVM: ObservableObject {
     @Published var shouldShowEmailErrorMessage = false
     @Published var shouldShowPasswordErrorMessage = false
     @Published var shouldShowConfirmPasswordError = false
-    @Published var shouldShowFirebaseError = false
 
     @Published var emailErrorMessage = ""
     @Published var usernameErrorMessage = ""
     @Published var passwordErrorMessage = ""
     @Published var confirmPasswordErrorMessage = ""
-    @Published var firebaseErrorMessage = ""
     
     @ObservedObject var network = NetworkManager.instance
+    @ObservedObject var errorManager = ErrorManager.instance
 
     var auth = Authorization()
 
@@ -114,8 +113,8 @@ class SignupVM: ObservableObject {
             self.shouldShowConfirmPasswordError = true
             
         case .firebase:
-            self.firebaseErrorMessage = message
-            self.shouldShowFirebaseError = true
+            errorManager.message = message
+            errorManager.shouldDisplay = true
             
         }
     }

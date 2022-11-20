@@ -76,8 +76,8 @@ struct AddLocationView: View {
         })
         
         .alert("Location Submitted!", isPresented: $shouldDipslayLocationSubmitConfirmationAlert, actions: {
-            Button("Awesome!", role: .destructive, action: { self.submitConfirmed() })
-            Button("Whoops, UNDO", role: .cancel, action: {})
+            Button("Awesome!", role: .cancel, action: { self.submitConfirmed() })
+            Button("Whoops, UNDO", role: .destructive, action: {})
         })
         
         .onSubmit {

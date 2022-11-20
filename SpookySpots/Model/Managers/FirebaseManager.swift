@@ -158,11 +158,13 @@ class FirebaseManager: ObservableObject {
     //MARK: - Favorites
     
     func getFavorites(withCompletion completion: @escaping(FavoriteLocation) -> Void) {
+                
+        guard !userStore.isGuest else { return }
         
         guard let db = db else { return }
 
         db.collection("Favorites")
-            .whereField("userID", isEqualTo: UserStore.instance.user.id)
+            .whereField("userID", isEqualTo: userStore.user.id)
             .getDocuments { snapshot, error in
                 
                 if let error = error {
@@ -190,6 +192,8 @@ class FirebaseManager: ObservableObject {
     }
     
     func addLocToFavoritesBucket(_ favLoc: FavoriteLocation, withCompletion completion: ((Bool) -> ())? = nil) {
+        
+        guard !userStore.isGuest else { return }
         
         guard let db = db else { return }
 

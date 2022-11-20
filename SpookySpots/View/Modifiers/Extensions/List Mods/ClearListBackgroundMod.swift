@@ -20,3 +20,15 @@ struct ClearListBackgroundMod: ViewModifier {
         }
     }
 }
+
+struct DisabledScroll: ViewModifier {
+    
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, *) {
+            content.scrollDisabled(true)
+        } else {
+            content
+        }
+    }
+}

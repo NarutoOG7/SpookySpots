@@ -106,21 +106,20 @@ struct LD: View {
     
     private var image: some View {
         GeometryReader { geo in
-            WebImage(url: self.imageURL)
-                .resizable()
-                .aspectRatio(1.75, contentMode: .fill)
-                .blur(radius: self.getBlurRadiusForImage(geo))
-                .shadow(radius: self.calculateShadow(geo))
-                .overlay(header
-                    .opacity(self.getBlurRadiusForImage(geo) - 0.35))
-                .frame(width: geo.size.width,
-                       height: self.calculateHeight(minHeight: collapsedImageHeight,
-                                                    maxHeight: imageMaxHeight,
-                                                    yOffset: geo.frame(in: .global).origin.y))
-                .offset(y: geo.frame(in: .global).origin.y < 0
-                        ? abs(geo.frame(in: .global).origin.y)
-                        : -geo.frame(in: .global).origin.y)
-            
+            WebImage(url: imageURL)
+                    .resizable()
+                    .aspectRatio(1.75, contentMode: .fill)
+                    .blur(radius: self.getBlurRadiusForImage(geo))
+                    .shadow(radius: self.calculateShadow(geo))
+                    .overlay(header
+                        .opacity(self.getBlurRadiusForImage(geo) - 0.35))
+                    .frame(width: geo.size.width,
+                           height: self.calculateHeight(minHeight: collapsedImageHeight,
+                                                        maxHeight: imageMaxHeight,
+                                                        yOffset: geo.frame(in: .global).origin.y))
+                    .offset(y: geo.frame(in: .global).origin.y < 0
+                            ? abs(geo.frame(in: .global).origin.y)
+                            : -geo.frame(in: .global).origin.y)
         }
     }
     
@@ -252,7 +251,7 @@ struct LD: View {
     private var directionsButton: some View {
         CircleButton(
             size: .medium,
-            image: images.directions,
+            image: images.Trip.directions,
             mainColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
             title: "Directions",

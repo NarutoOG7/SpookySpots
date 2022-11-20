@@ -26,6 +26,7 @@ struct DestinationsList: View {
             forEachDestination
             endCell
         }
+        .modifier(DisabledScroll())
         .modifier(ClearListBackgroundMod())
         .padding(.leading, 0)
         .padding(.trailing, 20)

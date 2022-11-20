@@ -21,12 +21,17 @@ struct TabBarSetup: View {
     
     @ObservedObject var errorManager: ErrorManager
     @ObservedObject var userStore: UserStore
+    @ObservedObject var loginVM: LoginVM
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
-    init(userStore: UserStore, errorManager: ErrorManager) {
+    init(userStore: UserStore,
+         errorManager: ErrorManager,
+         loginVM: LoginVM) {
+        
         self.userStore = userStore
         self.errorManager = errorManager
+        self.loginVM = loginVM
         
         handleHiddenKeys()
         
@@ -132,7 +137,8 @@ struct TabBarSetup: View {
             SettingsPage(userStore: userStore,
                          locationStore: locationStore,
                          firebaseManager: firebaseManager,
-                         errorManager: errorManager)
+                         errorManager: errorManager,
+                         loginVM: loginVM)
             .navigationTitle("Settings")
         }
         .accentColor(weenyWitch.black)
@@ -257,6 +263,7 @@ struct TabBarSetup: View {
 struct TabBarSetup_Previews: PreviewProvider {
     static var previews: some View {
         TabBarSetup(userStore: UserStore(),
-                    errorManager: ErrorManager())
+                    errorManager: ErrorManager(),
+                    loginVM: LoginVM())
     }
 }

@@ -14,9 +14,12 @@ struct SignUp: View {
     
     @Binding var index: Int
     
+    let geo: GeometryProxy
+    
     var auth = Authorization()
     
     let weenyWitch = K.Colors.WeenyWitch.self
+    let images = K.Images.Login.self
     
     //MARK: - TextField Focus State
     @FocusState private var focusedField: Field?
@@ -25,30 +28,32 @@ struct SignUp: View {
     @ObservedObject var errorManager: ErrorManager
         
     var body: some View {
-        ZStack {
         ZStack(alignment: .bottom) {
             
             VStack {
                 authTypeView
-                userNameField
-                email
-                password
-                confirmPassword
+                    .padding(.top, -7)
+                VStack(spacing: -18) {
+                    userNameField
+                    email
+                    password
+                    confirmPassword
+                }
+                .padding(.top, -40)
             }
             .padding()
-            .padding(.bottom, 65)
-            .background(K.Colors.WeenyWitch.light)
+            .padding(.bottom, 45)
+            .background(weenyWitch.light)
             .clipShape(CurvedShapeRight())
             .contentShape(CurvedShapeRight())
-            .shadow(color: K.Colors.WeenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
+            .shadow(color: weenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
             .onTapGesture(perform: authTypeSignUpTapped)
             .cornerRadius(45)
             .padding(.horizontal, 20)
-            
+            .frame(height: 475)
             signUpButton
         }
-            firebaseErrorBanner
-        }
+        
         .onSubmit {
             switch focusedField {
             case .username:
@@ -108,7 +113,7 @@ struct SignUp: View {
             isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
-            icon: Image(systemName: "envelope.fill"),
+            icon: images.email,
             placeholderText: "Email Address",
             errorMessage: signupVM.emailErrorMessage)
         .focused($focusedField, equals: .email)
@@ -122,7 +127,7 @@ struct SignUp: View {
             isSecured: $passwordIsSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
-            icon: Image(systemName: passwordIsSecured ? "eye.slash.fill" : "eye" ),
+            icon: passwordIsSecured ? images.eyeWithSlash : images.eye,
             placeholderText: "Password",
             errorMessage: signupVM.passwordErrorMessage,
             canSecure: true)
@@ -137,7 +142,7 @@ struct SignUp: View {
             isSecured: $confirmPasswordIsSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
-            icon: Image(systemName: confirmPasswordIsSecured ? "eye.slash.fill" : "eye" ),
+            icon: confirmPasswordIsSecured ? images.eyeWithSlash : images.eye,
             placeholderText: "Confirm Password",
             errorMessage: K.ErrorHelper.Messages.Auth.passwordsDontMatch.rawValue,
             canSecure: true)
@@ -163,18 +168,7 @@ struct SignUp: View {
         .offset(y: 25)
         .opacity(self.index == 1 ? 1 : 0)
     }
-    
-    private var firebaseErrorBanner: some View {
 
-            NotificationBanner(message: $signupVM.firebaseErrorMessage,
-                               isVisible: $signupVM.shouldShowFirebaseError,
-                               errorManager: errorManager)
-            .task {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                    signupVM.shouldShowFirebaseError = false
-                }
-            }
-    }
     
     //MARK: - Methods
     
@@ -192,9 +186,12 @@ struct SignUp: View {
 //MARK: - Previews
 struct SignUp_Previews: PreviewProvider {
     static var previews: some View {
-        SignUp(index: .constant(0),
-               signupVM: SignupVM(),
-               errorManager: ErrorManager())
+        GeometryReader { geo in
+            SignUp(index: .constant(0),
+                   geo: geo,
+                   signupVM: SignupVM(),
+                   errorManager: ErrorManager())
+        }
     }
 }
 
@@ -203,7 +200,7 @@ struct CurvedShapeRight : Shape {
     
     func path(in rect: CGRect) -> Path {
         return Path { path in
-            path.move(to: CGPoint(x: 0, y: 120))
+            path.move(to: CGPoint(x: 0, y: 115))
             path.addLine(to: CGPoint(x: 0, y: rect.height))
             path.addLine(to: CGPoint(x: rect.width, y: rect.height))
             path.addLine(to: CGPoint(x: rect.width, y: 0))

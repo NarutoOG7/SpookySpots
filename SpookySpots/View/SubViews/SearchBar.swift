@@ -44,9 +44,12 @@ struct SearchBar: View {
     }
     
     private var searchField: some View {
-        TextField("Search",
-                  text:
-                    $exploreVM.searchText)
+        TextField("", text: $exploreVM.searchText)
+            .placeholder(when: exploreVM.searchText == "", placeholder: {
+                Text("Hotel, City, or State")
+                    .font(.avenirNext(size: 16))
+                    .fontWeight(.thin)
+            })
         .padding()
         .font(.avenirNext(size: 18))
         .foregroundColor(weenyWitch.brown)

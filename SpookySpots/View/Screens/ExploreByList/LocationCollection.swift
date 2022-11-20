@@ -85,9 +85,7 @@ struct LocationCollection: View {
     private var trendingLocationsView: some View {
         
         ForEach(0..<locationStore.trendingLocations.count, id: \.self) { index in
-            
-            VStack(alignment: .leading) {
-                
+                            
                 NavigationLink {
                     
                     LD(location: $locationStore.trendingLocations[index],
@@ -104,7 +102,7 @@ struct LocationCollection: View {
                                  ? .horizontal : .leading)
                         .padding(.vertical)
                 }
-            }
+            
         }
     }
     
@@ -117,9 +115,7 @@ struct LocationCollection: View {
     private var featuredList: some View {
         
         ForEach(0..<locationStore.featuredLocations.count, id: \.self) { index in
-            
-            VStack(alignment: .leading) {
-                
+                            
                 NavigationLink {
                     
                     LD(location: $locationStore.featuredLocations[index],
@@ -136,7 +132,7 @@ struct LocationCollection: View {
                                  ? .horizontal : .leading)
                         .padding(.vertical)
                 }
-            }
+            
         }
     }
     
@@ -159,9 +155,7 @@ struct LocationCollection: View {
             view = AnyView(
                 
                 ForEach(0..<locationStore.nearbyLocations.count, id: \.self) { index in
-                    
-                    VStack(alignment: .leading) {
-                        
+                                            
                         NavigationLink {
                             
                             LD(location: $locationStore.nearbyLocations[index],
@@ -178,7 +172,6 @@ struct LocationCollection: View {
                                          ? .horizontal : .leading)
                                 .padding(.vertical)
                         }
-                    }
                 })
         }
         

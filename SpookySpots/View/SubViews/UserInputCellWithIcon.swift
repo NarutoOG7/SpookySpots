@@ -86,6 +86,7 @@ struct UserInputCellWithIcon: View {
                 .weight(boldText ? .bold : .regular))
             .textInputAutocapitalization(.never)
             .foregroundColor(primaryColor)
+            .tint(accentColor)
             .placeholder(when: input.isEmpty) {
                 Text(placeholderText)
                     .foregroundColor(accentColor)
@@ -105,6 +106,7 @@ struct UserInputCellWithIcon: View {
                 .weight(boldText ? .bold : .regular))
             .textInputAutocapitalization(.never)
             .foregroundColor(primaryColor)
+            .tint(accentColor)
             .placeholder(when: self.input.isEmpty) {
                 Text(placeholderText)
                     .foregroundColor(accentColor)

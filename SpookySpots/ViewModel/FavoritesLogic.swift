@@ -29,6 +29,8 @@ class FavoritesLogic: ObservableObject {
                 
                 self.hotels.append(favLoc)
                 
+                self.locationStore.favoriteLocations = []
+                
                 self.firebaseManager.getHotelWithReviews(favLoc.locationID) { locModel in
                     
                     self.locationStore.favoriteLocations.append(locModel)

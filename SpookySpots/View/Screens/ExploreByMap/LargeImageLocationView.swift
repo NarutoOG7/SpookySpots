@@ -48,16 +48,12 @@ struct LargeImageLocationView: View {
     //MARK: - SubViews
 
     private var image: some View {
-        AsyncImage(url: self.imageURL) { image in
-            image
+        WebImage(url: imageURL)
                 .resizable()
                 .aspectRatio(0.9, contentMode: .fill)
                 .frame(width: UIScreen.main.bounds.width-20, height: UIScreen.main.bounds.height/3.2)
                 .cornerRadius(15)
                 .shadow(color: .black, radius: 3, x: 0, y: 1.5)
-        } placeholder: {
-            ProgressView()
-        }
     }
     
     

@@ -10,6 +10,9 @@ import SwiftUI
 struct ProfilePage: View {
     
     @ObservedObject var userStore: UserStore
+    @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var loginVM: LoginVM
+    
     var auth = Authorization.instance
     
     @State var wasEdited = false
@@ -17,35 +20,37 @@ struct ProfilePage: View {
     @State var displayNameInput = ""
     @State var emailInput = ""
     
-    @State var deleteAcctAlertShown = false
+    @State var confirmDeletePasswordInput = ""
     
-    @State private var shouldShowFirebaseError = false
-    @State private var firebaseErrorMessage = ""
-
+    @State var confirmDeleteAlertShouldShow = false
+    
     @Environment(\.dismiss) var dismiss
     
     let weenyWitch = K.Colors.WeenyWitch.self
     
     var body: some View {
-        VStack {
-            Spacer()
-            displayName
-            emailView
-            Spacer()
-            saveButton
-            Spacer()
-            deleteAcctButton
-            Spacer()
-        }
-        .background(weenyWitch.black)
-        /////MARK: - Delete Account Confirmation Alert
-        .alert("Are You Sure?", isPresented: $deleteAcctAlertShown) {
-            Button(role: .destructive, action: confirmDeleteTapped) {
-                Text("DELETE")
+        ZStack {
+            VStack {
+                Spacer()
+                displayName
+                emailView
+                Spacer()
+                saveButton
+                Spacer()
+                deleteAcctButton
+                Spacer()
             }
-            Button("CANCEL", role: .cancel) { }
+            .background(weenyWitch.black)
+            
+            if confirmDeleteAlertShouldShow {
+                ConfirmDeleteView(shouldShow: $confirmDeleteAlertShouldShow,
+                                  loginVM: loginVM,
+                                  errorManager: errorManager)
+            }
+            
+                
+            
         }
-        
         .navigationTitle("Profile")
     }
     
@@ -63,6 +68,7 @@ struct ProfilePage: View {
                             .font(.avenirNext(size: 24))
 
                     }
+                    .tint(weenyWitch.orange)
                     .foregroundColor(weenyWitch.lightest)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
@@ -86,6 +92,7 @@ struct ProfilePage: View {
                             .foregroundColor(weenyWitch.lightest)
                             .font(.avenirNext(size: 24))
                     }
+                    .tint(weenyWitch.orange)
                     .foregroundColor(weenyWitch.lightest)
                     .disableAutocorrection(true)
                     .textInputAutocapitalization(.never)
@@ -131,9 +138,9 @@ struct ProfilePage: View {
         
         auth.setCurrentUsersName(displayNameInput) { error in
             
-            self.shouldShowFirebaseError = true
+            errorManager.shouldDisplay = true
             
-            self.firebaseErrorMessage = error.message()
+            errorManager.message = error.message()
     
         }
         self.dismiss.callAsFunction()
@@ -141,29 +148,19 @@ struct ProfilePage: View {
     
     
     private func deleteAcctTapped() {
-        self.deleteAcctAlertShown = true
+        self.confirmDeleteAlertShouldShow = true
     }
     
-    private func confirmDeleteTapped() {
-        
-        auth.deleteUserAccount { error in
-            
-            self.deleteAcctAlertShown = true
-            
-        } success: { result in
-            
-            if result == true {
-                
-            }
-        }
-    }
+
     
 }
 
 //MARK: - Preview
 struct ProfilePage_Previews: PreviewProvider {
     static var previews: some View {
-        ProfilePage(userStore: UserStore())
+        ProfilePage(userStore: UserStore(),
+                    errorManager: ErrorManager(),
+                    loginVM: LoginVM())
     }
 }
 

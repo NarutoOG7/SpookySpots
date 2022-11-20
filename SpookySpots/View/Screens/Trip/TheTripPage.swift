@@ -24,7 +24,7 @@ struct TheTripPage: View {
     @ObservedObject var locationStore: LocationStore
     @ObservedObject var errorManager: ErrorManager
     @ObservedObject var firebaseManager: FirebaseManager
-    
+        
     private let map = MapViewUI(mapIsForExplore: false)
     
     var body: some View {

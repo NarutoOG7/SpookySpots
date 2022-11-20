@@ -20,15 +20,15 @@ struct CreativeSignInUp: View {
     let weenyWitch = K.Colors.WeenyWitch.self
     
     @StateObject var signupVM = SignupVM.instance
-    @StateObject var loginVM = LoginVM.instance
     
+    @ObservedObject var loginVM: LoginVM
     @ObservedObject var userStore: UserStore
     @ObservedObject var errorManager: ErrorManager
 
     
     var body: some View {
         
-        GeometryReader { _ in
+        GeometryReader { geo in
             ZStack {
                 
                 VStack {
@@ -40,11 +40,13 @@ struct CreativeSignInUp: View {
                             
                             ZStack {
                                 SignUp(index: self.$index,
+                                       geo: geo,
                                        signupVM: signupVM,
                                        errorManager: errorManager)
                                 .zIndex(Double(self.index))
                                 
                                 LogIn(index: self.$index,
+                                      geo: geo,
                                       loginVM: loginVM,
                                       errorManager: errorManager)
                             }
@@ -133,7 +135,8 @@ struct CreativeSignInUp: View {
 //MARK: - Previews
 struct CreativeSignInUp_Previews: PreviewProvider {
     static var previews: some View {
-        CreativeSignInUp(userStore: UserStore(),
+        CreativeSignInUp(loginVM: LoginVM(),
+                         userStore: UserStore(),
                          errorManager: ErrorManager())
     }
 }

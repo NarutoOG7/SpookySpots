@@ -30,12 +30,12 @@ struct MainLocCell: View {
     }
     
     private var image: some View {
-        WebImage(url: self.imageURL)
-            .resizable()
-            .aspectRatio(0.9, contentMode: .fill)
-            .frame(width: 240, height: 270)
-            .cornerRadius(15)
-            .shadow(color: weenyWitch.black, radius: 3, x: 0, y: 1.5)
+        WebImage(url: imageURL)
+        .resizable()
+        .aspectRatio(0.9, contentMode: .fill)
+        .frame(width: 240, height: 270)
+        .cornerRadius(15)
+        .shadow(color: weenyWitch.black, radius: 3, x: 0, y: 1.5)
     }
     
     private var title: some View {

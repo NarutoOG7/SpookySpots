@@ -14,6 +14,8 @@ struct ChangeStartAndStop: View {
     @ObservedObject var viewModel: ChangeStartStopViewModel
     @ObservedObject var errorManager: ErrorManager
     
+    @ObservedObject var localSearchService = LocalSearchService.instance
+    
     let weenyWitch = K.Colors.WeenyWitch.self
     
     @Environment(\.dismiss) var dismiss
@@ -75,7 +77,7 @@ struct ChangeStartAndStop: View {
     }
     
     private var searchResultsList: some View {
-        List(viewModel.localSearchService.locationsList) { location in
+        List(localSearchService.locationsList) { location in
             Button(action: {
                 viewModel.locationChosen(location)
             }, label: {

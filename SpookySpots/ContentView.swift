@@ -13,15 +13,18 @@ struct ContentView: View {
         
     @StateObject var userStore = UserStore.instance
     @StateObject var errorManager = ErrorManager.instance
+    @StateObject var loginVM = LoginVM.instance
     
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 if userStore.isSignedIn {
                     TabBarSetup(userStore: userStore,
-                                errorManager: errorManager)
+                                errorManager: errorManager,
+                                loginVM: loginVM)
                 } else {
-                    CreativeSignInUp(userStore: userStore,
+                    CreativeSignInUp(loginVM: loginVM,
+                                     userStore: userStore,
                                      errorManager: errorManager)
                 }
                 
@@ -49,8 +52,7 @@ struct ContentView: View {
     }
     
     private var errorBanner: some View {
-        _ = K.Colors.WeenyWitch.self
-        return NotificationBanner(message: $errorManager.message,
+         NotificationBanner(message: $errorManager.message,
                                   isVisible: $errorManager.shouldDisplay,
                                   errorManager: errorManager)
 

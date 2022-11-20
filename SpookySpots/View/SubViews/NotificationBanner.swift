@@ -54,6 +54,7 @@ struct NotificationBanner: View {
         Text(message)
             .foregroundColor(.white)
             .font(.avenirNext(size: 18))
+            .multilineTextAlignment(.center)
     }
 }
 

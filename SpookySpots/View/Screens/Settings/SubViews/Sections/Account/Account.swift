@@ -18,6 +18,7 @@ struct Account: View {
     @ObservedObject var firebaseManager: FirebaseManager
     @ObservedObject var locationStore: LocationStore
     @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var loginVM: LoginVM
     
     var auth = Authorization.instance
     
@@ -27,20 +28,28 @@ struct Account: View {
         VStack {
             SettingsHeader(settingType: .account)
             List {
-                editProfile
-                manageReviews
-                sendPasswordResetButton
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(weenyWitch.black)
-                signOutButton
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(weenyWitch.black)
+                if userStore.isGuest {
+                    createAccountButton
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(weenyWitch.black)
+                } else {
+                    editProfile
+                    manageReviews
+                    sendPasswordResetButton
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(weenyWitch.black)
+                    
+                    signOutButton
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(weenyWitch.black)
+                }
             }
+            .modifier(DisabledScroll())
             .modifier(ClearListBackgroundMod())
 
             .listStyle(.plain)
             
-            .frame(height: 160)
+            .frame(height: userStore.isGuest ? 45 : 160)
         }
         /// //MARK: - Confirm Sign Out Alert
         .alert("Sign Out?", isPresented: $confirmSignOutAlertShown) {
@@ -59,6 +68,8 @@ struct Account: View {
         /////MARK: - Password Reset Alert
         .alert("Email Sent", isPresented: $passwordResetAlertShown) {
             Button("OK", role: .cancel) { }
+        } message: {
+            Text("Password reset sent out to \(userStore.user.email)")
         }
         /////MARK: - Firebase Error Alert
         .alert("Trouble with Firebase", isPresented: $firebaseErrorAlertShown) {
@@ -69,7 +80,9 @@ struct Account: View {
     }
     
     private var editProfile: some View {
-        NavigationLink(destination: ProfilePage(userStore: userStore)) {
+        NavigationLink(destination: ProfilePage(userStore: userStore,
+                                                errorManager: errorManager,
+                                                loginVM: loginVM)) {
             Text("Edit Profile")
                 .foregroundColor(weenyWitch.lighter)
                 .font(.avenirNext(size: 18))
@@ -110,7 +123,14 @@ struct Account: View {
                 .foregroundColor(weenyWitch.lighter)
         }
     }
-  
+
+    private var createAccountButton: some View {
+        Button(action: createAccountTapped) {
+            Text("Create Account")
+                .font(.avenirNext(size: 17))
+                .foregroundColor(weenyWitch.lighter)
+        }
+    }
     
     //MARK: - Methods
     
@@ -150,6 +170,12 @@ struct Account: View {
         }
     }
     
+    private func createAccountTapped() {
+        userStore.isSignedIn = false
+        userStore.user = User()
+        UserDefaults.standard.set(false, forKey: K.UserDefaults.isGuest)
+
+    }
 
 }
 
@@ -159,6 +185,7 @@ struct Account_Previews: PreviewProvider {
         Account(userStore: UserStore(),
                 firebaseManager: FirebaseManager(),
                 locationStore: LocationStore(),
-                errorManager: ErrorManager())
+                errorManager: ErrorManager(),
+                loginVM: LoginVM())
     }
 }

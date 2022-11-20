@@ -13,7 +13,10 @@ struct LogIn: View {
     
     @Binding var index: Int
     
+    let geo: GeometryProxy
+    
     let weenyWitch = K.Colors.WeenyWitch.self
+    let images = K.Images.Login.self
     
     @FocusState private var focusedField: Field?
     
@@ -21,38 +24,36 @@ struct LogIn: View {
     @ObservedObject var errorManager: ErrorManager
             
     var body: some View {
-        ZStack {
-        ZStack(alignment: .bottom) {
             
-            VStack {
-                
-                authTypeView
-                emptySpace
-                email
-                password
-                forgotPasswordButton
-                emptySpace
-            }
-            .padding()
-            .padding(.bottom, 65)
-            .background(weenyWitch.light)
-            .clipShape(CurvedShapeLeft())
-            .contentShape(CurvedShapeLeft())
-            .shadow(color: weenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
-            .onTapGesture(perform: authTypeLoginTapped)
-            .cornerRadius(45)
-            .padding(.horizontal, 20)
-            
-            loginButton
-        }
+                ZStack(alignment: .bottom) {
+                    
+                    VStack {
+                        
+                        authTypeView
+                        email
+                        password
+                        forgotPasswordButton
+                    }
+                    .padding()
+                    .padding(.bottom, 65)
+                    .background(weenyWitch.light)
+                    .clipShape(CurvedShapeLeft())
+                    .contentShape(CurvedShapeLeft())
+                    .shadow(color: weenyWitch.orange.opacity(0.3), radius: 5, x: 0, y: -5)
+                    .onTapGesture(perform: authTypeLoginTapped)
+                    .cornerRadius(45)
+                    .padding(.horizontal, 20)
+                    .frame(height: 475)
+                    
+                    loginButton
+                }
             
             
         .alert("Email Sent", isPresented: $loginVM.showingAlertPasswordReset) {
             Button("OK", role: .cancel) { }
         }
-            firebaseErrorBanner
     
-        }
+        
         .onSubmit {
             switch focusedField {
             case .email:
@@ -62,18 +63,6 @@ struct LogIn: View {
             default: break
             }
         }
-    }
-    
-    private var firebaseErrorBanner: some View {
-
-            NotificationBanner(message: $loginVM.firebaseErrorMessage,
-                               isVisible: $loginVM.shouldShowFirebaseError,
-                               errorManager: errorManager)
-            .task {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                    loginVM.shouldShowFirebaseError = false
-                }
-            }
     }
     
     private var authTypeView: some View {
@@ -104,7 +93,7 @@ struct LogIn: View {
             isSecured: .constant(false),
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
-            icon: Image(systemName: "envelope.fill"),
+            icon: images.email,
             placeholderText: "Email Address",
             errorMessage: loginVM.emailErrorMessage)
         .focused($focusedField, equals: .email)
@@ -119,19 +108,12 @@ struct LogIn: View {
             isSecured: $isSecured,
             primaryColor: weenyWitch.brown,
             accentColor: weenyWitch.lightest,
-            icon: Image(systemName: isSecured ? "eye.slash.fill" : "eye"),
+            icon: isSecured ? images.eyeWithSlash : images.eye,
             placeholderText: "Password",
             errorMessage: loginVM.passwordErrorMessage,
             canSecure: true)
         .focused($focusedField, equals: .password)
         .submitLabel(.done)
-    }
-
-    
-    private var emptySpace: some View {
-        Rectangle()
-            .fill(Color.clear)
-            .frame(width: 100, height: 36.25)
     }
     
     //MARK: - Buttons
@@ -151,7 +133,7 @@ struct LogIn: View {
     }
     
     private var loginButton: some View {
-        Button(action: loginVM.loginTapped) {
+        Button(action: self.loginTapped) {
             Text("LOGIN")
                 .foregroundColor(weenyWitch.brown)
                 .font(.avenirNext(size: 20))
@@ -173,6 +155,10 @@ struct LogIn: View {
     private func authTypeLoginTapped() {
         self.index = 0
     }
+    
+    private func loginTapped() {
+        loginVM.loginTapped()
+    }
 
 
     //MARK: - Field
@@ -184,9 +170,12 @@ struct LogIn: View {
 //MARK: - Previews
 struct LogIn_Previews: PreviewProvider {
     static var previews: some View {
-        LogIn(index: .constant(0),
-              loginVM: LoginVM(),
-              errorManager: ErrorManager())
+        GeometryReader { geo in
+            LogIn(index: .constant(0),
+                  geo: geo,
+                  loginVM: LoginVM(),
+                  errorManager: ErrorManager())
+        }
     }
 }
 
@@ -195,7 +184,7 @@ struct CurvedShapeLeft : Shape {
     
     func path(in rect: CGRect) -> Path {
         return Path { path in
-            path.move(to: CGPoint(x: rect.width, y: 120))
+            path.move(to: CGPoint(x: rect.width, y: 125))
             path.addLine(to: CGPoint(x: rect.width, y: rect.height))
             path.addLine(to: CGPoint(x: 0, y: rect.height))
             path.addLine(to: CGPoint(x: 0, y: 0))

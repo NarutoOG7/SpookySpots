@@ -33,10 +33,11 @@ struct FavoritesCell: View {
     }
     
     private var image: some View {
-        WebImage(url: self.imageURL)
-            .resizable()
-            .cornerRadius(15)
-            .shadow(color: .black, radius: 3, x: 0, y: 1.5)
+        WebImage(url: imageURL)
+                .resizable()
+                .cornerRadius(15)
+                .shadow(color: .black, radius: 3, x: 0, y: 1.5)
+        
     }
     
     private var title: some View {

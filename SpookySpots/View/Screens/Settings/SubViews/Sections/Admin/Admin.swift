@@ -33,6 +33,8 @@ struct Admin: View {
                     .listRowBackground(weenyWitch.black)
             }
             .modifier(ClearListBackgroundMod())
+            .modifier(DisabledScroll())
+
             .frame(minHeight: 50)
             .listStyle(.plain)
         }

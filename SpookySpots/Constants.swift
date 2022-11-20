@@ -125,14 +125,31 @@ enum K {
             static let currentLocationIconWithDots = Image("CurrentLocationMarker.WithDots.orange")
             static let lastDestinationIcon = Image("DestinationPin.WithDots.TopSide.orange")
             static let destinationIcon = Image("DestinationPin.WithDots.bothSides.orange")
+            static let directions = Image(systemName:"arrow.triangle.turn.up.right.diamond.fill")
         }
+        enum Favorites {
+            static let imageDisplayOption = Image(systemName: "square.split.1x2.fill")
+            static let list = Image(systemName: "list.bullet")
+        }
+        
+        enum Login {
+            static let email = Image(systemName: "envelope.fill")
+            static let eyeWithSlash = Image(systemName: "eye.slash.fill")
+            static let eye = Image(systemName: "eye")
+        }
+        
         static let splashOne = Image("SplashOne")
         static let splashTwo = Image("SplashTwo")
         static let logo = Image("Logo")
         static let paperBackground = Image("PaperBackground")
-        static let directions = Image(systemName:"arrow.triangle.turn.up.right.diamond.fill")
         static let share = Image(systemName: "square.and.arrow.up")
         static let placeholder = Image("placeholder")
-        
+    }
+    
+    //MARK: - UserDefaults
+    
+    enum UserDefaults {
+        static let user = "user"
+        static let isGuest = "isGuest"
     }
 }

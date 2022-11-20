@@ -27,7 +27,7 @@ class UserStore: ObservableObject {
         }
     }
     
-    @Published var isGuest = false
+    @Published var isGuest = UserDefaults.standard.bool(forKey: "isGuest")
     @Published var isSignedIn = UserDefaults.standard.bool(forKey: "signedIn")
     @Published var reviews: [ReviewModel] = []
     @Published var selectedLocationDistanceToUser: Double = 0

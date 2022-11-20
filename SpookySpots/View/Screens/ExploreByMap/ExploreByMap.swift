@@ -155,7 +155,7 @@ struct ExploreByMap: View {
     
     private var listButton: some View {
         CircleButton(size: .small,
-                     image: Image(systemName: "list.bullet"),
+                     image: K.Images.Favorites.list,
                      mainColor: K.Colors.WeenyWitch.brown,
                      accentColor: K.Colors.WeenyWitch.lightest,
                      clicked: listButtonPressed)

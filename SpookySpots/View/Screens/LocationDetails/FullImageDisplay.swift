@@ -18,10 +18,14 @@ struct FullImageDisplay: View {
     
     private var imageCollection: some View {
         ForEach(location.imageURLs, id: \.self) { url in
-            WebImage(url: url)
-                .resizable()
-                .frame(width: UIScreen.main.bounds.width)
-                .aspectRatio(1, contentMode: .fit)
+            AsyncImage(url: url) { image in
+                image
+                    .resizable()
+                    .frame(width: UIScreen.main.bounds.width)
+                    .aspectRatio(1, contentMode: .fit)
+            } placeholder: {
+                ProgressView()
+            }
         }
     }
 }

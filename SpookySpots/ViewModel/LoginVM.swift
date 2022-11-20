@@ -19,18 +19,17 @@ class LoginVM: ObservableObject {
     //MARK: - Error Message Helpers
     @Published var shouldShowEmailErrorMessage = false
     @Published var shouldShowPasswordErrorMessage = false
-    @Published var shouldShowFirebaseError = false
 
     @Published var emailErrorMessage = ""
     @Published var passwordErrorMessage = ""
-    @Published var firebaseErrorMessage = ""
     
     @ObservedObject var network = NetworkManager.instance
+    @ObservedObject var errorManager = ErrorManager.instance
 
     var auth = Authorization()
 
 
-    func loginTapped() {
+    func loginTapped(withCompletion completion: @escaping(Bool) -> Void = {_ in}) {
         
         guard isConnectedToNetwork() else {
             setErrorMessage(.firebase, message: "Please check your network connection and try again.")
@@ -41,10 +40,14 @@ class LoginVM: ObservableObject {
         
         if fieldsAreFilled() {
             
-            auth.signIn(email: emailInput,
-                        password: passwordInput) { error in
+            auth.signIn(email: emailInput, password: passwordInput) { success in
+                if success {
+                    completion(true)
+                }
+            } error: { error in
                 self.handleError(error)
             }
+
         }
     }
     
@@ -64,7 +67,8 @@ class LoginVM: ObservableObject {
             
             if error == .firebaseTrouble {
                 
-                self.shouldShowFirebaseError = true
+                self.errorManager.shouldDisplay = true
+                
             }
         }
     }
@@ -113,8 +117,8 @@ class LoginVM: ObservableObject {
             self.shouldShowPasswordErrorMessage = true
             
         default:
-            self.firebaseErrorMessage = message
-            self.shouldShowFirebaseError = true
+            errorManager.message = message
+            errorManager.shouldDisplay = true
             
         }
     }

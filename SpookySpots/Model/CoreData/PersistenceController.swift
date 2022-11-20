@@ -24,7 +24,8 @@ struct PersistenceController {
         container = NSPersistentContainer(name: "TripCDModel")
         container.loadPersistentStores { description, error in
             if let error = error {
-                fatalError("Error: \(error.localizedDescription)")
+                ErrorManager.instance.message = error.localizedDescription
+                ErrorManager.instance.shouldDisplay = true
             }
         }
         

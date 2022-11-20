@@ -19,6 +19,7 @@ struct SettingsPage: View {
     @ObservedObject var locationStore: LocationStore
     @ObservedObject var firebaseManager: FirebaseManager
     @ObservedObject var errorManager: ErrorManager
+    @ObservedObject var loginVM: LoginVM
     
     var auth = Authorization.instance
     
@@ -30,12 +31,13 @@ struct SettingsPage: View {
                     Account(userStore: userStore,
                             firebaseManager: firebaseManager,
                             locationStore: locationStore,
-                            errorManager: errorManager)
+                            errorManager: errorManager,
+                            loginVM: loginVM)
                     About()
                     Admin(userStore: userStore,
                           locationStore: locationStore)
                     addLocationView
-                        .padding(.top, -30)
+                        .padding(.top, -15)
                 }
             .padding(.vertical, 30)
             .navigationTitle("Settings")
@@ -74,7 +76,8 @@ struct SettingsPage_Previews: PreviewProvider {
             SettingsPage(userStore: UserStore(),
                          locationStore: LocationStore(),
                          firebaseManager: FirebaseManager(),
-                         errorManager: ErrorManager())
+                         errorManager: ErrorManager(),
+                         loginVM: LoginVM())
         }
     }
 }
