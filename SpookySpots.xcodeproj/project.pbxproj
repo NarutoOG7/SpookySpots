@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		76B46F8EFBE36A7A56A19BF2 /* Pods_SpookySpotsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1045941F6DF120A541BD258D /* Pods_SpookySpotsTests.framework */; };
-		8AAC04B06C95F4A0ACDA9E34 /* Pods_SpookySpots_SpookySpotsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C080B1CFC246A0DFBDB4106B /* Pods_SpookySpots_SpookySpotsUITests.framework */; };
-		A8874B18C2309F93303D8C02 /* Pods_SpookySpots.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC76E2FFECCDCA9ACE2BDDA9 /* Pods_SpookySpots.framework */; };
+		0F5156EEAA3D633E3616699D /* Pods_SpookySpots.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 838B7197ABC89A69D9CA4E0B /* Pods_SpookySpots.framework */; };
+		41E0EDD1EC2DF5F534E8D55F /* Pods_SpookySpotsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 227E3D1086368C6DF0FB1409 /* Pods_SpookySpotsTests.framework */; };
+		BB01887F02FA336B6F9D2845 /* Pods_SpookySpots_SpookySpotsUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA761D18655D9613D966BBA3 /* Pods_SpookySpots_SpookySpotsUITests.framework */; };
 		C9087BE82809AC1D00372502 /* SettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9087BE72809AC1D00372502 /* SettingsPage.swift */; };
 		C9187F39280A8C550064627C /* Favorites.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F38280A8C550064627C /* Favorites.swift */; };
 		C9187F3B280AFB520064627C /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9187F3A280AFB520064627C /* Account.swift */; };
@@ -91,7 +91,6 @@
 		C9A8CA6227ED7DDE00116B61 /* SlideOverCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6127ED7DDE00116B61 /* SlideOverCard.swift */; };
 		C9A8CA6727ED7EA400116B61 /* CircularButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6627ED7EA400116B61 /* CircularButton.swift */; };
 		C9A8CA6927ED7F1000116B61 /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A8CA6827ED7F1000116B61 /* ExploreViewModel.swift */; };
-		C9A8CA7027ED800900116B61 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = C9A8CA6F27ED800900116B61 /* SDWebImageSwiftUI */; };
 		C9A8CA7227ED826500116B61 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C9A8CA7127ED826500116B61 /* GoogleService-Info.plist */; };
 		C9A9CEEB2819A08C00D4A1F9 /* LD.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A9CEEA2819A08C00D4A1F9 /* LD.swift */; };
 		C9A9CEF0281BA03800D4A1F9 /* Custom Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9A9CEEF281BA03800D4A1F9 /* Custom Fonts.swift */; };
@@ -123,6 +122,7 @@
 		C9FC76D728149AA1005777AF /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76D628149AA1005777AF /* Constants.swift */; };
 		C9FC76D928149ECF005777AF /* DatabaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76D828149ECF005777AF /* DatabaseView.swift */; };
 		C9FC76DB2814EFE3005777AF /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FC76DA2814EFE3005777AF /* Trip.swift */; };
+		FFB9410E2AED7A9500847971 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = FFB9410D2AED7A9500847971 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,13 +143,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1045941F6DF120A541BD258D /* Pods_SpookySpotsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpotsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		435461CA08197679A2463ACA /* Pods-SpookySpotsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpotsTests.debug.xcconfig"; path = "Target Support Files/Pods-SpookySpotsTests/Pods-SpookySpotsTests.debug.xcconfig"; sourceTree = "<group>"; };
-		55D0426BFF2742F7B7CC6ED9 /* Pods-SpookySpots.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots.debug.xcconfig"; path = "Target Support Files/Pods-SpookySpots/Pods-SpookySpots.debug.xcconfig"; sourceTree = "<group>"; };
-		57B6433C7649D0A19E873DE4 /* Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig"; path = "Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig"; sourceTree = "<group>"; };
-		7A834B86C411430A716ACFF8 /* Pods-SpookySpotsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpotsTests.release.xcconfig"; path = "Target Support Files/Pods-SpookySpotsTests/Pods-SpookySpotsTests.release.xcconfig"; sourceTree = "<group>"; };
-		A9F8889D78EF0D4527820B69 /* Pods-SpookySpots-SpookySpotsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots-SpookySpotsUITests.release.xcconfig"; path = "Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests.release.xcconfig"; sourceTree = "<group>"; };
-		C080B1CFC246A0DFBDB4106B /* Pods_SpookySpots_SpookySpotsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpots_SpookySpotsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		227E3D1086368C6DF0FB1409 /* Pods_SpookySpotsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpotsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A5905171FFF6509E0B61ABC /* Pods-SpookySpots-SpookySpotsUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots-SpookySpotsUITests.release.xcconfig"; path = "Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests.release.xcconfig"; sourceTree = "<group>"; };
+		337D7168D583222BBEF37EFC /* Pods-SpookySpotsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpotsTests.release.xcconfig"; path = "Target Support Files/Pods-SpookySpotsTests/Pods-SpookySpotsTests.release.xcconfig"; sourceTree = "<group>"; };
+		6CFEC5088AE60C76BEE74036 /* Pods-SpookySpotsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpotsTests.debug.xcconfig"; path = "Target Support Files/Pods-SpookySpotsTests/Pods-SpookySpotsTests.debug.xcconfig"; sourceTree = "<group>"; };
+		838B7197ABC89A69D9CA4E0B /* Pods_SpookySpots.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpots.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		849927482640D17B4BBC30D3 /* Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig"; path = "Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		88720DD7B4E8E5D1DDDB4C55 /* Pods-SpookySpots.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots.release.xcconfig"; path = "Target Support Files/Pods-SpookySpots/Pods-SpookySpots.release.xcconfig"; sourceTree = "<group>"; };
 		C9087BE72809AC1D00372502 /* SettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPage.swift; sourceTree = "<group>"; };
 		C9187F38280A8C550064627C /* Favorites.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorites.swift; sourceTree = "<group>"; };
 		C9187F3A280AFB520064627C /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
@@ -266,8 +266,8 @@
 		C9FC76D628149AA1005777AF /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C9FC76D828149ECF005777AF /* DatabaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseView.swift; sourceTree = "<group>"; };
 		C9FC76DA2814EFE3005777AF /* Trip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trip.swift; sourceTree = "<group>"; };
-		E53B0095E74CC9BCF80AFF55 /* Pods-SpookySpots.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots.release.xcconfig"; path = "Target Support Files/Pods-SpookySpots/Pods-SpookySpots.release.xcconfig"; sourceTree = "<group>"; };
-		FC76E2FFECCDCA9ACE2BDDA9 /* Pods_SpookySpots.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpots.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF83C9C964947077C09EDB96 /* Pods-SpookySpots.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SpookySpots.debug.xcconfig"; path = "Target Support Files/Pods-SpookySpots/Pods-SpookySpots.debug.xcconfig"; sourceTree = "<group>"; };
+		FA761D18655D9613D966BBA3 /* Pods_SpookySpots_SpookySpotsUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SpookySpots_SpookySpotsUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,10 +275,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C9A8CA7027ED800900116B61 /* SDWebImageSwiftUI in Frameworks */,
+				FFB9410E2AED7A9500847971 /* SDWebImageSwiftUI in Frameworks */,
 				C9D36C622808F32800C9AFAF /* MapKit.framework in Frameworks */,
-				A8874B18C2309F93303D8C02 /* Pods_SpookySpots.framework in Frameworks */,
 				C9D36C642808F34300C9AFAF /* AudioToolbox.framework in Frameworks */,
+				0F5156EEAA3D633E3616699D /* Pods_SpookySpots.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,7 +286,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				76B46F8EFBE36A7A56A19BF2 /* Pods_SpookySpotsTests.framework in Frameworks */,
+				41E0EDD1EC2DF5F534E8D55F /* Pods_SpookySpotsTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,21 +294,34 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8AAC04B06C95F4A0ACDA9E34 /* Pods_SpookySpots_SpookySpotsUITests.framework in Frameworks */,
+				BB01887F02FA336B6F9D2845 /* Pods_SpookySpots_SpookySpotsUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		71C6835F2D3F56BCC50B8701 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DF83C9C964947077C09EDB96 /* Pods-SpookySpots.debug.xcconfig */,
+				88720DD7B4E8E5D1DDDB4C55 /* Pods-SpookySpots.release.xcconfig */,
+				849927482640D17B4BBC30D3 /* Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig */,
+				2A5905171FFF6509E0B61ABC /* Pods-SpookySpots-SpookySpotsUITests.release.xcconfig */,
+				6CFEC5088AE60C76BEE74036 /* Pods-SpookySpotsTests.debug.xcconfig */,
+				337D7168D583222BBEF37EFC /* Pods-SpookySpotsTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		A4BF464B9D328BC1AE0BECAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				C9D36C632808F34300C9AFAF /* AudioToolbox.framework */,
 				C9D36C612808F32800C9AFAF /* MapKit.framework */,
-				FC76E2FFECCDCA9ACE2BDDA9 /* Pods_SpookySpots.framework */,
-				C080B1CFC246A0DFBDB4106B /* Pods_SpookySpots_SpookySpotsUITests.framework */,
-				1045941F6DF120A541BD258D /* Pods_SpookySpotsTests.framework */,
+				838B7197ABC89A69D9CA4E0B /* Pods_SpookySpots.framework */,
+				FA761D18655D9613D966BBA3 /* Pods_SpookySpots_SpookySpotsUITests.framework */,
+				227E3D1086368C6DF0FB1409 /* Pods_SpookySpotsTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -493,8 +506,8 @@
 				C92DB77E28A83678009B7646 /* Logo.png */,
 				C9A8C9ED27ED621000116B61 /* SpookySpots */,
 				C9A8C9EC27ED621000116B61 /* Products */,
-				DBCE3EF4CE4A5617310DB5A3 /* Pods */,
 				A4BF464B9D328BC1AE0BECAB /* Frameworks */,
+				71C6835F2D3F56BCC50B8701 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -763,19 +776,6 @@
 			path = Favorites;
 			sourceTree = "<group>";
 		};
-		DBCE3EF4CE4A5617310DB5A3 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				55D0426BFF2742F7B7CC6ED9 /* Pods-SpookySpots.debug.xcconfig */,
-				E53B0095E74CC9BCF80AFF55 /* Pods-SpookySpots.release.xcconfig */,
-				57B6433C7649D0A19E873DE4 /* Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig */,
-				A9F8889D78EF0D4527820B69 /* Pods-SpookySpots-SpookySpotsUITests.release.xcconfig */,
-				435461CA08197679A2463ACA /* Pods-SpookySpotsTests.debug.xcconfig */,
-				7A834B86C411430A716ACFF8 /* Pods-SpookySpotsTests.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -783,11 +783,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C9A8CA0F27ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpots" */;
 			buildPhases = (
-				066C5BE9E4546593336B94D9 /* [CP] Check Pods Manifest.lock */,
+				90D0BCDA00FCD7874B98AEE1 /* [CP] Check Pods Manifest.lock */,
 				C9A8C9E727ED621000116B61 /* Sources */,
 				C9A8C9E827ED621000116B61 /* Frameworks */,
 				C9A8C9E927ED621000116B61 /* Resources */,
-				828DC2CBADC2A15D2696062C /* [CP] Embed Pods Frameworks */,
+				0BAB0510498C3F4DBD906BD3 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -795,7 +795,7 @@
 			);
 			name = SpookySpots;
 			packageProductDependencies = (
-				C9A8CA6F27ED800900116B61 /* SDWebImageSwiftUI */,
+				FFB9410D2AED7A9500847971 /* SDWebImageSwiftUI */,
 			);
 			productName = SpookySpots;
 			productReference = C9A8C9EB27ED621000116B61 /* SpookySpots.app */;
@@ -805,7 +805,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C9A8CA1227ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpotsTests" */;
 			buildPhases = (
-				363A103C3E8C3898BB3D3C62 /* [CP] Check Pods Manifest.lock */,
+				A52DEBB04962E513BE4097BF /* [CP] Check Pods Manifest.lock */,
 				C9A8C9F727ED621000116B61 /* Sources */,
 				C9A8C9F827ED621000116B61 /* Frameworks */,
 				C9A8C9F927ED621000116B61 /* Resources */,
@@ -824,11 +824,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C9A8CA1527ED621100116B61 /* Build configuration list for PBXNativeTarget "SpookySpotsUITests" */;
 			buildPhases = (
-				03ABFBDE26C0B56036B61BA1 /* [CP] Check Pods Manifest.lock */,
+				0108B0C53115B8A7ED899FC3 /* [CP] Check Pods Manifest.lock */,
 				C9A8CA0127ED621100116B61 /* Sources */,
 				C9A8CA0227ED621100116B61 /* Frameworks */,
 				C9A8CA0327ED621100116B61 /* Resources */,
-				5D1CB40808B463D2EF32CDFC /* [CP] Embed Pods Frameworks */,
+				10FECA01CDC15AC9ABB764D7 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -873,7 +873,7 @@
 			);
 			mainGroup = C9A8C9E227ED621000116B61;
 			packageReferences = (
-				C9A8CA6E27ED800900116B61 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				FFB9410C2AED7A9400847971 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = C9A8C9EC27ED621000116B61 /* Products */;
 			projectDirPath = "";
@@ -918,7 +918,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		03ABFBDE26C0B56036B61BA1 /* [CP] Check Pods Manifest.lock */ = {
+		0108B0C53115B8A7ED899FC3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -940,7 +940,41 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		066C5BE9E4546593336B94D9 /* [CP] Check Pods Manifest.lock */ = {
+		0BAB0510498C3F4DBD906BD3 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots/Pods-SpookySpots-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots/Pods-SpookySpots-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpookySpots/Pods-SpookySpots-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		10FECA01CDC15AC9ABB764D7 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		90D0BCDA00FCD7874B98AEE1 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -962,7 +996,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		363A103C3E8C3898BB3D3C62 /* [CP] Check Pods Manifest.lock */ = {
+		A52DEBB04962E513BE4097BF /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -982,40 +1016,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5D1CB40808B463D2EF32CDFC /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpookySpots-SpookySpotsUITests/Pods-SpookySpots-SpookySpotsUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		828DC2CBADC2A15D2696062C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots/Pods-SpookySpots-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SpookySpots/Pods-SpookySpots-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SpookySpots/Pods-SpookySpots-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1212,7 +1212,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = SpookySpots/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1267,7 +1267,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = SpookySpots/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1279,19 +1279,22 @@
 		};
 		C9A8CA1027ED621100116B61 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 55D0426BFF2742F7B7CC6ED9 /* Pods-SpookySpots.debug.xcconfig */;
+			baseConfigurationReference = DF83C9C964947077C09EDB96 /* Pods-SpookySpots.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = SpookySpots/SpookySpots.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SpookySpots/Preview Content\"";
-				DEVELOPMENT_TEAM = S9WALA6A8N;
+				DEVELOPMENT_TEAM = Q4449HJNAM;
 				ENABLE_PREVIEWS = YES;
+				GCC_NO_COMMON_BLOCKS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SpookySpots/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spooky Spots";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show you nearby Spooky Spots.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1299,13 +1302,15 @@
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpots;
+				PRODUCT_BUNDLE_IDENTIFIER = com.konohaKoders.SpookySpots;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1317,19 +1322,22 @@
 		};
 		C9A8CA1127ED621100116B61 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E53B0095E74CC9BCF80AFF55 /* Pods-SpookySpots.release.xcconfig */;
+			baseConfigurationReference = 88720DD7B4E8E5D1DDDB4C55 /* Pods-SpookySpots.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = SpookySpots/SpookySpots.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SpookySpots/Preview Content\"";
-				DEVELOPMENT_TEAM = S9WALA6A8N;
+				DEVELOPMENT_TEAM = Q4449HJNAM;
 				ENABLE_PREVIEWS = YES;
+				GCC_NO_COMMON_BLOCKS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SpookySpots/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spooky Spots";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We need your location to show you nearby Spooky Spots.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -1337,13 +1345,15 @@
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = beltonS.SpookySpots;
+				PRODUCT_BUNDLE_IDENTIFIER = com.konohaKoders.SpookySpots;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1355,7 +1365,7 @@
 		};
 		C9A8CA1327ED621100116B61 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 435461CA08197679A2463ACA /* Pods-SpookySpotsTests.debug.xcconfig */;
+			baseConfigurationReference = 6CFEC5088AE60C76BEE74036 /* Pods-SpookySpotsTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1376,7 +1386,7 @@
 		};
 		C9A8CA1427ED621100116B61 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7A834B86C411430A716ACFF8 /* Pods-SpookySpotsTests.release.xcconfig */;
+			baseConfigurationReference = 337D7168D583222BBEF37EFC /* Pods-SpookySpotsTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1397,7 +1407,7 @@
 		};
 		C9A8CA1627ED621100116B61 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57B6433C7649D0A19E873DE4 /* Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig */;
+			baseConfigurationReference = 849927482640D17B4BBC30D3 /* Pods-SpookySpots-SpookySpotsUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1416,7 +1426,7 @@
 		};
 		C9A8CA1727ED621100116B61 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9F8889D78EF0D4527820B69 /* Pods-SpookySpots-SpookySpotsUITests.release.xcconfig */;
+			baseConfigurationReference = 2A5905171FFF6509E0B61ABC /* Pods-SpookySpots-SpookySpotsUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -1475,7 +1485,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		C9A8CA6E27ED800900116B61 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+		FFB9410C2AED7A9400847971 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
 			requirement = {
@@ -1486,9 +1496,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		C9A8CA6F27ED800900116B61 /* SDWebImageSwiftUI */ = {
+		FFB9410D2AED7A9500847971 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C9A8CA6E27ED800900116B61 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			package = FFB9410C2AED7A9400847971 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */

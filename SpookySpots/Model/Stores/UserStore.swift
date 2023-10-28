@@ -33,9 +33,5 @@ class UserStore: ObservableObject {
     @Published var selectedLocationDistanceToUser: Double = 0
     @Published var trip: Trip?
     @Published var user = User()
-    
-
-
-    
 
 }

@@ -7,12 +7,11 @@ target 'SpookySpots' do
 
   # Pods for SpookySpots
 
-
-pod 'GeoFire'
-pod 'FirebaseAuth'
-pod 'FirebaseFirestore'
-pod 'FirebaseStorage'
-pod "MapKitGoogleStyler"
+  pod 'GeoFire'
+  pod 'FirebaseAuth'
+  pod 'FirebaseFirestore'
+  pod 'FirebaseStorage'
+  pod "MapKitGoogleStyler"
 
 
   target 'SpookySpotsTests' do

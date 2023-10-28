@@ -24,7 +24,7 @@ class LocalSearchService: ObservableObject {
         searchRequest.naturalLanguageQuery = text
         searchRequest.pointOfInterestFilter = .includingAll
         searchRequest.resultTypes = .pointOfInterest
-        
+
         let search = MKLocalSearch(request: searchRequest)
         
         search.start { (response, error) in

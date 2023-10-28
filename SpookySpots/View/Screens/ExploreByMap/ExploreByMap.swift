@@ -85,6 +85,7 @@ struct ExploreByMap: View {
                                 exploreVM.displayedLocation = location
                                 self.shouldNavigate = true
                             }
+                        
                             .gesture(
                                 DragGesture(minimumDistance: 3.0,
                                             coordinateSpace: .local)

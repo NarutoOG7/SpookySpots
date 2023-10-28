@@ -36,7 +36,7 @@ struct About: View {
     
     private var privacyPolicy: some View {
         let view: AnyView
-        if let url = URL(string: "https://pages.flycricket.io/spookyspots/privacy.html") {
+        if let url = URL(string: "https://doc-hosting.flycricket.io/spooky-spots-privacy-policy/0096733e-b02e-474a-912b-06e79004a9c1/privacy") {
             view = AnyView(
                 Link(destination: url, label: {
                     Text("Privacy Policy")
@@ -52,7 +52,7 @@ struct About: View {
     
     private var termsOfUse: some View {
         let view: AnyView
-        if let url = URL(string: "https://pages.flycricket.io/spookyspots/terms.html") {
+        if let url = URL(string: "https://doc-hosting.flycricket.io/spooky-spots-terms-of-use/6b6e5fcf-ebfd-489d-b081-b76c50d8c615/terms") {
             view = AnyView(
                 Link(destination: url, label: {
                     Text("Terms Of Use")

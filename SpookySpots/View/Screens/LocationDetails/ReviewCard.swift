@@ -44,7 +44,7 @@ struct ReviewCard: View {
             .font(.avenirNext(size: 17))
             .fontWeight(.light)
             .foregroundColor(weenyWitch.brown)
-            .fixedSize(horizontal: true, vertical: false)
+//            .fixedSize(horizontal: true, vertical: false)
     }
     
     var name: some View {
