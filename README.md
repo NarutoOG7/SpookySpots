@@ -18,3 +18,7 @@ Spooky Spots invites you to embark on a chilling journey to discover haunted hot
   - Share your haunting experiences and insights by leaving reviews and ratings for each visited location.
 - User-Generated Content:
   - Contribute to the Spooky Spots community by adding new haunted hotels and sharing your own ghostly encounters.
+
+## Tech Stack
+
+SwiftUI, MapKit, Firebase, GeoFire, CoreData
